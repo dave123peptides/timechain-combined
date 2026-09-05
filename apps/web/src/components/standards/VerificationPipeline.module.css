@@ -1,0 +1,175 @@
+.section {
+  padding: 5rem 0;
+  color: var(--paper);
+  background-image:
+    radial-gradient(44rem 26rem at 90% -15%, rgba(41, 82, 227, 0.2), transparent 65%),
+    linear-gradient(180deg, #101116 0%, #14151a 100%);
+}
+
+/* Split head: display line left, supporting paragraph right (the
+   reference's arrangement). */
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 2rem 4rem;
+  align-items: start;
+  margin-bottom: 3rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--paper);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.title {
+  margin-top: 1.25rem;
+  color: var(--paper);
+  font-size: var(--text-3xl);
+}
+
+.accent {
+  color: var(--gold);
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+  text-decoration-color: color-mix(in srgb, var(--gold) 65%, transparent);
+}
+
+.headBody {
+  padding-top: 0.5rem;
+  color: color-mix(in srgb, var(--paper) 68%, transparent);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.card,
+.cardHighlight {
+  position: relative;
+  border-radius: calc(var(--radius) + 4px);
+  padding: 1.6rem 1.6rem 1.75rem;
+}
+
+.card {
+  background: color-mix(in srgb, var(--paper) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--paper) 12%, transparent);
+}
+
+.cardHighlight {
+  background: var(--gold);
+  border: 1px solid var(--gold);
+}
+
+.number {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--paper) 45%, transparent);
+}
+
+.cardHighlight .number {
+  color: color-mix(in srgb, var(--paper) 75%, transparent);
+}
+
+.icon {
+  display: inline-flex;
+  margin-top: 0.9rem;
+  padding: 0.45rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--paper) 16%, transparent);
+  color: var(--gold);
+}
+
+.cardHighlight .icon {
+  border-color: color-mix(in srgb, var(--paper) 40%, transparent);
+  color: var(--paper);
+}
+
+.cardTitle {
+  margin-top: 0.9rem;
+  font-size: var(--text-base);
+  color: var(--paper);
+}
+
+.highlightStat {
+  margin-top: 0.9rem;
+}
+
+.stat {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-3xl);
+  line-height: 1;
+  color: var(--paper);
+}
+
+.statLabel {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 80%, transparent);
+}
+
+.cardBody {
+  margin-top: 0.55rem;
+  font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--paper) 62%, transparent);
+}
+
+.cardHighlight .cardBody {
+  color: color-mix(in srgb, var(--paper) 88%, transparent);
+}
+
+.footnote {
+  margin-top: 2rem;
+  font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--paper) 45%, transparent);
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 780px) {
+  .head {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding: 3.5rem 0;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

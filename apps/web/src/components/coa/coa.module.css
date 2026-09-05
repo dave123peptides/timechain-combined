@@ -1,0 +1,146 @@
+/* Certificate cards, shared by the PDP Lab report tab and /coa.
+   Border-based like the rest of the site (see globals.css's shadow
+   note); the accent carries the icon and the outline pill. */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  padding: 1.5rem 1.1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition: border-color 150ms ease;
+}
+
+.card:hover {
+  border-color: var(--gold);
+}
+
+.cardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 0.4rem;
+  border-radius: 10px;
+  background: var(--gold-pale);
+  color: var(--gold-deep);
+}
+
+.cardTitle {
+  font-size: var(--text-lg);
+  line-height: 1.2;
+}
+
+.cardTitle a:hover {
+  color: var(--gold-deep);
+}
+
+.cardSubtitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cardDate {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.cardMeta {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.cardButton {
+  margin-top: 0.85rem;
+  padding: 0.55rem 1.25rem;
+  font-size: var(--text-xs);
+}
+
+.cardLot {
+  margin-top: 0.5rem;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.cardTests {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
+
+.cardVerify {
+  margin-top: 0.25rem;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--gold-deep);
+  text-decoration: underline;
+}
+
+/* --- earlier lots ----------------------------------------------------- */
+
+.earlier {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.earlierSummary {
+  cursor: pointer;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  list-style: none;
+}
+
+.earlierSummary::-webkit-details-marker {
+  display: none;
+}
+
+.earlierSummary::after {
+  content: " +";
+}
+
+.earlier[open] .earlierSummary::after {
+  content: " −";
+}
+
+.earlierList {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.earlierList a {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+}
+
+.earlierList a:hover {
+  color: var(--gold-deep);
+  text-decoration-color: currentColor;
+}

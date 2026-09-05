@@ -1,0 +1,41 @@
+/* Moved verbatim out of shop/[slug]/sections.module.css (minus the `faq`
+   prefix) when the accordion was extracted for reuse on the homepage and
+   /faq. Rendering is unchanged. */
+.list {
+  border-top: 1px solid var(--line);
+}
+
+.item {
+  border-bottom: 1px solid var(--line);
+}
+
+.question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.mark {
+  flex-shrink: 0;
+  font-size: var(--text-lg);
+  color: var(--gold-deep);
+  line-height: 1;
+}
+
+.answer {
+  padding: 0 0 1.25rem;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  max-width: 46rem;
+}

@@ -1,0 +1,38 @@
+.nav {
+  padding: 1.25rem 0 0;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.link {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.link:hover {
+  color: var(--gold-deep);
+}
+
+.current {
+  color: var(--ink-faint);
+}
+
+.sep {
+  color: var(--line);
+}

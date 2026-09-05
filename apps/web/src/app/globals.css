@@ -1,0 +1,330 @@
+/* TimeChain Peptides — light, bold, consumer-DTC visual direction:
+   white ground, near-black ink, bold indigo accent, Inter Tight display.
+   This is David's committed identity (restored 8/31 after a one-day
+   "ledger & gold" serif/cream/gold experiment he reviewed and declined —
+   see git history if that direction is ever wanted back).
+   A single committed presentation (no dark-mode variant).
+
+   Token NAMES are unchanged from the prior theme on purpose — every
+   consumer CSS Module below references these by name, not by literal
+   value, so re-skinning the whole site is this one values swap plus the
+   font swap in layout.tsx, not a per-file rewrite. `--gold*` holds the
+   bold indigo accent (not literally gold) — kept as-is rather than
+   renamed to avoid touching ~12 downstream files for no functional gain. */
+
+:root {
+  --ink: #14151a;
+  --ink-soft: #52555f;
+  --ink-faint: #8b8e98;
+  --paper: #ffffff;
+  --surface: #f5f6fa;
+  --line: #e7e8ec;
+  --line-soft: #f0f1f5;
+
+  --gold: #2952e3;
+  --gold-deep: #1f3fb8;
+  --gold-pale: #e9edfc;
+
+  --danger: #b3261e;
+
+  --font-display: var(--font-display-sans), -apple-system, "Segoe UI", sans-serif;
+  --font-body: var(--font-body-sans), -apple-system, "Segoe UI", sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.15rem;
+  --text-xl: 1.4rem;
+  --text-2xl: 1.85rem;
+  --text-3xl: 2.5rem;
+  --text-4xl: 3.4rem;
+
+  --max-width: 1240px;
+  --radius: 10px;
+
+  /* --- Layout / stacking scales (added for the storefront parity build) ---
+     These exist for NEW components. Existing modules keep their ad-hoc rem
+     values on purpose — a mass refactor is churn with no functional gain
+     (same reasoning this file already gives for keeping the `--gold*` names).
+
+     --header-h is derived, not guessed: Header.module.css `.bar` is an
+     explicit 4.5rem tall (set as a height, not padding, precisely so this
+     token cannot drift when the bar's contents change) plus the header's
+     1px bottom border. The bar is the same height at every viewport, so
+     there is deliberately no narrow-viewport override. */
+  --header-h: calc(4.5rem + 1px);
+  --sticky-gap: 0.65rem;
+
+  /* Offset for page content that is itself position:sticky (the PDP gallery,
+     the cart and checkout summaries) — clears the sticky header. This used
+     to also add a --category-nav-h term; the sticky category strip was
+     unmounted in David's 8/30 review, so the term is gone — leaving it
+     would float every sticky panel 59px too low. */
+  --sticky-top: calc(var(--header-h) + var(--sticky-gap));
+
+  /* Header is position:sticky with a non-auto z-index, so it CREATES A
+     STACKING CONTEXT. Anything rendered inside Header can never paint above
+     something outside it, no matter how high its z-index — --z-dropdown only
+     orders siblings within the header. A future cart drawer must therefore be
+     rendered from (storefront)/layout.tsx or a portal, not from Header.tsx. */
+  --z-sticky-nav: 20;
+  --z-header: 30;
+  --z-buy-bar: 40;
+  --z-dropdown: 50;
+  --z-drawer-scrim: 55;
+  --z-drawer: 60;
+
+  /* Values chosen to match numbers already hardcoded across the modules
+     (.container 1.75rem, section heads 3.5rem, footer 5rem) so new
+     components sit flush against old ones. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.75rem;
+  --space-7: 2.5rem;
+  --space-8: 3.5rem;
+  --space-9: 5rem;
+
+  /* The design is border-based and shadow-free by default; keep it that way.
+     These are for the three places elevation is genuinely load-bearing:
+     card hover, the search dropdown, and the fixed buy bar (which casts
+     upward, hence the negative y on --shadow-lg). */
+  --shadow-sm: 0 1px 2px rgba(20, 21, 26, 0.06);
+  --shadow-md: 0 4px 16px rgba(20, 21, 26, 0.08);
+  --shadow-lg: 0 -8px 28px rgba(20, 21, 26, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  /* For the /shop category anchors (#cat-…). Disabled under
+     prefers-reduced-motion at the bottom of this file. */
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+  color: var(--ink);
+}
+
+h1 {
+  font-size: var(--text-4xl);
+}
+
+h2 {
+  font-size: var(--text-3xl);
+}
+
+h3 {
+  font-size: var(--text-xl);
+}
+
+p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  font-weight: 600;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.75rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  border: 1px solid var(--ink);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.buttonPrimary {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  background: var(--gold-deep);
+  border-color: var(--gold-deep);
+}
+
+.buttonSecondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Core-reference (9/4) button shapes. Modifiers, not replacements: the
+   storefront's new surfaces use pills in the accent colour, while the
+   checkout flow — out of scope for that redesign — keeps the 10px
+   ink buttons above. Compose as `button buttonPill buttonAccent`. */
+.buttonPill {
+  border-radius: 999px;
+}
+
+.buttonAccent {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--paper);
+}
+
+.buttonAccent:hover:not(:disabled) {
+  background: var(--gold-deep);
+  border-color: var(--gold-deep);
+}
+
+.buttonAccentOutline {
+  background: transparent;
+  border-color: var(--gold-deep);
+  color: var(--gold-deep);
+}
+
+.buttonAccentOutline:hover:not(:disabled) {
+  background: var(--gold-deep);
+  border-color: var(--gold-deep);
+  color: var(--paper);
+}
+
+.buttonOnDark {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
+}
+
+.buttonOnDark:hover:not(:disabled) {
+  background: var(--gold-pale);
+  border-color: var(--gold-pale);
+}
+
+.priceTag {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Keyboard/screen-reader escape hatch rendered by the storefront layout.
+   Off-screen until focused, then drops in above the sticky header (hence
+   the z-index above --z-header). */
+.skipLink {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: calc(var(--z-drawer) + 1);
+  padding: 0.6rem 1.1rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.skipLink:focus-visible {
+  top: 0;
+}
+
+/* Visible to screen readers only. Used for control labels that would be
+   redundant on screen (the shop sort <select>, the search combobox) and
+   for aria-live result announcements. Not `display: none` — that would
+   hide it from assistive tech too, which is the opposite of the point. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --text-4xl: 2.5rem;
+    --text-3xl: 2rem;
+  }
+
+  .container {
+    padding: 0 1.25rem;
+  }
+}
+
+/* Global motion opt-out — the backstop for every transition and animation
+   on the site (the cart drawer's slide, the card image swap, etc.). */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

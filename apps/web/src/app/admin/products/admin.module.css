@@ -1,0 +1,344 @@
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.subtitle {
+  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.actorField {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.actorField input {
+  border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.875rem;
+  width: 10rem;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  border-radius: 6px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  background: color-mix(in srgb, var(--foreground) 4%, var(--background));
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.wrap {
+  white-space: normal;
+  max-width: 22ch;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pillMapped {
+  background: color-mix(in srgb, #2f7d52 18%, transparent);
+  color: #2f7d52;
+}
+
+.pillUnmapped,
+.pillMissing {
+  background: color-mix(in srgb, #a5473f 18%, transparent);
+  color: #a5473f;
+}
+
+.pillChanged {
+  background: color-mix(in srgb, #a8791f 18%, transparent);
+  color: #a8791f;
+}
+
+.pillExact {
+  background: color-mix(in srgb, #2f7d52 18%, transparent);
+  color: #2f7d52;
+}
+
+.pillLikely {
+  background: color-mix(in srgb, #3a6ea5 18%, transparent);
+  color: #3a6ea5;
+}
+
+.pillAmbiguous {
+  background: color-mix(in srgb, #a8791f 18%, transparent);
+  color: #a8791f;
+}
+
+.pillManual {
+  background: color-mix(in srgb, #6a4fa0 18%, transparent);
+  color: #6a4fa0;
+}
+
+.pillNoMatch,
+.pillNeutral {
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
+  color: color-mix(in srgb, var(--foreground) 65%, transparent);
+}
+
+.sellableYes {
+  color: #2f7d52;
+  font-weight: 600;
+}
+
+.sellableNo {
+  color: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+
+.actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+  background: var(--background);
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.actions button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.changeRow {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  margin-top: 0.35rem;
+}
+
+.changeRow select {
+  font-size: 0.75rem;
+  padding: 0.25rem;
+  max-width: 16rem;
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+  border-radius: 4px;
+}
+
+.rowError {
+  color: #a5473f;
+  font-size: 0.75rem;
+  margin-top: 0.35rem;
+  max-width: 22ch;
+  white-space: normal;
+}
+
+.loading,
+.empty {
+  padding: 2rem 0;
+  color: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+/* --- shared admin chrome (orders page, 9/4) ---------------------------- */
+.nav {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.navLink,
+.navActive {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.navActive {
+  background: color-mix(in srgb, var(--foreground) 8%, var(--background));
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.toolbar select {
+  border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.credsForm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 24rem;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+  border-radius: 6px;
+}
+
+.button,
+.buttonGhost {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.buttonGhost {
+  background: transparent;
+  color: var(--foreground);
+  border-color: color-mix(in srgb, var(--foreground) 30%, transparent);
+}
+
+.button:disabled,
+.buttonGhost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.muted {
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+  font-size: 0.8rem;
+}
+
+.error {
+  color: #b3261e;
+  font-size: 0.8rem;
+}
+
+.detailRow td {
+  background: color-mix(in srgb, var(--foreground) 3%, var(--background));
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 2fr 1.3fr;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.detailGrid h3 {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 0.5rem;
+  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+}
+
+.detailBlock {
+  line-height: 1.6;
+  margin: 0;
+}
+
+.innerTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.innerTable th,
+.innerTable td {
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+
+.events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+@media (max-width: 900px) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}

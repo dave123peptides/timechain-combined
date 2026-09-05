@@ -1,0 +1,41 @@
+[project]
+name = "timechain-api"
+version = "0.1.0"
+description = "TimeChain Peptides API service"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.14.0",
+    "psycopg[binary]>=3.2.0",
+    "pydantic-settings>=2.6.0",
+    "email-validator>=2.2.0",
+    "httpx>=0.27.0",
+    "google-auth>=2.30",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "httpx>=0.27.0",
+    "ruff>=0.7.0",
+]
+# Only needed to run `python -m app.catalog_import.run` — not part of the
+# base image, since the deployed API never needs to read a spreadsheet.
+import = [
+    "openpyxl>=3.1",
+]
+# Only needed to run `python -m app.scripts.build_coa_manifest` — reads
+# the certificate PDFs once to build services/api/data/coa/coa_manifest.csv. The
+# deployed API never opens a PDF (it links to the lab's hosted copy).
+coa = [
+    "pypdf>=4.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]

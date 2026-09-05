@@ -1,0 +1,123 @@
+.head {
+  padding: 3.5rem 0 2rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 20rem;
+  gap: 3rem;
+  padding-bottom: 5rem;
+  align-items: start;
+}
+
+.lines {
+  border-top: 1px solid var(--line);
+}
+
+.line {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.lineImageWrap {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--line-soft);
+  flex-shrink: 0;
+}
+
+.lineImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lineName {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+}
+
+.lineMeta {
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+  margin-top: 0.2rem;
+}
+
+.bulkBadge {
+  color: var(--gold-deep);
+  font-weight: 600;
+}
+
+.lineUnavailable {
+  color: var(--danger);
+  font-size: var(--text-sm);
+  margin-top: 0.2rem;
+}
+
+.qtyInput {
+  width: 4rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-sm);
+}
+
+.lineTotal {
+  font-weight: 700;
+  min-width: 5rem;
+  text-align: right;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  font-size: var(--text-xs);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.summary {
+  border: 1px solid var(--line);
+  padding: 1.75rem;
+  position: sticky;
+  top: var(--sticky-top);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  margin-bottom: 0.85rem;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin: 1.25rem 0 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.empty {
+  padding: 3rem 0 5rem;
+  text-align: center;
+  color: var(--ink-faint);
+}
+
+.note {
+  margin-top: 1rem;
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}

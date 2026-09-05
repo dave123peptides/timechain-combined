@@ -1,0 +1,164 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Explicit height, not padding: --header-h in globals.css is derived from
+   this number, and everything that offsets against the sticky header (the
+   PDP gallery, cart summary, the drawer) depends on it staying true. */
+.bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-6);
+  height: 4.5rem;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.wordmark span {
+  color: var(--gold);
+}
+
+.nav {
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.navLink {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+  transition: color 150ms ease;
+}
+
+.navLink:hover {
+  color: var(--gold-deep);
+}
+
+.navLinkActive {
+  color: var(--gold-deep);
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-self: end;
+}
+
+.cartButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.cartButton:hover {
+  color: var(--gold-deep);
+}
+
+.cartCount {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--paper);
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.menuToggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.mobileNav {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .nav {
+    display: none;
+  }
+
+  .wordmarkSuffix {
+    display: none;
+  }
+
+  .menuToggle {
+    display: inline-flex;
+  }
+
+  .mobileNavOpen {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 0.5rem 1.25rem 1rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow-md);
+  }
+
+  .mobileNavOpen .navLink {
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .mobileNavOpen .navLink:last-child {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 780px) {
+  .bar {
+    gap: var(--space-3);
+  }
+
+  .tools {
+    gap: 0.25rem;
+  }
+}

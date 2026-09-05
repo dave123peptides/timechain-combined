@@ -1,0 +1,87 @@
+.footer {
+  border-top: 1px solid var(--line);
+  margin-top: 5rem;
+  padding: 3rem 0 2.5rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 2rem;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paper);
+  margin-bottom: 0.75rem;
+}
+
+.wordmark span {
+  color: var(--gold);
+}
+
+.tagline {
+  color: color-mix(in srgb, var(--paper) 65%, transparent);
+  font-size: var(--text-sm);
+  max-width: 32ch;
+}
+
+/* Core's column headings are the accent colour at display size, not
+   small caps. */
+.heading {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 0.9rem;
+}
+
+.linkList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.linkList a {
+  font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--paper) 80%, transparent);
+}
+
+.linkList a:hover {
+  color: var(--gold);
+}
+
+.disclaimer {
+  margin-top: 2.5rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--paper) 15%, transparent);
+  font-size: var(--text-xs);
+  color: color-mix(in srgb, var(--paper) 50%, transparent);
+  line-height: 1.6;
+}
+
+.entity {
+  margin-top: 1rem;
+  font-size: var(--text-xs);
+  color: color-mix(in srgb, var(--paper) 40%, transparent);
+}
+
+/* Four columns don't fit a tablet. Ordered before the 720px rule on
+   purpose: both match at 375px and the later one would win. */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+}

@@ -1,0 +1,46 @@
+.strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  padding: 1.9rem 3.25rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--gold);
+  margin-top: 0.15rem;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.3rem;
+}
+
+.body {
+  font-size: var(--text-sm);
+  font-style: italic;
+  color: color-mix(in srgb, var(--paper) 78%, transparent);
+}
+
+@media (max-width: 900px) {
+  .strip {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.75rem 1.5rem;
+    border-radius: 28px;
+  }
+}

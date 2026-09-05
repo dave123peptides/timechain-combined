@@ -1,0 +1,77 @@
+name: timechain
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-timechain}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme-local-only}
+      POSTGRES_DB: ${POSTGRES_DB:-timechain}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-timechain}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://timechain:changeme-local-only@db:5432/timechain}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./services/api:/app
+      - ./data:/data
+
+  worker:
+    build:
+      context: ./services/worker
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://timechain:changeme-local-only@db:5432/timechain}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./services/worker:/app
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Browser-facing (the host, outside Docker) — reaches api via the
+      # published port.
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+      # Server-side (Next.js server components fetching from inside this
+      # container) — must use the Docker network service name, since
+      # "localhost" here means the web container itself, not api.
+      API_INTERNAL_BASE_URL: ${API_INTERNAL_BASE_URL:-http://api:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

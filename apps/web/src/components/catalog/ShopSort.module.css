@@ -1,0 +1,20 @@
+.sortLabel {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sortSelect {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+}
+
+.sortSelect:hover {
+  border-color: var(--gold);
+}

@@ -1,0 +1,33 @@
+.sectionHead {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.sectionHead h2 {
+  margin-top: 0.75rem;
+}
+
+.faq {
+  padding: 4rem 0 5rem;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+/* The accordion is a stack of full-width rules; capping the width keeps
+   the question line length readable on a wide screen. */
+.faqInner {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.faqActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+@media (max-width: 720px) {
+  .faq {
+    padding: 3rem 0 3.5rem;
+  }
+}

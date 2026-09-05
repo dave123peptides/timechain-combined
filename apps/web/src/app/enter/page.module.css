@@ -1,0 +1,91 @@
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--ink);
+}
+
+.card {
+  max-width: 26rem;
+  width: 100%;
+  text-align: center;
+  padding: 3rem 2.5rem;
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  margin-bottom: 0.6rem;
+}
+
+.eyebrow {
+  display: block;
+  color: var(--gold);
+  margin-bottom: 2rem;
+}
+
+.statement {
+  color: color-mix(in srgb, var(--paper) 85%, transparent);
+  font-size: var(--text-base);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.error {
+  color: #e5484d;
+  font-size: var(--text-sm);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: var(--text-base);
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  background: transparent;
+  color: var(--paper);
+}
+
+.input:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+/* The shared .buttonPrimary assumes a paper background (ink bg / paper
+   text) — invisible here since this page is deliberately dark. A local
+   variant instead. */
+.enterButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.85rem 1.75rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.enterButton:hover {
+  background: transparent;
+  color: var(--gold);
+}

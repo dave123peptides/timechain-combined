@@ -1,0 +1,274 @@
+# TimeChain Peptides CI/CD pipeline.
+#
+# Stages, in order: validate -> test -> security -> build -> deploy-nonprod
+# -> integration-test -> production-plan -> production-deploy.
+#
+# Everything through `build` works today against this repo as-is. Stages
+# from `deploy-nonprod` onward are placeholders (clearly marked TODO)
+# until the AWS/Terraform buildout (ECS/Fargate, ECR, GitLab OIDC ->
+# AWS STS) exists — see infra/terraform/README.md. They're kept in the
+# pipeline now so the shape (manual production approval, immutable
+# commit-SHA tags) is real and reviewable ahead of that work landing.
+#
+# production-deploy requires manual approval — see its `when: manual`
+# and the GitLab "production" protected environment (Settings -> CI/CD ->
+# Environments), which should be configured to require approval from a
+# specific group before this job can run.
+
+stages:
+  - validate
+  - test
+  - security
+  - build
+  - deploy-nonprod
+  - integration-test
+  - production-plan
+  - production-deploy
+
+variables:
+  # Immutable, traceable to an exact commit — never `latest` or a branch
+  # name. Every build/deploy job below tags with this.
+  IMAGE_TAG: "${CI_COMMIT_SHA}"
+  PIP_CACHE_DIR: "${CI_PROJECT_DIR}/.cache/pip"
+
+# ---------------------------------------------------------------------------
+# validate
+# ---------------------------------------------------------------------------
+
+validate:api:ruff:
+  stage: validate
+  image: python:3.12-slim
+  rules:
+    - changes: [services/api/**/*]
+  script:
+    - pip install -q ruff
+    - cd services/api && ruff check .
+
+validate:worker:ruff:
+  stage: validate
+  image: python:3.12-slim
+  rules:
+    - changes: [services/worker/**/*]
+  script:
+    - pip install -q ruff
+    - cd services/worker && ruff check .
+
+validate:web:lint:
+  stage: validate
+  image: node:22-slim
+  rules:
+    - changes: [apps/web/**/*]
+  script:
+    - cd apps/web && npm ci && npm run lint && npm run typecheck
+
+validate:terraform:
+  stage: validate
+  image: hashicorp/terraform:1.9
+  rules:
+    - changes: [infra/terraform/**/*]
+  script:
+    - cd infra/terraform && terraform fmt -check -recursive && terraform init -backend=false && terraform validate
+
+# ---------------------------------------------------------------------------
+# test
+# ---------------------------------------------------------------------------
+
+test:api:
+  stage: test
+  image: python:3.12-slim
+  services:
+    - name: postgres:16-alpine
+      alias: db
+  variables:
+    POSTGRES_USER: timechain
+    POSTGRES_PASSWORD: changeme-ci-only
+    POSTGRES_DB: timechain
+    DATABASE_URL: "postgresql+psycopg://timechain:changeme-ci-only@db:5432/timechain"
+  script:
+    - cd services/api
+    - pip install -q -e ".[dev]"
+    - alembic upgrade head
+    - python -m pytest -q
+
+test:worker:
+  stage: test
+  image: python:3.12-slim
+  services:
+    - name: postgres:16-alpine
+      alias: db
+  variables:
+    POSTGRES_USER: timechain
+    POSTGRES_PASSWORD: changeme-ci-only
+    POSTGRES_DB: timechain
+    DATABASE_URL: "postgresql+psycopg://timechain:changeme-ci-only@db:5432/timechain"
+  script:
+    # worker's tests assume services/api's schema already exists (see
+    # services/worker/tests/*'s hand-mirrored table fixtures) — migrate
+    # via the api package first, same as local dev.
+    - pip install -q -e "services/api[dev]"
+    - cd services/api && alembic upgrade head && cd -
+    - pip install -q -e "services/worker[dev]"
+    - cd services/worker && python -m pytest -q
+
+# apps/web has no test script yet (see package.json) — build stands in
+# as the test gate until one exists.
+test:web:build:
+  stage: test
+  image: node:22-slim
+  script:
+    - cd apps/web && npm ci && npm run build
+
+# ---------------------------------------------------------------------------
+# security
+# ---------------------------------------------------------------------------
+
+include:
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+
+security:api:pip-audit:
+  stage: security
+  image: python:3.12-slim
+  script:
+    - pip install -q pip-audit
+    - cd services/api && pip-audit -r <(python -c "import tomllib; print('\n'.join(tomllib.load(open('pyproject.toml','rb'))['project']['dependencies']))")
+  allow_failure: true # advisory until the team decides on a fail policy
+
+security:worker:pip-audit:
+  stage: security
+  image: python:3.12-slim
+  script:
+    - pip install -q pip-audit
+    - cd services/worker && pip-audit -r <(python -c "import tomllib; print('\n'.join(tomllib.load(open('pyproject.toml','rb'))['project']['dependencies']))")
+  allow_failure: true
+
+security:web:npm-audit:
+  stage: security
+  image: node:22-slim
+  script:
+    - cd apps/web && npm ci && npm audit --audit-level=high
+  allow_failure: true
+
+# ---------------------------------------------------------------------------
+# build
+# ---------------------------------------------------------------------------
+#
+# Pushes to this project's own GitLab Container Registry today (works
+# immediately, no AWS dependency). Once ECR + GitLab OIDC -> AWS STS
+# exist (see infra/terraform), add a follow-up job that re-tags/pushes
+# the same $IMAGE_TAG-tagged image into ECR rather than rebuilding —
+# the image built and tested here should be the exact bytes that
+# eventually run in prod.
+
+.build_image:
+  stage: build
+  image: docker:27
+  services:
+    - docker:27-dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+
+build:web:
+  extends: .build_image
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE/web:$IMAGE_TAG" apps/web
+    - docker push "$CI_REGISTRY_IMAGE/web:$IMAGE_TAG"
+
+build:api:
+  extends: .build_image
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE/api:$IMAGE_TAG" services/api
+    - docker push "$CI_REGISTRY_IMAGE/api:$IMAGE_TAG"
+
+build:worker:
+  extends: .build_image
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE/worker:$IMAGE_TAG" services/worker
+    - docker push "$CI_REGISTRY_IMAGE/worker:$IMAGE_TAG"
+
+# ---------------------------------------------------------------------------
+# deploy-nonprod
+# ---------------------------------------------------------------------------
+# TODO: blocked on infra/terraform's ECS/Fargate nonprod environment and
+# GitLab OIDC -> AWS STS (see infra/terraform/README.md). Until then this
+# is a placeholder so the pipeline shape is real; it deliberately does
+# not pretend to deploy anywhere.
+
+deploy-nonprod:
+  stage: deploy-nonprod
+  image: alpine:3.20
+  script:
+    - echo "TODO not yet implemented -- pending AWS/Terraform nonprod ECS buildout and GitLab OIDC -> AWS STS role."
+    - echo "Will: aws ecs update-service --cluster timechain-nonprod --service api --force-new-deployment, with task def image tags pinned to \$IMAGE_TAG."
+    - exit 1 # fails loudly rather than silently no-opping, so this can't be mistaken for a real deploy
+
+# ---------------------------------------------------------------------------
+# integration-test
+# ---------------------------------------------------------------------------
+# Runs the local end-to-end flow (docs/testing/local-e2e-test-plan.md)
+# against a docker-compose stack built from this pipeline's own
+# $IMAGE_TAG-tagged images — a real, working substitute for testing
+# against a deployed nonprod environment until deploy-nonprod exists.
+
+integration-test:compose:
+  stage: integration-test
+  image: docker:27
+  services:
+    - docker:27-dind
+  variables:
+    COMPOSE_PROJECT_NAME: timechain-ci
+  script:
+    - apk add --no-cache docker-compose curl python3
+    - cp .env.example .env
+    - docker-compose up -d --build
+    - |
+      for i in $(seq 1 30); do
+        curl -sf http://localhost:8000/healthz && break
+        sleep 2
+      done
+    - docker-compose exec -T api alembic upgrade head
+    - docker-compose exec -T api sh -c "pip install -q pytest httpx && python -m pytest -q"
+    - docker-compose exec -T worker sh -c "pip install -q pytest httpx && python -m pytest -q"
+  after_script:
+    - docker-compose down -v
+
+# ---------------------------------------------------------------------------
+# production-plan
+# ---------------------------------------------------------------------------
+# TODO: blocked on infra/terraform having real Production resources (see
+# infra/terraform/README.md — "no terraform apply should be run" until
+# then). Once it does, this becomes `terraform plan -out=tfplan` against
+# infra/terraform/prod, with the plan published as a job artifact for
+# review before production-deploy's manual approval.
+
+production-plan:
+  stage: production-plan
+  image: alpine:3.20
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  script:
+    - echo "TODO not yet implemented -- pending infra/terraform/prod having real resources."
+    - exit 1
+
+# ---------------------------------------------------------------------------
+# production-deploy
+# ---------------------------------------------------------------------------
+# Requires manual approval: `when: manual` plus a GitLab protected
+# "production" environment (Settings -> CI/CD -> Environments ->
+# production -> add required approvers) so this can't run without an
+# explicit, authorized click, separate from who has push access to main.
+# TODO: blocked on the same AWS/Terraform + GitLab OIDC work as
+# deploy-nonprod.
+
+production-deploy:
+  stage: production-deploy
+  image: alpine:3.20
+  environment:
+    name: production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+  script:
+    - echo "TODO not yet implemented -- pending AWS/Terraform production ECS buildout and GitLab OIDC -> AWS STS role."
+    - echo "Will: aws ecs update-service --cluster timechain-prod --service api --force-new-deployment, with task def image tags pinned to \$IMAGE_TAG (the exact image built and integration-tested earlier in this same pipeline)."
+    - exit 1
