@@ -5,17 +5,21 @@ import styles from "./TrustStrip.module.css";
 // each a fact this codebase or David can stand behind — see HomeHero's
 // note. Core's middle item is "Free delivery over $200"; no threshold
 // exists here (system_settings holds only a flat rate), so the slot
-// carries the lyophilized-only guarantee instead.
+// carries the pens-only guarantee instead.
+//
+// TODO(David): the pen line holds no third-party certificates yet, so the
+// first item says "on request" rather than "published per lot". Restore
+// the published-per-lot wording only once pen COAs are loaded.
 const ITEMS = [
   {
     icon: "shield",
-    title: "Third-party tested",
-    body: "Certificates of Analysis are published per lot and open the laboratory's own copy. Verify the code with the lab directly.",
+    title: "Certificates on request",
+    body: "A Certificate of Analysis for any batch is available on request from support@timechainpeptides.com. Published certificates open the laboratory's own copy.",
   },
   {
-    icon: "vial",
-    title: "Lyophilized only",
-    body: "Every product ships as a freeze-dried vial. No pens, no pre-constituted formats. Enforced in our catalog, not just stated.",
+    icon: "pen",
+    title: "Pens only",
+    body: "Every product ships as a pre-filled 3 mL auto-injector pen. No vials, no reconstitution. Enforced in our catalog, not just stated.",
   },
   {
     icon: "chat",

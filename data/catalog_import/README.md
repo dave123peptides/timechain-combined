@@ -1,5 +1,10 @@
 # data/catalog_import
 
+> **Pens site (TCP):** the xlsx importer is not used here. The pen catalog
+> is seeded from `services/api/app/scripts/seed_pen_catalog.py`; the notes
+> below are inherited from the vial site and kept for the importer's own
+> reference.
+
 Drop TimeChain's own wholesale/retail price sheet (the `.xlsx` source of
 truth for `products`/`product_variants` pricing and names) here, then run
 the import. This directory is mounted read-write into the `api` container

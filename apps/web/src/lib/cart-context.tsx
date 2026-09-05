@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "timechain_cart";
+const STORAGE_KEY = "tcp_cart";
 
 export type CartLine = { variantId: string; quantity: number };
 

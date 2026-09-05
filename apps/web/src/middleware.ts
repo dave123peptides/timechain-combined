@@ -5,7 +5,7 @@ import { ACCESS_COOKIE } from "@/lib/access";
 // checkbox-equivalent, deliberately not framed as identity verification
 // anywhere. See app/age-gate/. This cookie only gates entry to the site;
 // checkout requires its own, separate acknowledgment regardless of it.
-export const AGE_ACK_COOKIE = "tc_age_ack";
+export const AGE_ACK_COOKIE = "tcp_age_ack";
 
 function unauthorized() {
   return new NextResponse("Authentication required.", {

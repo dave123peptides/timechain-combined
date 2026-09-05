@@ -39,7 +39,7 @@ class Product(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # Structured PDP copy: {overview, key_points: [...], research_areas:
     # [...], pairs_with: [slug, ...], faq: [{q, a}, ...]}. All optional —
     # the frontend only renders sections that are present. See
-    # app.scripts.sync_product_content for the authored content and
+    # app.scripts.seed_pen_catalog for the authored content and
     # app.services.storefront for the response shape.
     content: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict, server_default="{}")
     # Safety Data Sheet PDF, surfaced as a PDP link and on /coa. NULL is a
@@ -169,19 +169,19 @@ class ProductVariant(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         Fires on every assignment through the ORM (constructor kwargs
         included), which is the only way this app ever writes the column.
 
-        Pens are categorically excluded from this business (David's
-        explicit, repeated direction) — blocked here unconditionally,
-        before the mapping-status check, so this can never regress via a
-        future catalog import or an admin mis-click. This is not a
-        temporary sourcing gap like MISSING/CHANGED; it's a permanent
-        product-line decision.
+        This storefront (TCP, forked from the TimeChain vial site on
+        2026-09-05) sells pre-filled auto-injector pens and nothing else.
+        Every other form (lyophilized, vial, preconstituted, rx_vial) is
+        blocked here unconditionally, before the mapping-status check, so
+        the pens-only line can never regress via a catalog import or an
+        admin mis-click. The vial site carries the mirror-image rule.
         """
         if not value:
             return value
 
-        if self.form != "lyophilized":
+        if self.form != "pen":
             raise ValueError(
-                f"Cannot set is_sellable=True on variant {self.sku!r}: only lyophilized vials are sold on this site."
+                f"Cannot set is_sellable=True on variant {self.sku!r}: only auto-injector pens are sold on this site."
             )
 
         session = object_session(self)

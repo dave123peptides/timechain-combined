@@ -21,7 +21,7 @@ export default function ProofSection() {
           <p className={styles.sub}>A purity test measures one thing. Here are four things it can&apos;t see.</p>
           <p className={styles.lede}>
             Every supplier in this market quotes a purity percentage. But HPLC and mass spectrometry — the tests
-            behind that number — characterize the molecule, not what surrounds it. A vial can test 99% pure and
+            behind that number — characterize the molecule, not what surrounds it. A sample can test 99% pure and
             still carry bacterial endotoxins, heavy metals, or live microbial contamination the chromatogram will
             never show. That&apos;s why you won&apos;t find a headline number anywhere on this site: we&apos;d
             rather hand you the batch paperwork than a percentage stripped of its context.

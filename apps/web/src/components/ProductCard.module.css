@@ -1,4 +1,4 @@
-/* Core-reference tile (9/4): no frame, no panel — the vial render sits
+/* Core-reference tile (9/4): no frame, no panel — the pen render sits
    on the page, name and price centered beneath it. */
 .card {
   display: flex;
@@ -25,11 +25,16 @@
   transform: translateY(-4px);
 }
 
+/* Pen renders are landscape (about 4.3:1). Laid flat they would be a thin
+   strip across the middle of the square tile, so they sit diagonally
+   instead — rotated and scaled so the pen runs corner to corner. The
+   letter-tile placeholder is not affected (it isn't an <img>). */
 .image,
 .imageHover {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  transform: rotate(-30deg) scale(1.22);
 }
 
 .imageHover {

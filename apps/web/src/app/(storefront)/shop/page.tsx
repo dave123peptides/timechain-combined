@@ -2,14 +2,13 @@ import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
 import PageBanner from "@/components/PageBanner";
 import { listProductsOrEmpty } from "@/lib/api";
-import { withoutSupplies } from "@/lib/supplies";
 
 export const dynamic = "force-dynamic";
 
-// Cut-out renders (see public/products/hero/README.md) of promotable,
+// Cut-out pen renders (see public/products/hero/README.md) of promotable,
 // non-GLP products only (lib/compliance.ts) — this is a promotional
 // surface.
-const BANNER_VIALS = ["/products/hero/tb-500.png", "/products/hero/bpc-157.png", "/products/hero/ghk-cu.png"];
+const BANNER_PENS = ["/products/hero/tb-500.png", "/products/hero/bpc-157.png", "/products/hero/ghk-cu.png"];
 
 // One flat, alphabetical catalog — deliberately no category filter or
 // grouping (BioLongevity pattern). Benefit-named categories ("GLP-1 &
@@ -18,7 +17,7 @@ const BANNER_VIALS = ["/products/hero/tb-500.png", "/products/hero/bpc-157.png",
 // renders to customers; it stays internal-only. A stray ?category= from
 // an old link is simply ignored.
 //
-// No format filter either: every sellable variant is form="lyophilized"
+// No format filter either: every sellable variant is form="pen"
 // (ProductVariant._validate_is_sellable rejects every other form), so a
 // format control would be a one-option filter that does nothing. The
 // grid's standing line says the same thing more usefully. The Core
@@ -34,9 +33,8 @@ export default async function ShopPage({
   const sort = isSort(params.sort) ? params.sort : "name";
 
   // Degrades to empty rather than crashing the page if the API is
-  // unreachable. Supplies (BAC water) sell through the PDP addon block,
-  // not the catalog — see lib/supplies.ts.
-  const products = withoutSupplies(await listProductsOrEmpty({ q: query, sort }));
+  // unreachable.
+  const products = await listProductsOrEmpty({ q: query, sort });
 
   return (
     <main>
@@ -44,9 +42,10 @@ export default async function ShopPage({
         variant="dark"
         eyebrow="Research use only"
         title={query ? `Results for “${query}”` : "Research Peptides For Sale"}
-        vials={BANNER_VIALS}
+        images={BANNER_PENS}
       >
-        <p>Lyophilized vials, compounded and tested in the USA, with third-party certificates published per lot.</p>
+        {/* TODO(David): confirm the compounding/testing claim for the pen line before launch. */}
+        <p>Pre-filled 3 mL auto-injector pens. Ready to use — no reconstitution.</p>
       </PageBanner>
       <CatalogGrid
         products={products}

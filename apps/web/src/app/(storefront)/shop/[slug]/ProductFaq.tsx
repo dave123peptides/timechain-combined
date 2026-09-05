@@ -10,11 +10,11 @@ import styles from "./sections.module.css";
 const SHARED_FAQ: ProductFaqEntry[] = [
   {
     q: "What form does this ship in?",
-    a: "As a lyophilized (freeze-dried) powder in a sealed vial. It requires reconstitution with an appropriate diluent — bacteriostatic water is the standard choice — before use in a research setting.",
+    a: "As a pre-filled 3 mL auto-injector pen. It is ready to use in a research setting — no reconstitution or diluent is involved.",
   },
   {
     q: "How should it be stored?",
-    a: "Unreconstituted lyophilized powder should be kept in a cool, dry place away from light. Once reconstituted, standard laboratory practice is refrigeration and use within the diluent manufacturer's stated window.",
+    a: "Store as directed on the pen label, away from heat and light. Standard laboratory practice is refrigeration and use within the window stated on the label.",
   },
   {
     q: "Can I order multiple compounds together?",
@@ -26,7 +26,7 @@ const SHARED_FAQ: ProductFaqEntry[] = [
 // holds certificates — the answer must never outrun the documents.
 const COA_FAQ_HELD: ProductFaqEntry = {
   q: "Is there a Certificate of Analysis for this product?",
-  a: "Yes. Third-party certificates for this compound are in the Lab reports tab on this page — one per strength and lot, each opening the laboratory's own copy with a verification code you can check with the lab. If the lot printed on your vial isn't listed, email support@timechainpeptides.com with the lot number.",
+  a: "Yes. Third-party certificates for this compound are in the Lab reports tab on this page — one per strength and lot, each opening the laboratory's own copy with a verification code you can check with the lab. If the lot printed on your pen isn't listed, email support@timechainpeptides.com with the lot number.",
 };
 
 const COA_FAQ_ON_REQUEST: ProductFaqEntry = {

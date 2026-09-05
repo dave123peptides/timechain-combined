@@ -22,6 +22,15 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <path d="M7 12h10" />
     </>
   ),
+  // Auto-injector pen: body, cap band, dose window.
+  pen: (
+    <>
+      <rect x="9" y="2" width="6" height="20" rx="2" />
+      <path d="M9 7h6" />
+      <path d="M9 17h6" />
+      <path d="M11 11h2v3h-2z" />
+    </>
+  ),
   flag: (
     <>
       <path d="M5 21V4" />

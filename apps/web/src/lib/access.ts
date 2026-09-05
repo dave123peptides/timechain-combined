@@ -4,7 +4,7 @@
 // value is only the pre-launch default so the lock is never accidentally
 // absent. Remove this module (and its middleware/route references) at
 // public launch.
-export const ACCESS_COOKIE = "tc_access";
+export const ACCESS_COOKIE = "tcp_access"; // not the vial site's tc_access: cookies ignore ports on localhost
 
 export function siteAccessPassword(): string {
   return process.env.SITE_ACCESS_PASSWORD ?? "Verified 2026";

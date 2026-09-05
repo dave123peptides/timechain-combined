@@ -1,4 +1,4 @@
-name: timechain
+name: tcp
 
 services:
   db:
@@ -9,9 +9,9 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-timechain}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme-local-only}
-      POSTGRES_DB: ${POSTGRES_DB:-timechain}
+      POSTGRES_DB: ${POSTGRES_DB:-tcp}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -28,9 +28,9 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://timechain:changeme-local-only@db:5432/timechain}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://timechain:changeme-local-only@db:5432/tcp}
     ports:
-      - "8000:8000"
+      - "8100:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -46,7 +46,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://timechain:changeme-local-only@db:5432/timechain}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://timechain:changeme-local-only@db:5432/tcp}
     depends_on:
       db:
         condition: service_healthy
@@ -63,13 +63,13 @@ services:
     environment:
       # Browser-facing (the host, outside Docker) — reaches api via the
       # published port.
-      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8100}
       # Server-side (Next.js server components fetching from inside this
       # container) — must use the Docker network service name, since
       # "localhost" here means the web container itself, not api.
       API_INTERNAL_BASE_URL: ${API_INTERNAL_BASE_URL:-http://api:8000}
     ports:
-      - "3000:3000"
+      - "3100:3000"
     depends_on:
       - api
 

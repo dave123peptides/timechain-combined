@@ -44,3 +44,22 @@ Reasons: (a) the slug→category mapping already exists for all 32 sellable prod
 - Mobile-first, 375px verified. npm build/typecheck/lint + API pytest all green before finishing.
 - Deploys: push to GitHub and stop — Hermes agent runs `vercel deploy --prod` and live QA.
 - BAC water: stays sellable for v1 (it's a standard research supply), but flagged as a pre-launch discussion item with attorney (the FDA letters cite bac-water pairing as intent evidence — Janesa should rule on whether it stays on the public storefront at launch).
+
+---
+
+## Pens site (TCP) addendum — David, 2026-09-05
+
+For the pens storefront the four GLP-class products keep their code-name
+slugs (`glp-1s`, `glp-2t`, `glp-3r`, `cagrilinitide`) and every rule above
+(no promotion, no outcome language, `UNPROMOTED_SLUGS` in
+`lib/compliance.ts`), but the **display name carries the real name in
+parentheses** — "GLP-1S (Semaglutide)", "GLP-2T (Tirzepatide)", "GLP-3R
+(Retatrutide)", "Cagrilinitide (Cagrilintide)" — set in
+`services/api/app/scripts/seed_pen_catalog.py`. The pen renders also print
+"Each unit contains … Semaglutide" on the label. This departs from the
+"never surface drug names" rule above and is flagged `TODO(attorney-review)`
+in the seed script and `compliance.ts`.
+
+Size labels stay strength-only ("1.5mg"); the price sheet's "Month N"
+tiers are never printed publicly (they read as a titration schedule) and
+live only on the placeholder supplier rows for fulfillment.

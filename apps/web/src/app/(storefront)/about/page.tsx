@@ -16,8 +16,8 @@ export const metadata = { title: "About & Quality | TimeChain" };
 //    universal claim stays out. Say what is held; link to it.
 //  - "verified purity" — the certificates carry purity figures, but this
 //    site never quotes one outside the document (see ProofSection).
-//  - "liquid multi-mL vial formats" — nothing non-lyophilized can be sold
-//    here at all; ProductVariant._validate_is_sellable rejects it.
+//  - any vial or lyophilized format — nothing but pre-filled pens can be
+//    sold here at all; ProductVariant._validate_is_sellable rejects it.
 //
 // Since the 9/4 Core-reference redesign this page also carries the
 // standards content that used to fill the homepage (CommitmentsGrid,
@@ -91,9 +91,9 @@ export default function AboutPage() {
 
         <h2>Our format</h2>
         <p>
-          Everything here ships as a lyophilized (freeze-dried) vial. No pens, no pre-constituted formats — that
-          constraint is enforced in our catalog systems, not just stated as a preference. Lyophilized material is
-          more stable in transit and storage, and it leaves reconstitution under the researcher&apos;s control.
+          Everything here ships as a pre-filled 3 mL auto-injector pen. No vials, no lyophilized powders — that
+          constraint is enforced in our catalog systems, not just stated as a preference. A pre-filled pen removes
+          reconstitution from the workflow entirely: nothing to weigh, dilute, or draw.
         </p>
       </div>
 

@@ -11,8 +11,6 @@ import {
 import Breadcrumb from "@/components/Breadcrumb";
 import ProductGallery from "@/components/ProductGallery";
 import { isPromotable, promotableOnly } from "@/lib/compliance";
-import { isSupply } from "@/lib/supplies";
-import ReconstitutionAddon from "./ReconstitutionAddon";
 import VariantPicker from "./VariantPicker";
 import ProductOverview from "./ProductOverview";
 import ResearchAreas from "./ResearchAreas";
@@ -56,18 +54,12 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   // Resolved against the live sellable catalog, not trusted as-is — a
   // pairs_with slug that's out of stock or renamed just silently drops
   // instead of breaking the page (see ProductContentResponse's docstring).
-  // Supplies drop out too: the ReconstitutionAddon block already offers
-  // BAC water on every compound page. And a promotable product never
-  // suggests a GLP-class one (lib/compliance.ts); GLP↔GLP cross-links are
-  // research framing and stay.
+  // A promotable product never suggests a GLP-class one
+  // (lib/compliance.ts); GLP↔GLP cross-links are research framing and stay.
   const resolvedPairs = product.content.pairs_with
     .map((pairSlug) => allProducts.find((p) => p.slug === pairSlug))
-    .filter((p): p is (typeof allProducts)[number] => p !== undefined && p.slug !== product.slug && !isSupply(p));
+    .filter((p): p is (typeof allProducts)[number] => p !== undefined && p.slug !== product.slug);
   const relatedProducts = isPromotable(product) ? promotableOnly(resolvedPairs) : resolvedPairs;
-
-  // The BAC water card renders on every compound PDP, but not on BAC
-  // water's own page (it would offer the product to itself).
-  const reconstitutionSupply = isSupply(product) ? undefined : allProducts.find((p) => isSupply(p));
 
   // The tabbed block under the buy box: About / Lab reports / Questions.
   // (Specifications moved into the buy box itself, Core-style.) About is
@@ -120,13 +112,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             coas={product.coas}
             productName={product.name}
             sdsUrl={product.sds_url}
-            supply={isSupply(product)}
           />
           <p className={styles.disclaimerNote}>For laboratory research use only. Not for human consumption.</p>
         </div>
       </div>
 
-      <ReconstitutionAddon supply={reconstitutionSupply} />
       <ProductTabs tabs={tabs} />
       <RelatedProducts products={relatedProducts} />
     </main>

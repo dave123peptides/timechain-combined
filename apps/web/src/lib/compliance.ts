@@ -8,7 +8,7 @@ import type { ProductSummary } from "@/lib/api";
 // signalling — featured placement, "best seller" framing, outcome claims —
 // as evidence of intended drug use. David's decision is the survivor
 // pattern: keep them purchasable, strip the marketing-voice mechanism
-// language (see sync_product_content.py), and give them no promotional
+// language (see seed_pen_catalog.py), and give them no promotional
 // surface at all.
 //
 // EXCLUDE them from: the hero spotlight, featured/"popular" sections, any
@@ -18,6 +18,12 @@ import type { ProductSummary } from "@/lib/api";
 // results (direct lookup by name is deliberate — someone who already knows
 // what they want should find it), pairs_with cross-links between GLP
 // products, or the /coa document index.
+//
+// TCP pens site (David, 2026-09-05): the slugs stay code names so this
+// filter keeps working, but the DISPLAY names carry the drug name in
+// parentheses — "GLP-3R (Retatrutide)" — set in
+// services/api/app/scripts/seed_pen_catalog.py. That departs from the
+// vial site's never-print-drug-names rule. TODO(attorney-review).
 export const UNPROMOTED_SLUGS = new Set(["glp-1s", "glp-2t", "glp-3r", "cagrilinitide"]);
 
 export function isPromotable(product: Pick<ProductSummary, "slug">): boolean {

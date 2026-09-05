@@ -22,15 +22,11 @@ export const SITE_FAQ: ProductFaqEntry[] = [
   },
   {
     q: "What form do the products ship in?",
-    a: "Every product on this site ships as a lyophilized (freeze-dried) powder in a sealed vial. That is enforced in our systems, not just stated as policy — a non-lyophilized format cannot be listed for sale here at all. Lyophilized material requires reconstitution with an appropriate diluent before use in a research setting.",
+    a: "Every product on this site ships as a pre-filled 3 mL auto-injector pen. That is enforced in our systems, not just stated as policy — any other format cannot be listed for sale here at all. Pens are ready to use in a research setting; no reconstitution or diluent is involved.",
   },
   {
-    q: "How should material be stored?",
-    a: "Unreconstituted lyophilized powder should be kept cool, dry, and away from light. Once reconstituted, standard laboratory practice is refrigeration and use within the window stated by the diluent manufacturer.",
-  },
-  {
-    q: "What diluent is used for reconstitution?",
-    a: "Bacteriostatic water is the standard choice — sterile water preserved with 0.9% benzyl alcohol, which allows multiple draws from the same vial. We stock it under Supplies.",
+    q: "How should pens be stored?",
+    a: "Store as directed on the pen label, away from heat and light. Standard laboratory practice is refrigeration and use within the window stated on the label.",
   },
   {
     q: "Do you provide a Certificate of Analysis?",
@@ -42,7 +38,7 @@ export const SITE_FAQ: ProductFaqEntry[] = [
   },
   {
     q: "Are there discounts for larger quantities?",
-    a: "Yes — volume discounts apply per SKU and are shown as a pricing table on each product page, so you can see the per-vial price at each quantity break before adding to cart.",
+    a: "Yes — volume discounts apply per SKU and are shown as a pricing table on each product page, so you can see the per-pen price at each quantity break before adding to cart.",
   },
   {
     q: "Where are your products compounded and tested?",

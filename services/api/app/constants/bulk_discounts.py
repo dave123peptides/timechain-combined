@@ -1,4 +1,4 @@
-"""Quantity discount tiers: buy N vials of the *same* variant (same
+"""Quantity discount tiers: buy N pens of the *same* variant (same
 product, same strength — not N total items across different variants),
 get a flat percentage off that line's unit price. Applies uniformly
 across every SKU (no per-product overrides) — confirmed against "TimeChain

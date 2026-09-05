@@ -212,7 +212,7 @@ def test_create_order_computes_totals_server_side(session):
     assert order.total_cents == 8500
     assert order.status == "PAYMENT_PENDING"
     assert order.access_token
-    assert re.match(r"^TCP-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$", order.public_order_number)
+    assert re.match(r"^PEN-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$", order.public_order_number)
     assert len(order.items) == 1
     assert order.items[0].unit_price_cents == 1500
     assert order.items[0].sku_snapshot == variant.sku

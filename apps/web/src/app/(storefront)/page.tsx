@@ -6,7 +6,6 @@ import HomeHero from "@/components/home/HomeHero";
 import TrustStrip from "@/components/home/TrustStrip";
 import { listProductsOrEmpty } from "@/lib/api";
 import { SITE_FAQ } from "@/lib/faqContent";
-import { withoutSupplies } from "@/lib/supplies";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +21,7 @@ const HOMEPAGE_FAQ_COUNT = 6;
 export default async function Home({ searchParams }: { searchParams: Promise<{ sort?: string }> }) {
   const params = await searchParams;
   const sort = isSort(params.sort) ? params.sort : "name";
-  const products = withoutSupplies(await listProductsOrEmpty({ sort }));
+  const products = await listProductsOrEmpty({ sort });
 
   return (
     <main>

@@ -43,7 +43,7 @@ export const PURITY_GAPS: PurityGap[] = [
     sub: "Heat-stable. They survive standard sterilization.",
     missesLabel: "Why a purity number misses them",
     misses:
-      "HPLC and mass spectrometry characterize chemistry. Endotoxins are biological residue — invisible to both. A vial can test 99% pure and still carry them.",
+      "HPLC and mass spectrometry characterize chemistry. Endotoxins are biological residue — invisible to both. A sample can test 99% pure and still carry them.",
     mattersLabel: "Why it matters",
     matters:
       "Endotoxins are biologically active on their own. In sensitive research systems they confound results before an experiment even begins.",
@@ -55,7 +55,7 @@ export const PURITY_GAPS: PurityGap[] = [
     sub: "Assessed by culture — never by a chromatogram.",
     missesLabel: "Why a purity number misses it",
     misses:
-      "A purity test doesn't culture for bacteria, fungi, or yeast. Live contamination can grow in a vial whose purity figure looks flawless.",
+      "A purity test doesn't culture for bacteria, fungi, or yeast. Live contamination can grow in a sample whose purity figure looks flawless.",
     mattersLabel: "Why it matters",
     matters:
       "Microbial growth introduces uncontrolled variables into any research system — and no percentage on a label warns you it's there.",
@@ -79,7 +79,7 @@ export const PURITY_GAPS: PurityGap[] = [
     sub: "A single number describes a single sample — not a supply chain.",
     missesLabel: "Why a purity number misses it",
     misses:
-      "A purity figure is a snapshot of one vial at one point in time. It carries no information about the batch before it or the batch after it.",
+      "A purity figure is a snapshot of one sample at one point in time. It carries no information about the batch before it or the batch after it.",
     mattersLabel: "Why it matters",
     matters:
       "Reproducibility is the foundation of legitimate research. If batches drift, the data built on them drifts too.",
@@ -95,6 +95,7 @@ export const PURITY_GAPS: PurityGap[] = [
 export type IconName =
   | "flask"
   | "vial"
+  | "pen"
   | "flag"
   | "document"
   | "layers"
@@ -140,14 +141,14 @@ export const COMMITMENTS: Commitment[] = [
     statLabel: "of listed products supplier-mapped",
   },
   {
-    icon: "vial",
+    icon: "pen",
     number: "02",
-    title: "Lyophilized Only",
+    title: "Pens Only",
     // Enforced: ProductVariant._validate_is_sellable rejects every other
     // form outright.
-    body: "Everything here ships as a freeze-dried vial. Pens and pre-constituted formats can't even be entered into the catalog.",
+    body: "Everything here ships as a pre-filled 3 mL auto-injector pen. Vials and lyophilized powders can't even be entered into the catalog.",
     stat: "100%",
-    statLabel: "lyophilized vials · enforced in code",
+    statLabel: "auto-injector pens · enforced in code",
   },
   {
     icon: "flag",
@@ -201,7 +202,7 @@ export type EnforcementItem = {
 
 export const ENFORCEMENT_STRIP: EnforcementItem[] = [
   { value: "Supplier mapping", label: "required before listing" },
-  { value: "Lyophilized-only", label: "catalog validator" },
+  { value: "Pens-only", label: "catalog validator" },
   { value: "Auto-delist", label: "on supplier record changes" },
   { value: "RUO acknowledgment", label: "required at checkout" },
 ];
@@ -264,9 +265,9 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   },
   {
     number: "06",
-    icon: "vial",
+    icon: "pen",
     title: "Format Gate",
-    body: "The catalog rejects anything that isn't a lyophilized vial. Pens and pre-constituted formats fail validation and cannot be listed.",
+    body: "The catalog rejects anything that isn't a pre-filled pen. Vials and lyophilized powders fail validation and cannot be listed.",
   },
   {
     number: "07",

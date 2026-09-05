@@ -105,7 +105,7 @@ and `create_order`, both exercised here.)
 
 ```
 POST /api/v1/checkout/create
-  → 201-shaped 200: public_order_number=TCP-ENJLR9,
+  → 201-shaped 200: public_order_number=PEN-ENJLR9,
     subtotal_cents=4900, shipping_cents=4000, tax_cents=0,
     total_cents=8900, status=PAYMENT_PENDING
 ```

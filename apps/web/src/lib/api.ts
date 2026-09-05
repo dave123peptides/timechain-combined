@@ -16,9 +16,10 @@ export type Variant = {
   id: string;
   name: string;
   format: string;
-  // Raw form key ("lyophilized"/"preconstituted"/etc) — `format` above is
-  // the display label. Components that need to branch on physical form
-  // (reconstitution instructions vs. ready-to-use copy) key off this.
+  // Raw form key ("pen" for everything sellable on this site; the API
+  // still knows "lyophilized"/"preconstituted"/etc) — `format` above is
+  // the display label. Components that branch on physical form key off
+  // this (FormatNotice).
   form: string | null;
   strength: string | null;
   price_cents: number;
@@ -347,10 +348,11 @@ export function discountedUnitPriceCents(retailPriceCents: number, percentOff: n
   return retailPriceCents - Math.floor((retailPriceCents * percentOff) / 100);
 }
 
-// Variant.strength is usually a bare mg number/combo ("10", "10/10") that
-// needs "mg" appended for display, but some (e.g. BAC Water's "10mL")
-// already carry their own unit — appending "mg" to those would read as
-// "10mLmg". Only append when strength is purely numeric/slash-separated.
+// Variant.strength is usually a bare mg number/combo ("1.5", "10",
+// "10/10/50") that needs "mg" appended for display, but a value that
+// already carries its own unit (e.g. "10mL") must be left alone —
+// appending "mg" would read as "10mLmg". Only append when strength is
+// purely numeric (decimals allowed) or slash-separated.
 export function formatStrength(strength: string): string {
-  return /^[\d/]+$/.test(strength) ? `${strength}mg` : strength;
+  return /^[\d./]+$/.test(strength) ? `${strength}mg` : strength;
 }

@@ -57,7 +57,7 @@ def _make_supplier_product(session, supplier_product_id: int, *, sku: str, name:
     return supplier_product
 
 
-def _make_variant(session, slug_suffix: str, *, name: str = "Test Widget 10mg (Lyophilized)", form: str = "lyophilized"):
+def _make_variant(session, slug_suffix: str, *, name: str = "Test Widget 10mg pen", form: str = "pen"):
     product = Product(slug=f"{_TEST_SLUG_PREFIX}-{slug_suffix}", name="Test Widget", images=[], is_active=False)
     session.add(product)
     session.flush()

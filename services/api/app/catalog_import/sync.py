@@ -58,7 +58,7 @@ def _variant_name(product_name: str, form: str, size_key: Optional[str]) -> str:
         # "10mL") already carry their own unit — appending "mg" to those
         # would read as "10mLmg". Only append when size_key is purely
         # numeric/slash-separated.
-        size_display = f"{size_key}mg" if re.fullmatch(r"[\d/]+", size_key) else size_key
+        size_display = f"{size_key}mg" if re.fullmatch(r"[\d./]+", size_key) else size_key
         return f"{product_name} {size_display} ({label})"
     return f"{product_name} ({label})"
 

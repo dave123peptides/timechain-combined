@@ -121,7 +121,7 @@ def test_q_matches_slug(session):
 
 def test_q_matches_description(session):
     # description is NULL for every real product until
-    # app.scripts.sync_product_content runs, so this clause is currently
+    # app.scripts.seed_pen_catalog runs, so this clause is currently
     # inert in production — but it must work the moment content lands.
     _make_sellable_product(session, "alpha", "Zeta Compound", description="A distinctive marker phrase.")
     _make_sellable_product(session, "beta", "Omega Compound")

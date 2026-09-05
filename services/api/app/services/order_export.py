@@ -61,7 +61,7 @@ def _latest_payment(order: Order) -> Optional[Payment]:
 
 def order_export_row(order: Order) -> dict:
     """The flat record for one order. Items are one string —
-    "2 × BPC-157 10mg (Lyophilized) [supplier: BPC-10 · BPC-157 10mg]" —
+    "2 × BPC-157 20mg pen [supplier: PENDING-TC-BPC-157-PEN-20 · BPC-157 20mg]" —
     joined with " | ", so a row stays one order in a spreadsheet."""
     address = order.shipping_address or {}
     payment = _latest_payment(order)

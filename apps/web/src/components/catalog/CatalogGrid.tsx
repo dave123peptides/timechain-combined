@@ -35,7 +35,7 @@ export default function CatalogGrid({
               : `Showing all ${products.length} results`}
             {/* Stands in for a format filter: with a single format in the
                 catalog, stating it is more useful than filtering on it. */}
-            <span className={styles.note}> · Every product ships as a lyophilized vial.</span>
+            <span className={styles.note}> · Every product ships as a 3 mL auto-injector pen.</span>
           </p>
           <ShopSort value={sort} basePath={basePath} />
         </div>

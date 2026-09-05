@@ -1,5 +1,9 @@
+/* 4/3, not the vial site's 4/5: pen renders are landscape, and `contain`
+   rather than `cover` so a wide pen is never cropped to a sliver. */
 .mainWrap {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
+  padding: 1.5rem;
+  box-sizing: border-box;
   background: var(--line-soft);
   display: flex;
   align-items: center;
@@ -11,7 +15,7 @@
 .mainImage {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .thumbs {
@@ -40,5 +44,7 @@
 .thumbImage {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 0.35rem;
+  box-sizing: border-box;
 }

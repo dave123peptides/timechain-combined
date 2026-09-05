@@ -1,7 +1,7 @@
 # Google Sheets order feed (service account)
 
 Brief for whoever implements it. Goal: every order placed on
-timechainpeptides.com appears as a row in a Google Sheet within seconds,
+the storefront appears as a row in a Google Sheet within seconds,
 written directly by the API using a Google service account. No Zapier.
 
 Read first: `services/api/app/services/order_notify.py` (the webhook
@@ -202,7 +202,7 @@ Run with `.venv/bin/python -m pytest -q` from `services/api`.
 3. Place an order on localhost:3000 (password gate cookies
    `tc_access=1; tc_age_ack=1`; use `test-checkout@example.com`).
 4. The sheet gets a header row on the first order and one row per order.
-5. Watch the API log for `sheet append for TCP-... failed` if nothing shows
+5. Watch the API log for `sheet append for PEN-... failed` if nothing shows
    up; 403 means the sheet is not shared with the service account, 404
    means the spreadsheet id or tab name is wrong.
 
@@ -212,3 +212,13 @@ Set `GOOGLE_SHEETS_ORDERS_SPREADSHEET_ID`, `GOOGLE_SHEETS_ORDERS_TAB`,
 `GOOGLE_SERVICE_ACCOUNT_JSON` on the API host as secrets. Leave
 `ORDER_NOTIFY_WEBHOOK_URL` blank unless a second receiver is wanted; both
 can run at once.
+
+
+## Pens site (TCP) addendum — 2026-09-05
+
+The pens storefront appends to the **same spreadsheet and the same
+`Orders` tab** as the vial site, with identical `GOOGLE_SHEETS_*` values
+(the OAuth refresh token is a bearer credential; a second process can use
+it with no Google-side change). Rows are told apart by column A: pen
+orders are numbered `PEN-XXXXXX` (`app/services/storefront.py`), vial
+orders `TCP-XXXXXX`. There is no site column; filter on the prefix.

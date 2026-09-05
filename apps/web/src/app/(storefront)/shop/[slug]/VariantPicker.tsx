@@ -29,24 +29,23 @@ function rangeLabel(row: { min: number; max?: number }): string {
 // client component owns the lot.
 //
 // Spec rows are derived from data the catalog actually holds or from a
-// constraint enforced in code (the lyophilized format:
-// ProductVariant._validate_is_sellable rejects anything else). No
-// purity, no storage or shelf-life figures, no internal SKU — a spec
-// list is exactly where an unconfirmed number would read as a promise.
+// constraint enforced in code (the pen format:
+// ProductVariant._validate_is_sellable rejects anything that isn't a
+// pen). No purity, no storage or shelf-life figures, no internal SKU — a
+// spec list is exactly where an unconfirmed number would read as a
+// promise.
 export default function VariantPicker({
   variants,
   bulkTiers,
   coas,
   productName,
   sdsUrl,
-  supply,
 }: {
   variants: Variant[];
   bulkTiers: BulkDiscountTier[];
   coas: ProductCoa[];
   productName: string;
   sdsUrl: string | null;
-  supply: boolean;
 }) {
   const [selectedId, setSelectedId] = useState(variants[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
@@ -139,7 +138,7 @@ export default function VariantPicker({
                         className={styles.bulkRadio}
                         checked={active}
                         onChange={() => setQuantity(row.min)}
-                        aria-label={`${rangeLabel(row)} vials`}
+                        aria-label={`${rangeLabel(row)} pens`}
                       />
                     </td>
                     <td>
@@ -158,7 +157,7 @@ export default function VariantPicker({
 
       <dl className={styles.specs}>
         <div className={styles.specRow}>
-          <dt>{supply ? "Size" : "Strength"}</dt>
+          <dt>Strength</dt>
           <dd>{strengthText}</dd>
         </div>
         <div className={styles.specRow}>
@@ -167,7 +166,7 @@ export default function VariantPicker({
         </div>
         <div className={styles.specRow}>
           <dt>Form</dt>
-          <dd>{supply ? "Sealed vial" : "Lyophilized powder, sealed vial"}</dd>
+          <dd>Pre-filled 3 mL auto-injector pen</dd>
         </div>
         <div className={styles.specRow}>
           <dt>Certificates</dt>
@@ -193,7 +192,7 @@ export default function VariantPicker({
         </div>
       </dl>
 
-      {!supply && <FormatNotice form={selected.form} />}
+      <FormatNotice form={selected.form} />
 
       <StickyBuyBar
         watchRef={addButtonRef}

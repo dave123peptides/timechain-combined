@@ -5,8 +5,8 @@ import AdminNav from "../AdminNav";
 import styles from "../products/admin.module.css";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
-const ACTOR_STORAGE_KEY = "timechain_admin_actor";
-const CREDS_STORAGE_KEY = "timechain_admin_creds";
+const ACTOR_STORAGE_KEY = "tcp_admin_actor";
+const CREDS_STORAGE_KEY = "tcp_admin_creds";
 
 type OrderRow = {
   order_id: string;

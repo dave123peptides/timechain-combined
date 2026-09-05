@@ -2,26 +2,28 @@ import Link from "next/link";
 import SectionIcon from "@/components/SectionIcon";
 import styles from "./HomeHero.module.css";
 
-// Core-reference hero (David, 9/4): a calm uppercase headline with only
-// its last line bold, one accent pill, and two vials floating on a plain
-// light ground with three small callout badges. (The reference's
-// honeycomb lattice was tried and parked at David's request — see
-// components/HexLattice.tsx, currently unused.) Real claims only —
-// every line below is verifiable in this codebase or confirmed by David:
-// US compounding/testing (about page), lyophilized-only (enforced by
-// ProductVariant._validate_is_sellable), third-party certificates
-// (product_coas, published per lot on the PDP). Nothing about purity,
-// delivery speed or free shipping — none of those are facts we hold.
+// Core-reference hero (David, 9/4), carried over to the pens site
+// (2026-09-05): a calm uppercase headline with only its last line bold,
+// one accent pill, and two pens floating on a plain light ground with
+// three small callout badges. Real claims only — every line below is
+// verifiable in this codebase or confirmed by David: pens-only (enforced
+// by ProductVariant._validate_is_sellable), ready to use (a pre-filled
+// pen needs no reconstitution). Nothing about purity, delivery speed,
+// free shipping or third-party testing — none of those are facts this
+// site holds yet.
 //
-// The vials are hard-coded, promotable products (lib/compliance.ts): a
+// TODO(David): the bold closing line is a placeholder until the pen
+// line's compounding/testing facts are confirmed.
+//
+// The pens are hard-coded, promotable products (lib/compliance.ts): a
 // GLP-class code-name product must never appear here. Cut-out renders
 // (transparent background) — see public/products/hero/README.md.
-const HERO_VIALS = { front: "/products/hero/bpc-157.png", back: "/products/hero/tb-500.png" };
+const HERO_PENS = { front: "/products/hero/bpc-157.png", back: "/products/hero/tb-500.png" };
 
 const BADGES = [
-  { icon: "shield", label: "3rd-party tested" },
-  { icon: "vial", label: "Lyophilized vials" },
-  { icon: "flag", label: "US compounded & tested" },
+  { icon: "pen", label: "3 mL auto-injector pens" },
+  { icon: "check", label: "Ready to use" },
+  { icon: "flag", label: "Research use only" },
 ] as const;
 
 export default function HomeHero() {
@@ -30,14 +32,14 @@ export default function HomeHero() {
       <div className={`container ${styles.inner}`}>
         <div className={styles.copy}>
           <h1 className={styles.headline}>
-            Research peptides,
+            Research peptides
             <br />
-            compounded &amp; tested in the USA,
+            in pre-filled auto-injector pens,
             <br />
-            <strong>with third-party lab certificates</strong>
+            <strong>ready to use — no reconstitution</strong>
           </h1>
           <Link href="/shop" className={`button buttonPill ${styles.cta}`}>
-            Shop Peptides
+            Shop Pens
           </Link>
         </div>
 
@@ -45,9 +47,9 @@ export default function HomeHero() {
           <div className={styles.stage}>
             <span className={styles.shadow} />
             {/* eslint-disable-next-line @next/next/no-img-element -- product renders are static files under public/products */}
-            <img src={HERO_VIALS.back} alt="" width={396} height={815} className={`${styles.vial} ${styles.vialBack}`} />
+            <img src={HERO_PENS.back} alt="" width={830} height={195} className={`${styles.pen} ${styles.penBack}`} />
             {/* eslint-disable-next-line @next/next/no-img-element -- see above */}
-            <img src={HERO_VIALS.front} alt="" width={394} height={815} className={`${styles.vial} ${styles.vialFront}`} />
+            <img src={HERO_PENS.front} alt="" width={830} height={195} className={`${styles.pen} ${styles.penFront}`} />
           </div>
           {/* A sibling of the stage, not a child: overlaid on it on desktop,
               flowing beneath it on narrow viewports. */}

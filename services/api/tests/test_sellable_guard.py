@@ -48,7 +48,7 @@ def _make_supplier_product(session, supplier_product_id: int, *, sku: str, name:
     return supplier_product
 
 
-def _make_variant(session, slug_suffix: str, *, form="lyophilized"):
+def _make_variant(session, slug_suffix: str, *, form="pen"):
     product = Product(slug=f"{_TEST_SLUG_PREFIX}-{slug_suffix}", name="Test Widget", images=[], is_active=False)
     session.add(product)
     session.flush()
@@ -161,22 +161,22 @@ def test_setting_is_sellable_false_is_always_allowed(session):
     assert variant.is_sellable is False
 
 
-def test_pen_form_can_never_be_sellable_even_when_verified_mapped(session):
-    """Pens and other non-lyo forms are excluded from this business by
-    permanent product-line decision, not a sourcing gap — a verified
-    MAPPED mapping must not be enough to make one sellable."""
-    supplier_product = _make_supplier_product(session, _TEST_SUPPLIER_PRODUCT_IDS[0], sku="SKU-PEN", name="Widget Pen 10mg")
-    variant = _make_variant(session, "pen", form="pen")
+def test_lyophilized_form_can_never_be_sellable_even_when_verified_mapped(session):
+    """This storefront sells auto-injector pens only — every other form is
+    excluded by product-line decision, not a sourcing gap — so a verified
+    MAPPED mapping must not be enough to make a vial sellable."""
+    supplier_product = _make_supplier_product(session, _TEST_SUPPLIER_PRODUCT_IDS[0], sku="SKU-LYO", name="Widget Lyo 10mg")
+    variant = _make_variant(session, "lyo", form="lyophilized")
     _make_mapping(session, variant, supplier_product)
 
     assert get_mapping_status(session, variant.id) == "MAPPED"
-    with pytest.raises(ValueError, match="only lyophilized vials are sold"):
+    with pytest.raises(ValueError, match="only auto-injector pens are sold"):
         variant.is_sellable = True
 
 
 def test_is_sellable_true_on_unattached_variant_raises():
     """A variant not yet added to any session has no way to verify its
     mapping status — must fail closed, not silently allow it."""
-    variant = ProductVariant(sku="TC-TEST-UNATTACHED", name="Unattached Widget", retail_price_cents=500, form="lyophilized")
+    variant = ProductVariant(sku="TC-TEST-UNATTACHED", name="Unattached Widget", retail_price_cents=500, form="pen")
     with pytest.raises(ValueError, match="session"):
         variant.is_sellable = True

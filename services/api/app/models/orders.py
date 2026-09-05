@@ -14,7 +14,7 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     # The only order identifier ever shown to a customer or exposed by
     # the API — orders.id (a UUID, internal-only) is never returned to
-    # the frontend. Format "TCP-XXXXXX" (see
+    # the frontend. Format "PEN-XXXXXX" (see
     # app.services.storefront._generate_public_order_number).
     public_order_number: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, index=True)
     # Opaque, unguessable — the only "auth" for the guest order-lookup

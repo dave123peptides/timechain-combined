@@ -102,7 +102,7 @@ export default async function CoaPage() {
           )}
 
           <p className={styles.footnote}>
-            Certificates are issued per lot. If the lot printed on your vial isn&apos;t listed, email{" "}
+            Certificates are issued per lot. If the lot printed on your pen isn&apos;t listed, email{" "}
             <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> with the lot number and we&apos;ll send its
             certificate.
           </p>

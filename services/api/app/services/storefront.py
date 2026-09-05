@@ -201,7 +201,9 @@ _ORDER_NUMBER_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # no 0/O/1/I/L — 
 
 def _generate_public_order_number() -> str:
     suffix = "".join(secrets.choice(_ORDER_NUMBER_ALPHABET) for _ in range(6))
-    return f"TCP-{suffix}"
+    # "PEN-" (not the vial site's "TCP-"): both storefronts append to the
+    # same Google Sheet tab, and this prefix is how their rows are told apart.
+    return f"PEN-{suffix}"
 
 
 def _resolve_and_price_items(session: Session, items: list[OrderItemRequest]) -> tuple[list[QuoteLine], int]:
@@ -404,7 +406,7 @@ def list_sellable_products(
     whitespace-only input is treated as no filter rather than as a search
     for the empty string (which would match everything). Note the
     description clause contributes nothing until
-    app.scripts.sync_product_content has run — the column is NULL for
+    app.scripts.seed_pen_catalog has run — the column is NULL for
     every product before that, and NULL ILIKE ... yields NULL, which or_()
     correctly treats as not-true rather than as a match.
 
@@ -416,6 +418,7 @@ def list_sellable_products(
         select(ProductVariant, Product)
         .join(Product, ProductVariant.product_id == Product.id)
         .where(ProductVariant.is_sellable.is_(True))
+        .order_by(Product.name, ProductVariant.retail_price_cents)
     )
     if category is not None:
         query = query.where(Product.category == category)
