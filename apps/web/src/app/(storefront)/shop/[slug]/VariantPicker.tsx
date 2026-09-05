@@ -168,28 +168,31 @@ export default function VariantPicker({
           <dt>Form</dt>
           <dd>Pre-filled 3 mL auto-injector pen</dd>
         </div>
-        <div className={styles.specRow}>
-          <dt>Certificates</dt>
-          <dd>
-            {coas.length > 0 ? (
-              <LabReportLink className={styles.coaLink}>
-                {latestForStrength
-                  ? `${coasForStrength.length} on file for ${strengthText} · latest ${formatCoaDate(latestForStrength.issued_on)} · ${distinctLabs(coasForStrength).join(", ")}`
-                  : `${coas.length} on file (other strengths)`}
-              </LabReportLink>
-            ) : (
-              "Available on request"
-            )}
-            {sdsUrl && (
-              <>
-                {" · "}
-                <a className={styles.coaLink} href={sdsUrl} target="_blank" rel="noopener noreferrer">
-                  Safety Data Sheet
-                </a>
-              </>
-            )}
-          </dd>
-        </div>
+        {/* Certificates row only once a product holds them (David,
+            2026-09-05) — nothing on the page mentions COAs until the pen
+            certificates are loaded. */}
+        {(coas.length > 0 || sdsUrl) && (
+          <div className={styles.specRow}>
+            <dt>{coas.length > 0 ? "Certificates" : "Documents"}</dt>
+            <dd>
+              {coas.length > 0 && (
+                <LabReportLink className={styles.coaLink}>
+                  {latestForStrength
+                    ? `${coasForStrength.length} on file for ${strengthText} · latest ${formatCoaDate(latestForStrength.issued_on)} · ${distinctLabs(coasForStrength).join(", ")}`
+                    : `${coas.length} on file (other strengths)`}
+                </LabReportLink>
+              )}
+              {sdsUrl && (
+                <>
+                  {coas.length > 0 && " · "}
+                  <a className={styles.coaLink} href={sdsUrl} target="_blank" rel="noopener noreferrer">
+                    Safety Data Sheet
+                  </a>
+                </>
+              )}
+            </dd>
+          </div>
+        )}
       </dl>
 
       <FormatNotice form={selected.form} />

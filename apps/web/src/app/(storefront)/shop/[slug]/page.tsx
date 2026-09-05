@@ -63,11 +63,14 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   // The tabbed block under the buy box: About / Lab reports / Questions.
   // (Specifications moved into the buy box itself, Core-style.) About is
-  // omitted rather than shown empty for a product with no authored copy;
-  // Lab reports always renders, with the honest "on request" state when
-  // nothing is held, so the tab a customer looks for is always there.
+  // omitted rather than shown empty for a product with no authored copy.
+  // Lab reports is omitted until a product actually holds certificates
+  // (David, 2026-09-05: pen COAs exist but aren't loaded yet — the tab
+  // returns by itself once sync_coas has run), so nothing on the page
+  // talks about certificates in the meantime.
   const { content } = product;
   const hasAbout = Boolean(content.overview) || content.key_points.length > 0 || content.research_areas.length > 0;
+  const hasCoas = product.coas.length > 0;
   const tabs: ProductTab[] = [
     ...(hasAbout
       ? [
@@ -83,16 +86,20 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           },
         ]
       : []),
-    {
-      id: LAB_REPORTS_TAB_ID,
-      label: "Lab reports",
-      badge: product.coas.length,
-      content: <LabReport productName={product.name} productSlug={product.slug} coas={product.coas} />,
-    },
+    ...(hasCoas
+      ? [
+          {
+            id: LAB_REPORTS_TAB_ID,
+            label: "Lab reports",
+            badge: product.coas.length,
+            content: <LabReport productName={product.name} productSlug={product.slug} coas={product.coas} />,
+          },
+        ]
+      : []),
     {
       id: "questions",
       label: "Questions",
-      content: <ProductFaq faq={content.faq} hasCoas={product.coas.length > 0} />,
+      content: <ProductFaq faq={content.faq} hasCoas={hasCoas} />,
     },
   ];
 

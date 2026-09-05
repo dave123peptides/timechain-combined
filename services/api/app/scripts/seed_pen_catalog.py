@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from sqlalchemy import select
 
@@ -94,6 +94,59 @@ def _single(slug: str, name: str, size_key: str, price_cents: int, image: str | 
         images=(f"/products/pens/{image}",) if image else (),
     )
 
+
+# Per-pen copy from David's TCP Guide (https://tcpguidehelp.vercel.app/),
+# slug -> (chemistry subtitle, description), verbatim (David, 2026-09-05).
+# The subtitle becomes the tagline under the product name unless the name
+# already carries it (the GLP code names); the description becomes the
+# About tab's overview. Pens the guide doesn't cover keep the generic
+# tagline and no About tab.
+#
+# TODO(attorney-review): these are the guide's benefit-framed sentences
+# (weight loss, arousal, muscle growth) — human-outcome language the vial
+# site's standing rules exclude. David chose to show them on this site.
+_GUIDE: dict[str, tuple[str, str]] = {
+    "glp-1s": ("Semaglutide", "Strong appetite suppression and significant weight loss, with improved blood sugar control and added cardiovascular benefits."),
+    "glp-2t": ("Tirzepatide", "A dual GLP-1/GIP agonist that delivers superior weight loss and glycemic control compared to pure GLP-1s."),
+    "glp-3r": ("Retatrutide", "A triple agonist hitting GLP-1, GIP, and glucagon at once — currently one of the most potent options available for fat loss and overall metabolic improvement."),
+    "cagrilinitide": ("Amylin analog", "Reduces appetite and slows gastric emptying through a separate pathway from GLP-1s, which is why it's often stacked with them for enhanced weight loss."),
+    "mots-c": ("Mitochondrial-derived peptide", "Improves insulin sensitivity, exercise capacity, fat metabolism, and overall metabolic flexibility — often described as an exercise mimetic."),
+    "5-amino-1mq": ("NNMT inhibitor", "Boosts NAD+ levels, increases energy expenditure, and supports fat loss while helping preserve lean muscle mass."),
+    "bpc-157": ("Body Protection Compound-157", "Accelerates healing of tendons, ligaments, muscles, and gut lining. Strongly anti-inflammatory, with well-known gut repair benefits."),
+    "tb-500": ("Thymosin Beta-4 fragment", "Promotes cell migration and flexibility, speeding recovery from soft-tissue injuries while reducing inflammation."),
+    "bpc-157-tb-500-wolverine": ("BPC-157 / TB-500 blend", "The synergistic healing stack — faster recovery from injuries, joint issues, and soft-tissue damage than either compound alone."),
+    "ghk-cu": ("Copper peptide", "Wound healing, skin repair, and collagen production, plus anti-inflammatory action and support for hair and tissue regeneration."),
+    "glow-bpc-157-tb-500-ghk": ("BPC-157 / TB-500 / GHK-Cu blend", "Full-spectrum recovery paired with skin and anti-aging support — healing and aesthetics in a single blend."),
+    "klow-kpv-bpc-157-tb-500-ghk": ("KPV / BPC-157 / TB-500 / GHK-Cu blend", "Everything GLOW offers, plus added anti-inflammatory gut support from KPV — the most complete repair blend in the lineup."),
+    "kpv": ("Lysine-Proline-Valine", "A potent anti-inflammatory, especially for the gut and skin. Supports barrier function and helps balance immune response."),
+    "cjc-no-dac-ipamorelin": ("No DAC — GHRH + GHRP blend", "The gold-standard synergistic GH stack — CJC raises GH pulse amplitude and frequency while Ipamorelin adds a clean release, together supporting fat loss, recovery, and deeper sleep."),
+    "ipamorelin": ("Selective GHRP", "Clean GH release with minimal side effects — no meaningful spike in hunger, cortisol, or prolactin."),
+    "tesamorelin": ("GHRH analog", "A potent GHRH analog best known for specifically reducing visceral belly fat and improving overall body composition."),
+    "tesamorelin-ipamorelin": ("Dual secretagogue blend", "Enhanced GH release combined with targeted visceral fat reduction — the stronger option for body recomposition."),
+    "sermorelin": ("GHRH analog", "The classic GHRH analog — milder and more physiological GH stimulation, a gentler entry point than Tesamorelin."),
+    "igf1-lr3": ("Long R3 IGF-1", "A long-acting IGF-1 analog for muscle growth, recovery, and nutrient partitioning."),
+    "selank": ("Tuftsin analog", "An anxiolytic that improves mood, focus, and stress resilience, with mild nootropic effects and no sedation or dependence."),
+    "semax": ("ACTH(4-10) analog", "Neuroprotective and cognition-enhancing — sharpens focus and memory while raising BDNF. Widely used for cognitive performance."),
+    "dihexa": ("Angiotensin IV analog", "Drives formation of new brain synapses — studied for restoring memory and learning, and for recovery of cognitive function after injury."),
+    "dsip": ("Delta Sleep-Inducing Peptide", "Promotes deeper, more restorative sleep and may help with stress regulation and overall recovery."),
+    "epithalon": ("Epithalamin fragment", "Telomere support, circadian rhythm regulation, and anti-aging effects working through the pineal gland."),
+    "pt-141": ("Bremelanotide", "Increases sexual desire and arousal in both men and women, working through melanocortin receptors in the brain rather than blood flow."),
+    "kisspeptin": ("GPR54 (KISS1R) agonist", "Stimulates GnRH, which drives LH and FSH release — supporting the reproductive hormone axis, natural testosterone, and fertility signaling."),
+    "nad": ("Nicotinamide Adenine Dinucleotide", "Boosts cellular energy (ATP), DNA repair, and sirtuin activation — the central compound for longevity pathways and restored mental clarity."),
+    "ss-31": ("Elamipretide", "A mitochondrial membrane stabilizer that improves energy production and reduces oxidative stress in aging or damaged cells."),
+    "glutathione": ("Master antioxidant", "The body's master antioxidant — supports detoxification, immune function, and skin brightening while reducing oxidative stress."),
+    "ta-1": ("Thymosin Alpha-1", "A potent immune modulator that enhances T-cell function — used for immune support and studied heavily for antiviral response."),
+    "ll-37": ("Cathelicidin host-defense peptide", "An antimicrobial defense peptide that targets resistant bacteria, fungi, and biofilms while recruiting immune cells to the site."),
+}
+
+
+def _with_guide(pen: PenProduct) -> PenProduct:
+    entry = _GUIDE.get(pen.slug)
+    if entry is None:
+        return pen
+    subtitle, description = entry
+    tagline = pen.description if subtitle.lower() in pen.name.lower() else subtitle
+    return replace(pen, description=tagline, content={**pen.content, "overview": description})
 
 _PENS: tuple[PenProduct, ...] = (
     # TODO(attorney-review): GLP-class display names carry the drug name in
@@ -181,6 +234,7 @@ _PENS: tuple[PenProduct, ...] = (
     _single("glutathione", "Glutathione", "600", 11900, "glutathione-600.png"),
     _single("5-amino-1mq", "5-Amino-1MQ", "50", 7900, "5-amino-1mq-50.png"),
 )
+_PENS = tuple(_with_guide(pen) for pen in _PENS)
 
 
 def _next_placeholder_id(session) -> int:

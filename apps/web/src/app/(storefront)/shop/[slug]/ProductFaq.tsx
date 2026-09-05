@@ -22,16 +22,12 @@ const SHARED_FAQ: ProductFaqEntry[] = [
   },
 ];
 
-// Which of these renders is decided per product by whether it actually
-// holds certificates — the answer must never outrun the documents.
+// Rendered only for a product that actually holds certificates — the
+// answer must never outrun the documents. While the pen COAs are not
+// loaded yet (David, 2026-09-05) the question is left out entirely.
 const COA_FAQ_HELD: ProductFaqEntry = {
   q: "Is there a Certificate of Analysis for this product?",
   a: "Yes. Third-party certificates for this compound are in the Lab reports tab on this page — one per strength and lot, each opening the laboratory's own copy with a verification code you can check with the lab. If the lot printed on your pen isn't listed, email support@timechainpeptides.com with the lot number.",
-};
-
-const COA_FAQ_ON_REQUEST: ProductFaqEntry = {
-  q: "Is there a Certificate of Analysis for this product?",
-  a: "Not published for this compound yet. A certificate for a given batch is available on request — email support@timechainpeptides.com and reference the product and lot number. We publish certificates as we hold them.",
 };
 
 export default function ProductFaq({ faq, hasCoas }: { faq: ProductFaqEntry[]; hasCoas: boolean }) {
@@ -41,7 +37,7 @@ export default function ProductFaq({ faq, hasCoas }: { faq: ProductFaqEntry[]; h
         <span className="eyebrow">Questions</span>
         <h2>Frequently Asked Questions</h2>
       </div>
-      <Faq entries={[...faq, hasCoas ? COA_FAQ_HELD : COA_FAQ_ON_REQUEST, ...SHARED_FAQ]} />
+      <Faq entries={[...faq, ...(hasCoas ? [COA_FAQ_HELD] : []), ...SHARED_FAQ]} />
     </section>
   );
 }
