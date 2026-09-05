@@ -50,8 +50,7 @@ export default function Header() {
     <header className={styles.header}>
       <div className={`container ${styles.bar}`}>
         <Link href="/" className={styles.wordmark}>
-          Time<span>Chain</span>
-          <span className={styles.wordmarkSuffix}> Peptides</span>
+          T<span>CP</span>
         </Link>
 
         <nav className={styles.nav} aria-label="Primary">
