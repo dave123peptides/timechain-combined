@@ -2,6 +2,7 @@ import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
 import PageBanner from "@/components/PageBanner";
 import { listProductsOrEmpty } from "@/lib/api";
+import { findCategory } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -10,12 +11,11 @@ export const dynamic = "force-dynamic";
 // surface.
 const BANNER_PENS = ["/products/hero/tb-500.png", "/products/hero/bpc-157.png", "/products/hero/ghk-cu.png"];
 
-// One flat, alphabetical catalog — deliberately no category filter or
-// grouping (BioLongevity pattern). Benefit-named categories ("GLP-1 &
-// Metabolic", "Sexual Health & Hormonal") are implied-intended-use claims
-// incompatible with the RUO positioning, so Product.category never
-// renders to customers; it stays internal-only. A stray ?category= from
-// an old link is simply ignored.
+// One flat, alphabetical catalog with a benefit-category pill row on top
+// (lib/categories.ts — David's 2026-09-05 decision for the pens site;
+// the vial site kept categories internal, see the TODO(attorney-review)
+// there). ?category= narrows the grid; an unknown value means "all".
+// Product.category (the internal taxonomy) still never renders.
 //
 // No format filter either: every sellable variant is form="pen"
 // (ProductVariant._validate_is_sellable rejects every other form), so a
@@ -26,11 +26,12 @@ const BANNER_PENS = ["/products/hero/tb-500.png", "/products/hero/bpc-157.png", 
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; sort?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; category?: string }>;
 }) {
   const params = await searchParams;
   const query = params.q?.trim() || undefined;
   const sort = isSort(params.sort) ? params.sort : "name";
+  const category = findCategory(params.category);
 
   // Degrades to empty rather than crashing the page if the API is
   // unreachable.
@@ -53,6 +54,7 @@ export default async function ShopPage({
         basePath="/shop"
         sort={sort}
         query={query}
+        category={category}
       />
     </main>
   );

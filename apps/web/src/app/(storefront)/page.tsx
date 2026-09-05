@@ -5,6 +5,7 @@ import { isSort } from "@/components/catalog/sort";
 import HomeHero from "@/components/home/HomeHero";
 import TrustStrip from "@/components/home/TrustStrip";
 import { listProductsOrEmpty } from "@/lib/api";
+import { findCategory } from "@/lib/categories";
 import { SITE_FAQ } from "@/lib/faqContent";
 import styles from "./page.module.css";
 
@@ -16,18 +17,20 @@ const HOMEPAGE_FAQ_COUNT = 6;
 // the WHOLE catalog as a grid — no featured/"popular" selection, which is
 // also what lib/compliance.ts wants: with every product listed
 // alphabetically there is no curated surface that could promote a
-// GLP-class product. The standards/pipeline/purity content that used to
+// GLP-class product. Category pills (lib/categories.ts) filter that
+// grid in place. The standards/pipeline/purity content that used to
 // fill this page lives on /about now.
-export default async function Home({ searchParams }: { searchParams: Promise<{ sort?: string }> }) {
+export default async function Home({ searchParams }: { searchParams: Promise<{ sort?: string; category?: string }> }) {
   const params = await searchParams;
   const sort = isSort(params.sort) ? params.sort : "name";
+  const category = findCategory(params.category);
   const products = await listProductsOrEmpty({ sort });
 
   return (
     <main>
       <HomeHero />
       <TrustStrip />
-      <CatalogGrid products={products} title="Research Peptides For Sale" basePath="/" sort={sort} />
+      <CatalogGrid products={products} title="Research Peptides For Sale" basePath="/" sort={sort} category={category} />
       <section className={styles.faq}>
         <div className={`container ${styles.faqInner}`}>
           <div className={styles.sectionHead}>

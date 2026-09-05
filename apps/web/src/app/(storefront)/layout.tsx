@@ -2,10 +2,12 @@ import CartDrawer from "@/components/cart/CartDrawer";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
-// No category navigation anywhere: benefit-named categories are
-// implied-intended-use claims incompatible with RUO positioning, so
-// Product.category is internal-only and never renders to customers.
-// /shop is one flat alphabetical catalog (BioLongevity pattern).
+// Category navigation lives in the catalog grid itself (CategoryPills,
+// lib/categories.ts) — David's 2026-09-05 decision for the pens site.
+// The vial site kept every category internal because benefit-named
+// groups read as intended-use claims; that concern is recorded as a
+// TODO(attorney-review) in lib/categories.ts. Product.category (the
+// internal taxonomy) still never renders to customers.
 
 export default function StorefrontLayout({ children }: { children: React.ReactNode }) {
   return (

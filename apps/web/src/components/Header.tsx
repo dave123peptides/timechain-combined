@@ -10,8 +10,8 @@ import styles from "./Header.module.css";
 
 // Core-reference header (9/4): light bar, wordmark left, the primary
 // pages centered as uppercase links, search pill + cart on the right.
-// No account icon — there are no customer accounts. No category links —
-// categories are internal-only (see (storefront)/layout.tsx). No COAs
+// No account icon — there are no customer accounts. No category links
+// here — the category pills sit above the catalog grid. No COAs
 // link (David, 9/5): certificates belong to each product and are reached
 // from the product page; /coa still exists via the footer.
 const NAV = [

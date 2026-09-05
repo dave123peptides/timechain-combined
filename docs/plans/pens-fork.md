@@ -14,6 +14,7 @@ Forked from `timechain-storefront` at `8d087b5` on 2026-09-05 into
 | Size labels | Strength only ("1.5mg"). "Month N" from the sheet is fulfillment-only (placeholder supplier row name → the sheet's `items` column). |
 | Orders | Same Google Sheet and `Orders` tab as the vial site; pen orders are numbered `PEN-XXXXXX`. |
 | Images | David's renders (`assets/pen-images/`, as delivered) → `apps/web/public/products/pens/<slug>-<size>.<ext>`; hero cut-outs via `apps/web/scripts/pen-cutouts.py`. |
+| Categories | Seven benefit categories from David's TCP Guide (https://tcpguidehelp.vercel.app/) render as a pill row above the catalog grid on `/` and `/shop` (`lib/categories.ts`, `CategoryPills`); `?category=` filters in place, a pen can sit in several groups. **TODO(attorney-review):** benefit-named categories and the guide's descriptions are the intended-use signals the vial site avoided. |
 | Deployment | Not done in this pass. No `.vercel/` links exist in this repo; `vercel link` to NEW projects before any deploy. |
 
 ## Side-by-side with the vial site
