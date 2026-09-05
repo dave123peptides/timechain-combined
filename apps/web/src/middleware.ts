@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { ACCESS_COOKIE } from "@/lib/access";
+import { ACCESS_COOKIE, hasValidAccessToken } from "@/lib/access";
 
 // Site-entry age self-attestation — a plain "I confirm I am 21+"
 // checkbox-equivalent, deliberately not framed as identity verification
@@ -42,14 +42,15 @@ function isAdminAuthorized(request: NextRequest): boolean {
   return suppliedUser === user && suppliedPassword === password;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/admin")) {
     return isAdminAuthorized(request) ? NextResponse.next() : unauthorized();
   }
 
   // Pre-launch lock: everything (including the age gate) sits behind the
-  // access password until the cookie says this session passed /enter.
-  if (!request.cookies.has(ACCESS_COOKIE)) {
+  // access password until the cookie proves this session passed /enter
+  // (its value is verified, not just its presence — see lib/access.ts).
+  if (!(await hasValidAccessToken(request.cookies.get(ACCESS_COOKIE)?.value))) {
     const url = request.nextUrl.clone();
     url.pathname = "/enter";
     url.search = "";

@@ -42,6 +42,60 @@ Checks: `services/api/.venv/bin/python -m pytest -q` (against `tcp_test`
 via `DATABASE_URL=...`), `npm run lint && npm run typecheck && npm run build`
 in `apps/web`.
 
+## Deploying to Vercel
+
+Two Vercel projects from this one repo, both importing the GitHub repo
+`tcp-storefront` with **Automatically deploy on push** (unlike the vial
+site, which deploys from the CLI). Never link this repo to the vial site's
+`timechain-storefront` / `timechain-api` projects.
+
+**1. Database.** Create a NEW Postgres database for this site (e.g. Neon
+from the Vercel Marketplace). Do not reuse the vial site's database. Copy
+its connection string; the API accepts `postgres://` or `postgresql://`.
+
+**2. API project** (`tcp-api`): Root Directory `services/api`. The
+`vercel.json` there sets the build command (migrations + catalog seed +
+certificate sync run inside the build) and rewrites every path to the
+FastAPI app. Environment variables:
+
+```
+DATABASE_URL=<the new database's connection string>
+PUBLIC_SITE_URL=https://<the web project's domain>     # bare or www — both are allowed for CORS
+API_CORS_ORIGINS=https://<the web project's domain>
+ADMIN_BASIC_AUTH_USER=<pick>
+ADMIN_BASIC_AUTH_PASSWORD=<pick>
+FULFILLMENT_MODE=manual
+CHECKOUT_ENABLED=true
+GOOGLE_SHEETS_ORDERS_SPREADSHEET_ID=<same as the vial site>
+GOOGLE_SHEETS_ORDERS_TAB=Orders
+GOOGLE_SHEETS_REFRESH_TOKEN_JSON=<same one-line JSON as the vial site>
+```
+
+**3. Web project** (`tcp-storefront`): Root Directory `apps/web`,
+framework Next.js. Environment variables:
+
+```
+NEXT_PUBLIC_API_BASE_URL=https://<the API project's domain>
+API_INTERNAL_BASE_URL=https://<the API project's domain>
+SITE_ACCESS_PASSWORD=health123            # the pre-launch gate; also the code default
+ADMIN_BASIC_AUTH_USER=<same as the API>
+ADMIN_BASIC_AUTH_PASSWORD=<same as the API>
+```
+
+Deploy the API first (so its domain is known), then the web project, then
+set `PUBLIC_SITE_URL` / `API_CORS_ORIGINS` on the API to the web domain
+and redeploy the API — a CORS mismatch breaks the cart and checkout (this
+exact mistake took the vial site's cart down on 2026-09-05). Verify with:
+
+```sh
+curl -s https://<api-domain>/healthz
+curl -s https://<api-domain>/shop/products | head -c 300
+curl -sD - -o /dev/null -H "Origin: https://<web-domain>" https://<api-domain>/shop/products | grep -i access-control-allow-origin
+```
+
+Then open the web domain, pass the gate with the password, and place a
+test order to confirm a `PEN-` row lands in the Orders sheet.
+
 ## Structure
 
 ```

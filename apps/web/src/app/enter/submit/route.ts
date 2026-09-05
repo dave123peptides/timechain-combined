@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
-import { ACCESS_COOKIE, siteAccessPassword } from "@/lib/access";
+import { ACCESS_COOKIE, accessToken, siteAccessPassword } from "@/lib/access";
 
 // Pre-launch lock: compare the submitted password in constant time and,
 // on success, grant a session-scoped cookie (no maxAge — a fresh browser
 // session has to enter the password again, which is the point while the
-// site is unpublished). On failure, bounce back to the form.
+// site is unpublished) carrying the password-derived token that the
+// middleware verifies. On failure, bounce back to the form.
 export async function POST(request: NextRequest) {
   const form = await request.formData();
   const supplied = String(form.get("password") ?? "");
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.redirect(new URL(next, request.url), 303);
-  response.cookies.set(ACCESS_COOKIE, "1", {
+  response.cookies.set(ACCESS_COOKIE, await accessToken(), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
