@@ -28,7 +28,7 @@ LAUNCH_CATEGORIES: list[str] = [
     "Sexual Health & Hormonal",
 ]
 
-# All 34 pen products (51 pens) from David's 2026-09-05 pen price sheet.
+# All 35 pen products (52 pens) from David's 2026-09-05 pen price sheet.
 PRODUCT_CATEGORY_BY_SLUG: dict[str, str] = {
     "glp-1s": "GLP-1 & Metabolic",
     "glp-2t": "GLP-1 & Metabolic",
@@ -63,5 +63,6 @@ PRODUCT_CATEGORY_BY_SLUG: dict[str, str] = {
     "glutathione": "Longevity & Cognitive",
     "kisspeptin": "Sexual Health & Hormonal",
     "pt-141": "Sexual Health & Hormonal",
+    "mt-2": "Sexual Health & Hormonal",
     "hcg-6000-units": "Sexual Health & Hormonal",
 }

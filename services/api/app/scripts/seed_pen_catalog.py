@@ -130,6 +130,7 @@ _GUIDE: dict[str, tuple[str, str]] = {
     "dihexa": ("Angiotensin IV analog", "Drives formation of new brain synapses — studied for restoring memory and learning, and for recovery of cognitive function after injury."),
     "dsip": ("Delta Sleep-Inducing Peptide", "Promotes deeper, more restorative sleep and may help with stress regulation and overall recovery."),
     "epithalon": ("Epithalamin fragment", "Telomere support, circadian rhythm regulation, and anti-aging effects working through the pineal gland."),
+    "mt-2": ("Melanotan II", "Tanning plus a significant libido boost, with appetite suppression as an added effect."),
     "pt-141": ("Bremelanotide", "Increases sexual desire and arousal in both men and women, working through melanocortin receptors in the brain rather than blood flow."),
     "kisspeptin": ("GPR54 (KISS1R) agonist", "Stimulates GnRH, which drives LH and FSH release — supporting the reproductive hormone axis, natural testosterone, and fertility signaling."),
     "nad": ("Nicotinamide Adenine Dinucleotide", "Boosts cellular energy (ATP), DNA repair, and sirtuin activation — the central compound for longevity pathways and restored mental clarity."),
@@ -210,6 +211,8 @@ _PENS: tuple[PenProduct, ...] = (
     _single("hcg-6000-units", "HCG (6000 units)", "3", 20900, "hcg-6000-units-3.jpg"),
     _single("nad", "NAD+", "500", 20900, "nad-500.png"),
     _single("pt-141", "PT-141", "10", 10900, "pt-141-10.jpg"),
+    # Added by David on 2026-09-05 (not on the original sheet): MT-II 10 mg, $140.
+    _single("mt-2", "MT-II", "10", 14000, "mt-2-10.png"),
     _single("igf1-lr3", "IGF-1 LR3", "1", 20900, "igf1-lr3-1.png"),
     PenProduct(
         slug="mots-c",

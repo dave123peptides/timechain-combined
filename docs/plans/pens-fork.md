@@ -9,7 +9,7 @@ Forked from `timechain-storefront` at `8d087b5` on 2026-09-05 into
 |---|---|
 | Brand | Same TimeChain Peptides brand: wordmark, support email, Venmo `@timechain`, Zelle placeholder, Timechain Ventures LLC. |
 | Product line | Pre-filled 3 mL auto-injector pens only. No vials, no BAC water, no COAs yet. `ProductVariant._validate_is_sellable` now rejects every form except `pen` (the vial site's rule inverted). |
-| Catalog source | `services/api/app/scripts/seed_pen_catalog.py` — the 2026-09-05 pen price sheet: 34 products, 51 pens, suggested-retail prices. Idempotent; replaces the four vial-era sync scripts and the xlsx importer. |
+| Catalog source | `services/api/app/scripts/seed_pen_catalog.py` — the 2026-09-05 pen price sheet: 35 products, 52 pens (MT-II 10 mg $140 added after the sheet), suggested-retail prices. Idempotent; replaces the four vial-era sync scripts and the xlsx importer. |
 | GLP naming | Code-name slugs kept; display names carry the real name in parentheses ("GLP-3R (Retatrutide)"). `TODO(attorney-review)`. See `claude-answers-glp-decision.md` addendum. |
 | Size labels | Strength only ("1.5mg"). "Month N" from the sheet is fulfillment-only (placeholder supplier row name → the sheet's `items` column). |
 | Orders | Same Google Sheet and `Orders` tab as the vial site; pen orders are numbered `PEN-XXXXXX`. |

@@ -13,9 +13,10 @@ _PUBLIC = Path(__file__).resolve().parents[3] / "apps" / "web" / "public"
 
 
 def test_table_matches_the_price_sheet_counts():
-    # 51 sheet rows: 5 multi-size products (22 rows) + 29 single-size pens.
-    assert len(_PENS) == 34
-    assert sum(len(p.sizes) for p in _PENS) == 51
+    # 51 sheet rows: 5 multi-size products (22 rows) + 29 single-size pens,
+    # plus MT-II 10 mg added by David on 2026-09-05.
+    assert len(_PENS) == 35
+    assert sum(len(p.sizes) for p in _PENS) == 52
 
 
 def test_slugs_and_skus_are_unique():

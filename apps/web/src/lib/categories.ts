@@ -71,7 +71,7 @@ export const STOREFRONT_CATEGORIES: StorefrontCategory[] = [
     slug: "sexual",
     label: "Sexual Health & Libido",
     description: "Desire, arousal, and reproductive hormone support for both men and women.",
-    products: ["pt-141", "kisspeptin", "hcg-6000-units"],
+    products: ["pt-141", "mt-2", "kisspeptin", "hcg-6000-units"],
   },
   {
     slug: "longevity",
