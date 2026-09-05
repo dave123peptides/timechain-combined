@@ -36,8 +36,13 @@ BPC-157-20 (stands in for the 10 mg pen too) · TB-500 · NAD+500 · PT-141-10 �
 Cagrilinitide-10 · GHK-Cu-50 · TA-1-10 · Epithalon-10-red-pen.png (label reads 60 mg) · Kisspeptin-5 · KPV-10 · LL37-10 ·
 Selank-20 · Semax-20 · SS-31-50 · DSIP-5 · Dihexa-10 · Gluthathione-600 · 5Amino-1-50.
 
-No render (letter-tile placeholder): ipamorelin (only a 30 mg render exists; sheet says 10 mg),
-klow-kpv-bpc-157-tb-500-ghk, cjc-1295-no-dac, bpc-157-tb-500-wolverine, hcg-6000-units, hexarelin.
+Second delivery (`assets/pen-images/updated-2026-09-05/`, 2170×725 with extra white space, cropped and
+downscaled to the 830×195 framing by the one-off Pillow step recorded in the git history): Ipamorelin 10,
+KLOW 10/10/10/50, CJC-1295 no DAC 10, Wolverine 10/10, HCG 3, Hexarelin 5. Every product now has a render.
+**Label text to fix on those renders (David/designer):** the KLOW pen lists KPV, LL-37, Oxytocin and White
+Adipose Tissue Extract (sheet says KPV/BPC-157/TB-500/GHK-Cu); the Wolverine pen lists CJC-1295 and
+Ipamorelin (should be BPC-157/TB-500); Ipamorelin, Hexarelin and HCG carry a stray "(No DAC)". Replacing a
+file under `apps/web/public/products/pens/` with the same name is all a corrected render needs.
 
 Renders in `assets/pen-images/` for products not on the sheet (unused): AOD-9604, B3 1000, FOX-04,
 MT-I, MT-II, NAD 1000/1600, GLP-1S 15 mg, GLP1-S 1 mg, Tesamorelin 10, Ipamorelin 30, BPC-100, Tesa/Ipa 40/10,
@@ -48,5 +53,5 @@ and the six large "GLP-xx PEN Nmg.JPEG" photo sets.
 - Confirm the pen line's compounding/testing facts (`TODO(David)` in `HomeHero.tsx`, `TrustStrip.tsx`, `shop/page.tsx`).
 - Zelle recipient/account name are still placeholders (`lib/paymentMethods.ts`), same as the vial site.
 - Attorney review of the parenthetical GLP names.
-- Renders for the six placeholder products; a 10 mg BPC-157 render.
+- Corrected label text on the KLOW, Wolverine, Ipamorelin, Hexarelin and HCG renders (see above); a 10 mg BPC-157 render.
 - Real pen supplier SKUs (the seed creates `PENDING-` placeholder mappings, like the vial site did at launch).

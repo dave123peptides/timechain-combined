@@ -8,8 +8,8 @@ and Google Sheets order feed, with a pens-only catalog. The vial repo is
 not touched by anything in here. Decisions and the side-by-side setup are
 recorded in [`docs/plans/pens-fork.md`](docs/plans/pens-fork.md).
 
-**Status:** local storefront complete (34 products, 51 pens, renders for
-28 of them); deployment to its own Vercel projects still to do.
+**Status:** local storefront complete (34 products, 51 pens, every product
+has a render); deployment to its own Vercel projects still to do.
 
 ## Running it locally (native, side by side with the vial site)
 
