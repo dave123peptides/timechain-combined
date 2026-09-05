@@ -2,7 +2,7 @@ import SectionIcon from "@/components/SectionIcon";
 import ContactForm from "./ContactForm";
 import styles from "./page.module.css";
 
-export const metadata = { title: "Contact | TimeChain" };
+export const metadata = { title: "Contact | TCP" };
 
 const SUPPORT_EMAIL = "support@timechainpeptides.com";
 

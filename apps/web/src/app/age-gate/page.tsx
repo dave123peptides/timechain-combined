@@ -12,7 +12,7 @@ export default async function AgeGatePage({
   return (
     <main className={styles.wrap}>
       <div className={styles.card}>
-        <div className={styles.wordmark}>TimeChain Peptides</div>
+        <div className={styles.wordmark}>TCP</div>
         <span className={styles.eyebrow}>Research Use Only</span>
         <form action="/age-gate/enter" method="post" className={styles.form}>
           <input type="hidden" name="next" value={safeNext} />

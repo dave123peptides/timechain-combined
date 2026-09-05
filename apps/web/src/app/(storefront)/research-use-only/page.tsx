@@ -1,6 +1,6 @@
 import styles from "../legal.module.css";
 
-export const metadata = { title: "Research Use Only | TimeChain" };
+export const metadata = { title: "Research Use Only | TCP" };
 
 export default function ResearchUseOnlyPage() {
   return (

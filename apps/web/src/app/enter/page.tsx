@@ -13,7 +13,7 @@ export default async function EnterPage({
   return (
     <main className={styles.wrap}>
       <div className={styles.card}>
-        <div className={styles.wordmark}>TimeChain Peptides</div>
+        <div className={styles.wordmark}>TCP</div>
         <span className={styles.eyebrow}>Private Preview</span>
         <form action="/enter/submit" method="post" className={styles.form}>
           <input type="hidden" name="next" value={safeNext} />

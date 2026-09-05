@@ -16,7 +16,7 @@ export default function Footer() {
         <div className={styles.grid}>
           <div>
             <div className={styles.wordmark}>
-              Time<span>Chain</span>
+              T<span>CP</span>
             </div>
             <p className={styles.tagline}>
               Research compounds sourced and handled to exacting standards, for laboratory and research use.

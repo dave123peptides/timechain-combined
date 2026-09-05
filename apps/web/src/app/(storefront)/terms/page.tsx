@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "../legal.module.css";
 
-export const metadata = { title: "Terms of Service | TimeChain" };
+export const metadata = { title: "Terms of Service | TCP" };
 
 export default function TermsPage() {
   return (

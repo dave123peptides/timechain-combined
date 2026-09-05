@@ -5,7 +5,7 @@ import ProofSection from "@/components/standards/ProofSection";
 import VerificationPipeline from "@/components/standards/VerificationPipeline";
 import styles from "./page.module.css";
 
-export const metadata = { title: "About & Quality | TimeChain" };
+export const metadata = { title: "About & Quality | TCP" };
 
 // Real claims only. Several statements previously on this page could not
 // be backed and have been removed rather than softened:

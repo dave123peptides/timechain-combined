@@ -3,7 +3,7 @@ import Faq from "@/components/Faq";
 import { SITE_FAQ } from "@/lib/faqContent";
 import styles from "../legal.module.css";
 
-export const metadata = { title: "FAQ | TimeChain" };
+export const metadata = { title: "FAQ | TCP" };
 
 export default function FaqPage() {
   return (

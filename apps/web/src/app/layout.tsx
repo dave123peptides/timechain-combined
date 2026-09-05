@@ -21,7 +21,7 @@ const bodyFont = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TimeChain",
+  title: "TCP",
   description: "Research compounds sourced and handled to exacting standards, for laboratory and research use.",
 };
 

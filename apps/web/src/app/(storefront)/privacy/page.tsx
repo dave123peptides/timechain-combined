@@ -1,6 +1,6 @@
 import styles from "../legal.module.css";
 
-export const metadata = { title: "Privacy Policy | TimeChain" };
+export const metadata = { title: "Privacy Policy | TCP" };
 
 export default function PrivacyPage() {
   return (
