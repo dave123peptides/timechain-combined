@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Faq from "@/components/Faq";
 import { SITE_FAQ } from "@/lib/faqContent";
 import styles from "../legal.module.css";
@@ -13,7 +12,7 @@ export default function FaqPage() {
 
       <p>
         Shared with the homepage from a single list, so the two can never disagree. If something isn&apos;t
-        answered here, <Link href="/contact">get in touch</Link> — we&apos;d rather tell you we don&apos;t know
+        answered here, email <a href="mailto:support@timechainpeptides.com">support@timechainpeptides.com</a> — we&apos;d rather tell you we don&apos;t know
         yet than guess.
       </p>
 

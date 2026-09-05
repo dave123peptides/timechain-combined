@@ -27,8 +27,6 @@ export default function Footer() {
             <div className={styles.linkList}>
               <Link href="/shop">Shop</Link>
               <Link href="/coa">Certificates of Analysis</Link>
-              <Link href="/about">About</Link>
-              <Link href="/contact">Contact</Link>
               <Link href="/faq">FAQ</Link>
               <Link href="/cart">Cart</Link>
             </div>

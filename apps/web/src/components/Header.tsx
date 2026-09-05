@@ -14,11 +14,11 @@ import styles from "./Header.module.css";
 // here — the category pills sit above the catalog grid. No COAs
 // link (David, 9/5): certificates belong to each product and are reached
 // from the product page; /coa still exists via the footer.
+// About and Contact were removed on 2026-09-05 (David); support is by
+// email, shown in the trust strip and the FAQ.
 const NAV = [
   { href: "/", label: "Home" },
   { href: "/shop", label: "Shop" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
 ];
 
 function isActive(pathname: string, href: string): boolean {

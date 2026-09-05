@@ -17,7 +17,8 @@ Forked from `timechain-storefront` at `8d087b5` on 2026-09-05 into
 | Categories | Seven benefit categories from David's TCP Guide (https://tcpguidehelp.vercel.app/) render as a pill row above the catalog grid on `/` and `/shop` (`lib/categories.ts`, `CategoryPills`); `?category=` filters in place, a pen can sit in several groups. **TODO(attorney-review):** benefit-named categories and the guide's descriptions are the intended-use signals the vial site avoided. |
 | Product copy | Each pen's subtitle and description come from the TCP Guide (`_GUIDE` in `seed_pen_catalog.py`): subtitle = tagline under the name (skipped when the name already carries it), description = About tab overview. 31 of 34 pens covered; CJC-1295 no DAC, Hexarelin and HCG keep the generic tagline. **TODO(attorney-review):** benefit-framed sentences. |
 | Certificates | Hidden on the product page until a product holds COAs (Lab reports tab, Certificates spec row, COA FAQ entry all gate on `coas.length`). David has pen COAs; loading them via the manifest + `sync_coas` brings everything back with no code change. `/coa` and the footer link remain. |
-| Deployment | Not done in this pass. No `.vercel/` links exist in this repo; `vercel link` to NEW projects before any deploy. |
+| Pages removed | About and Contact pages removed (David, 2026-09-05), with the standards components/content that only About used. Nav is Home / Shop; support is by email (trust strip, FAQ). |
+| Deployment | Live at https://www.buytcp.com (Vercel projects `tcp-storefront` + `tcp-api`, auto-deploy from GitHub `main`). No `.vercel/` links exist in this repo; `vercel link` to NEW projects before any deploy. |
 
 ## Side-by-side with the vial site
 

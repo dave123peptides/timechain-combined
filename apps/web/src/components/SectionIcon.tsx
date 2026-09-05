@@ -1,8 +1,35 @@
-import type { IconName } from "@/lib/standardsContent";
 
-// Minimal inline stroke icons for the standards sections and, since the
-// 9/4 Core-reference redesign, the site chrome (header, cart drawer,
-// contact panels). Hand-rolled rather than pulling in an icon package:
+export type IconName =
+  | "flask"
+  | "vial"
+  | "pen"
+  | "flag"
+  | "document"
+  | "layers"
+  | "bitcoin"
+  | "link"
+  | "shield"
+  | "record"
+  | "gate"
+  | "loop"
+  | "map"
+  | "chat"
+  // Chrome glyphs (header, drawer, order page).
+  | "search"
+  | "bag"
+  | "menu"
+  | "close"
+  | "mail"
+  | "trash"
+  | "chevronLeft"
+  | "check"
+  | "warning"
+  | "copy"
+  | "external";
+
+// Minimal inline stroke icons for the homepage trust strip, hero badges
+// and the site chrome (header, cart drawer, order page). Hand-rolled
+// rather than pulling in an icon package:
 // this web app deliberately has only react/next in dependencies, and
 // twenty-ish 24px glyphs don't justify changing that. All paths are drawn on a 24x24 grid, stroke-only, and
 // inherit currentColor so each section's CSS decides the color.
