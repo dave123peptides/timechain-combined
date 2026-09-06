@@ -23,8 +23,14 @@ from sqlalchemy.orm import Session, selectinload
 from app.models.orders import Order
 from app.models.payments import Payment
 
+# Column order is shared with the vial site (~/Desktop/timechain), whose
+# TCP- orders land in the same "Timechain Orders" sheet: both apps must
+# write the same layout or their rows misalign. discount_code (column B,
+# added 9/6) is the vial site's checkout discount code; pens have no
+# discount codes yet, so this app writes it empty.
 EXPORT_COLUMNS = [
     "order_number",
+    "discount_code",
     "placed_at",
     "status",
     "payment_method",
@@ -92,6 +98,7 @@ def order_export_row(order: Order) -> dict:
         "tax": _money(order.tax_cents),
         "total": _money(order.total_cents),
         "currency": order.currency.upper(),
+        "discount_code": "",
     }
 
 
