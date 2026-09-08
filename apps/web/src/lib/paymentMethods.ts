@@ -62,7 +62,9 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
       "Place your order first. The Zelle details and your order number appear on the next page.",
       // The checkout step names the account only (David, 9/7); the enrolled
       // address is shown on the order page, where the customer actually sends.
-      `Send your order total via Zelle to ${ZELLE.accountName}.`,
+      // Quoted so it reads as the name Zelle will display, not a handle
+      // (David, 9/8): Zelle has no @usernames, only the registered name.
+      `Send your order total via Zelle. The recipient will show up as “${ZELLE.accountName}”.`,
       "Enter ONLY your order number in the memo. Do not mention peptides or product names.",
       "Your order ships once the payment is received and matched to your order number.",
     ],

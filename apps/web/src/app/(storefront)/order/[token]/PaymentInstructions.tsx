@@ -39,7 +39,11 @@ export default function PaymentInstructions({ order, method }: { order: Order; m
         {method === "zelle" ? (
           <>
             <CopyField label="Recipient" value={ZELLE.recipient} />
-            <CopyField label="Name on the account" value={ZELLE.accountName} />
+            <CopyField label="Name shown on Zelle" value={ZELLE.accountName} />
+            <p className={styles.payLinkHint}>
+              After you enter the recipient, Zelle shows the name “{ZELLE.accountName}”. If a different name comes up, stop and
+              email {SUPPORT_EMAIL} before sending.
+            </p>
           </>
         ) : (
           <>
