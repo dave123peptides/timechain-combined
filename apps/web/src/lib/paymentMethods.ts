@@ -13,9 +13,11 @@ import type { PaymentMethod } from "@/lib/api";
 export const SUPPORT_EMAIL = "support@timechainpeptides.com";
 export const BUSINESS_NAME = "Timechain Ventures LLC";
 
+// Venmo details changed by David on 2026-09-08: payments go to the
+// timechainp profile, @timechainp (same as the vial site).
 export const VENMO = {
-  handle: "@david-jeffries-20",
-  url: "https://venmo.com/u/David-Jeffries-20",
+  handle: "@timechainp",
+  url: "https://venmo.com/u/timechainp",
 };
 
 export const ZELLE = {
