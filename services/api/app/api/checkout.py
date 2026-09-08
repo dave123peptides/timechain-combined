@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.shop import OrderResponse, ShippingAddressRequest, order_response
 from app.core.config import get_settings
 from app.db.session import get_db
-from app.services import order_notify, order_sheet, storefront
+from app.services import ghl_notify, order_notify, order_sheet, storefront
 from app.services.order_export import order_notification_payload
 
 router = APIRouter(prefix="/api/v1/checkout", tags=["checkout"])
@@ -160,6 +160,11 @@ def create_checkout(
     payload = order_notification_payload(order, order_url=f"{site}/order/{order.access_token}" if site else None)
     background.add_task(order_notify.notify_new_order, payload)
     background.add_task(order_sheet.append_order_row, payload)
+    # GoHighLevel CRM push — customer-safe fields only (ghl_notify builds
+    # them); skipped silently when GHL_ORDER_WEBHOOK_URL is blank.
+    ghl = ghl_notify.ghl_payload(payload)
+    if ghl:
+        background.add_task(ghl_notify.push_order_to_ghl, ghl)
     return order_response(order)
 
 

@@ -79,6 +79,15 @@ class Settings(BaseSettings):
     # logged and never affects the customer's checkout.
     order_notify_webhook_url: str = ""
 
+    # GoHighLevel CRM push (app/services/ghl_notify.py). When set, every
+    # newly placed order is POSTed (customer-safe fields only) to a GHL
+    # workflow's Inbound Webhook URL, which creates/updates the contact
+    # and emails the customer their order number + payment steps.
+    # This is the pens site's OWN workflow (distinct from the vial
+    # storefront's) so PEN- orders are told apart in the CRM.
+    # Blank = feature off.
+    ghl_order_webhook_url: str = ""
+
     # Google Sheets order feed (docs/plans/google-sheets-order-feed.md).
     # Every new order is appended as a row to the named tab via a service
     # account. Blank spreadsheet id = feature off.
