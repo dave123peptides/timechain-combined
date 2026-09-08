@@ -13,8 +13,8 @@ export const SUPPORT_EMAIL = "support@timechainpeptides.com";
 export const BUSINESS_NAME = "Timechain Ventures LLC";
 
 export const VENMO = {
-  handle: "@timechain",
-  url: "https://www.venmo.com/u/timechain",
+  handle: "@david-jeffries-20",
+  url: "https://venmo.com/u/David-Jeffries-20",
 };
 
 export const ZELLE = {
