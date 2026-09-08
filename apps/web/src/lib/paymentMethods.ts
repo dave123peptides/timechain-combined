@@ -6,8 +6,9 @@ import type { PaymentMethod } from "@/lib/api";
 // coming soon. Every string shown at checkout and on the order page for
 // these methods comes from here, so the details live in one place.
 //
-// TODO(David): confirm the Zelle recipient and the name customers will
-// see on the account before this branch ships — both are placeholders.
+// Zelle details confirmed by David on 2026-09-06 for the vial site and
+// applied here on 2026-09-07: the enrolled address is
+// support@timechainpeptides.com and the account shows as "Timechain".
 
 export const SUPPORT_EMAIL = "support@timechainpeptides.com";
 export const BUSINESS_NAME = "Timechain Ventures LLC";
@@ -18,10 +19,11 @@ export const VENMO = {
 };
 
 export const ZELLE = {
-  // TODO(David): the email or phone number enrolled with Zelle.
-  recipient: "ZELLE-RECIPIENT-TBD",
-  // TODO(David): the name Zelle shows for the recipient.
-  accountName: BUSINESS_NAME,
+  // The address enrolled with Zelle. Kept as its own literal (not SUPPORT_EMAIL)
+  // so a support-inbox change can never silently redirect payments.
+  recipient: "support@timechainpeptides.com",
+  // The name Zelle shows for the recipient (confirmed by David, 2026-09-06).
+  accountName: "Timechain",
 };
 
 export type LivePaymentMethod = Extract<PaymentMethod, "venmo" | "zelle">;
@@ -56,7 +58,9 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
     live: true,
     steps: [
       "Place your order first. The Zelle details and your order number appear on the next page.",
-      `Send your order total via Zelle to ${ZELLE.recipient} — the account will show as “${ZELLE.accountName}”.`,
+      // The checkout step names the account only (David, 9/7); the enrolled
+      // address is shown on the order page, where the customer actually sends.
+      `Send your order total via Zelle to ${ZELLE.accountName}.`,
       "Enter ONLY your order number in the memo. Do not mention peptides or product names.",
       "Your order ships once the payment is received and matched to your order number.",
     ],
