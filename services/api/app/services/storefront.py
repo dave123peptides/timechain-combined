@@ -17,6 +17,7 @@ from app.models.orders import Order, OrderEvent, OrderItem
 from app.models.payments import Payment
 from app.models.settings import SystemSetting
 from app.constants.bulk_discounts import discounted_unit_price_cents
+from app.constants.discount_codes import discount_cents_for, find_discount_code, normalize_discount_code
 from app.constants.forms import FORM_LABEL as _FORM_LABEL
 from app.services.mapping_status import get_active_mapping, get_mapping_status
 
@@ -181,6 +182,27 @@ class Quote:
     shipping_cents: int
     tax_cents: int
     total_cents: int
+    # Discount code (app.constants.discount_codes): the normalized code
+    # and the cents it took off subtotal_cents, or None/0. discount_error
+    # is set instead when the request named a code that doesn't exist —
+    # the quote still succeeds without it so checkout can show the
+    # message next to the field; create_order refuses the same code.
+    discount_code: Optional[str] = None
+    discount_cents: int = 0
+    discount_error: Optional[str] = None
+
+
+INVALID_DISCOUNT_CODE_MESSAGE = "That discount code isn't valid."
+
+
+def _apply_discount_code(subtotal_cents: int, discount_code: Optional[str]) -> tuple[Optional[str], int, Optional[str]]:
+    """(normalized code, cents off, error). No code → (None, 0, None)."""
+    if not normalize_discount_code(discount_code):
+        return None, 0, None
+    found = find_discount_code(discount_code)
+    if found is None:
+        return None, 0, INVALID_DISCOUNT_CODE_MESSAGE
+    return found.code, discount_cents_for(subtotal_cents, found.percent_off), None
 
 
 def _format_label(form: Optional[str]) -> str:
@@ -262,23 +284,30 @@ def _resolve_and_price_items(session: Session, items: list[OrderItemRequest]) ->
     return lines, subtotal_cents
 
 
-def build_quote(session: Session, *, items: list[OrderItemRequest], country: str = "US") -> Quote:
+def build_quote(
+    session: Session, *, items: list[OrderItemRequest], country: str = "US", discount_code: Optional[str] = None
+) -> Quote:
     """POST /api/v1/checkout/quote's implementation. Read-only — writes
     nothing — a pure preview of what create_order would charge. Shares
-    its validation/pricing/shipping/tax logic with create_order exactly
-    (via _resolve_and_price_items / get_shipping_quote /
-    calculate_tax_cents) so the two can never quietly disagree."""
+    its validation/pricing/shipping/tax/discount logic with create_order
+    exactly (via _resolve_and_price_items / get_shipping_quote /
+    calculate_tax_cents / _apply_discount_code) so the two can never
+    quietly disagree."""
     lines, subtotal_cents = _resolve_and_price_items(session, items)
+    code, discount_cents, discount_error = _apply_discount_code(subtotal_cents, discount_code)
     shipping_quote = get_shipping_quote(session, country=country)
     tax_cents = calculate_tax_cents(
-        session, subtotal_cents=subtotal_cents, shipping_address={"country": country}
+        session, subtotal_cents=subtotal_cents - discount_cents, shipping_address={"country": country}
     )
     return Quote(
         items=lines,
         subtotal_cents=subtotal_cents,
         shipping_cents=shipping_quote.amount_cents,
         tax_cents=tax_cents,
-        total_cents=subtotal_cents + shipping_quote.amount_cents + tax_cents,
+        total_cents=subtotal_cents - discount_cents + shipping_quote.amount_cents + tax_cents,
+        discount_code=code,
+        discount_cents=discount_cents,
+        discount_error=discount_error,
     )
 
 
@@ -566,16 +595,18 @@ def create_order(
     payment_method: str,
     customer_name: Optional[str] = None,
     customer_phone: Optional[str] = None,
+    discount_code: Optional[str] = None,
 ) -> Order:
     """POST /api/v1/checkout/create's implementation. Steps:
 
     1-3. validate cart / verify products+sellability / verify supplier
          mappings — _resolve_and_price_items.
     4.   calculate totals server-side — subtotal from
-         _resolve_and_price_items, shipping from get_shipping_quote, tax
-         from calculate_tax_cents. A client-submitted price, a variant
-         disabled since it was cached client-side, or a mapping that's
-         drifted can never reach an Order.
+         _resolve_and_price_items, the discount code (if any) from
+         app.constants.discount_codes, shipping from get_shipping_quote,
+         tax from calculate_tax_cents. A client-submitted price, a
+         variant disabled since it was cached client-side, a made-up
+         code, or a mapping that's drifted can never reach an Order.
     5.   validate shipping — get_shipping_quote rejects non-US.
     6.   record consents — all three required, or nothing is written.
     7.   create internal order (public_order_number + access_token, both
@@ -604,11 +635,16 @@ def create_order(
         raise StorefrontError("You must agree to the Terms of Service and Privacy Policy to place an order.")
 
     lines, subtotal_cents = _resolve_and_price_items(session, items)
+    code, discount_cents, discount_error = _apply_discount_code(subtotal_cents, discount_code)
+    if discount_error:
+        raise StorefrontError(discount_error)
 
     country = shipping_address.get("country", "")
     shipping_quote = get_shipping_quote(session, country=country)
-    tax_cents = calculate_tax_cents(session, subtotal_cents=subtotal_cents, shipping_address=shipping_address)
-    total_cents = subtotal_cents + shipping_quote.amount_cents + tax_cents
+    tax_cents = calculate_tax_cents(
+        session, subtotal_cents=subtotal_cents - discount_cents, shipping_address=shipping_address
+    )
+    total_cents = subtotal_cents - discount_cents + shipping_quote.amount_cents + tax_cents
 
     order = Order(
         public_order_number=_generate_public_order_number(),
@@ -622,6 +658,8 @@ def create_order(
         shipping_cents=shipping_quote.amount_cents,
         tax_cents=tax_cents,
         total_cents=total_cents,
+        discount_code=code,
+        discount_cents=discount_cents,
         items=[
             OrderItem(
                 product_variant_id=line.variant_id,

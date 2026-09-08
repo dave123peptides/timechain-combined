@@ -43,6 +43,11 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     shipping_cents: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
     tax_cents: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
     total_cents: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    # Checkout discount code (app.constants.discount_codes), snapshotted as
+    # the normalized code and the cents it took off the subtotal —
+    # total_cents already reflects it. Null / 0 when none was used.
+    discount_code: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    discount_cents: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
 
     items: Mapped[list["OrderItem"]] = relationship(back_populates="order", cascade="all, delete-orphan")
     events: Mapped[list["OrderEvent"]] = relationship(back_populates="order", cascade="all, delete-orphan")

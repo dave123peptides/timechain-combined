@@ -31,6 +31,9 @@ class CheckoutItemRequest(BaseModel):
 class QuoteRequest(BaseModel):
     items: list[CheckoutItemRequest]
     country: str = "US"
+    # Optional checkout discount code — validated and priced server-side
+    # (app.constants.discount_codes); the client never sends an amount.
+    discount_code: str | None = Field(default=None, max_length=40)
 
 
 class QuoteLineResponse(BaseModel):
@@ -47,6 +50,12 @@ class QuoteResponse(BaseModel):
     shipping_cents: int
     tax_cents: int
     total_cents: int
+    # The normalized code and cents off when the request's code is
+    # valid; discount_error (and no discount) when it isn't — the quote
+    # itself still succeeds so checkout can show the message inline.
+    discount_code: str | None = None
+    discount_cents: int = 0
+    discount_error: str | None = None
 
 
 class ConsentRequest(BaseModel):
@@ -75,6 +84,9 @@ class CreateCheckoutRequest(BaseModel):
     # offers the launch methods; the others stay accepted so existing
     # orders and the admin flow keep working.
     payment_method: Literal["venmo", "zelle", "crypto", "ach"]
+    # Same code the quote validated; create_order re-validates and
+    # re-prices it, and rejects the order outright if it isn't real.
+    discount_code: str | None = Field(default=None, max_length=40)
 
 
 @router.post("/quote", response_model=QuoteResponse)
@@ -94,6 +106,7 @@ def quote_checkout(body: QuoteRequest, db: Session = Depends(get_db)) -> QuoteRe
             db,
             items=[storefront.OrderItemRequest(variant_id=item.variant_id, quantity=item.quantity) for item in body.items],
             country=body.country,
+            discount_code=body.discount_code,
         )
     except storefront.StorefrontError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -113,6 +126,9 @@ def quote_checkout(body: QuoteRequest, db: Session = Depends(get_db)) -> QuoteRe
         shipping_cents=quote.shipping_cents,
         tax_cents=quote.tax_cents,
         total_cents=quote.total_cents,
+        discount_code=quote.discount_code,
+        discount_cents=quote.discount_cents,
+        discount_error=quote.discount_error,
     )
 
 
@@ -150,6 +166,7 @@ def create_checkout(
             payment_method=body.payment_method,
             customer_name=body.customer_name.strip(),
             customer_phone=body.customer_phone.strip(),
+            discount_code=body.discount_code,
         )
         db.commit()
     except storefront.StorefrontError as exc:

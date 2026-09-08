@@ -98,12 +98,18 @@ def _values_url(suffix: str) -> str:
 
 
 def ensure_header() -> None:
-    """Write EXPORT_COLUMNS into row 1 if the tab is empty. Called lazily
-    on the first append per process; cheap (one GET)."""
+    """Write EXPORT_COLUMNS into row 1 if the tab is empty, or rewrite
+    row 1 when it no longer matches. Rewriting row 1 never moves data,
+    so this is only right for columns appended to the end of
+    EXPORT_COLUMNS; a column inserted in the middle (discount_code, 9/6)
+    must be inserted in the sheet itself first, after which row 1 already
+    matches and this is a no-op. Called lazily on the first append per
+    process; cheap (one GET)."""
     headers = {"Authorization": f"Bearer {_access_token()}"}
-    got = httpx.get(_values_url("!A1:A1"), headers=headers, timeout=_TIMEOUT_SECONDS)
+    got = httpx.get(_values_url("!1:1"), headers=headers, timeout=_TIMEOUT_SECONDS)
     got.raise_for_status()
-    if got.json().get("values"):
+    current = (got.json().get("values") or [[]])[0]
+    if current == EXPORT_COLUMNS:
         return
     put = httpx.put(
         _values_url("!A1"),

@@ -25,9 +25,10 @@ from app.models.payments import Payment
 
 # Column order is shared with the vial site (~/Desktop/timechain), whose
 # TCP- orders land in the same "Timechain Orders" sheet: both apps must
-# write the same layout or their rows misalign. discount_code (column B,
-# added 9/6) is the vial site's checkout discount code; pens have no
-# discount codes yet, so this app writes it empty.
+# write the same layout or their rows misalign. discount_code sits
+# beside the order number (David, 9/6); the sheet's column B was inserted
+# by hand for it, since rewriting row 1 alone would not shift old rows.
+# Discount codes reached this site on 9/8 (same NATALIE/TRUTH table).
 EXPORT_COLUMNS = [
     "order_number",
     "discount_code",
@@ -98,7 +99,8 @@ def order_export_row(order: Order) -> dict:
         "tax": _money(order.tax_cents),
         "total": _money(order.total_cents),
         "currency": order.currency.upper(),
-        "discount_code": "",
+        # The code only — the amount is already reflected in total.
+        "discount_code": order.discount_code or "",
     }
 
 

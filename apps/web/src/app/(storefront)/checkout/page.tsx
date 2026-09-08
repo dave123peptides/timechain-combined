@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { createOrder, formatMoney, type PaymentMethod } from "@/lib/api";
 import { useCart } from "@/lib/cart-context";
 import { PAYMENT_OPTIONS, isLivePaymentMethod } from "@/lib/paymentMethods";
@@ -20,11 +20,17 @@ import styles from "./page.module.css";
 //
 // Totals are always the server's quote (useResolvedCart → /checkout/
 // quote), never computed here — the same trust boundary as the charge
-// itself in create_order.
+// itself in create_order. That includes the discount code (David, 9/6):
+// the typed code goes to the server on the quote, which answers with
+// the normalized code and cents off (or an error to show inline), and
+// only a code the quote accepted is sent with the order.
 export default function CheckoutPage() {
   const router = useRouter();
   const { clear } = useCart();
-  const { hydrated, loading, lines, quote, quoteError, hasUnavailable } = useResolvedCart();
+  const [codeInput, setCodeInput] = useState("");
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const codeFieldId = useId();
+  const { hydrated, loading, lines, quote, quoteError, hasUnavailable } = useResolvedCart(true, appliedCode);
   const available = lines.filter((line) => line.variant);
 
   const [step, setStep] = useState<StepIndex>(0);
@@ -66,6 +72,7 @@ export default function CheckoutPage() {
         items: available.map((line) => ({ variant_id: line.variantId, quantity: line.quantity })),
         consent: { age_confirmed: ageConfirmed, ruo_acknowledged: ruoAcknowledged, terms_accepted: termsAccepted },
         payment_method: paymentMethod,
+        discount_code: quote?.discount_code ?? null,
       });
       clear();
       // Crypto (not offered today, kept for when it returns): Speed's
@@ -327,11 +334,64 @@ export default function CheckoutPage() {
                 </li>
               ))}
             </ul>
+            <div className={styles.discount}>
+              {quote?.discount_code ? (
+                <div className={styles.discountApplied}>
+                  <span className={styles.discountAppliedLabel}>
+                    <SectionIcon name="check" size={16} /> Code <strong>{quote.discount_code}</strong> applied
+                  </span>
+                  <button
+                    type="button"
+                    className={styles.discountRemove}
+                    onClick={() => {
+                      setAppliedCode(null);
+                      setCodeInput("");
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <form
+                  className={styles.discountForm}
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    setAppliedCode(codeInput.trim() || null);
+                  }}
+                >
+                  <label className={styles.fieldLabel} htmlFor={codeFieldId}>
+                    Discount code
+                  </label>
+                  <div className={styles.discountRow}>
+                    <input
+                      id={codeFieldId}
+                      className={`${styles.input} ${styles.discountInput}`}
+                      value={codeInput}
+                      onChange={(e) => setCodeInput(e.target.value)}
+                      autoComplete="off"
+                      autoCapitalize="characters"
+                      spellCheck={false}
+                      placeholder="Enter code"
+                    />
+                    <button type="submit" className="button buttonPill buttonAccentOutline" disabled={!codeInput.trim()}>
+                      Apply
+                    </button>
+                  </div>
+                  {appliedCode && quote?.discount_error && <p className={styles.error}>{quote.discount_error}</p>}
+                </form>
+              )}
+            </div>
             <div className={styles.totals}>
               <div className={styles.totalRow}>
                 <span>Subtotal</span>
                 <span className={styles.accent}>{quote ? formatMoney(quote.subtotal_cents) : "—"}</span>
               </div>
+              {quote && quote.discount_cents > 0 && (
+                <div className={styles.totalRow}>
+                  <span>Discount ({quote.discount_code})</span>
+                  <span className={styles.accent}>&minus;{formatMoney(quote.discount_cents)}</span>
+                </div>
+              )}
               <div className={styles.totalRow}>
                 <span>Shipping</span>
                 <span>{quote ? formatMoney(quote.shipping_cents) : step === 0 ? "Next step" : "—"}</span>
@@ -361,7 +421,7 @@ export default function CheckoutPage() {
                 <input type="checkbox" checked={ruoAcknowledged} onChange={(e) => setRuoAcknowledged(e.target.checked)} />
                 <span>
                   I understand that everything on this site is for laboratory research use only and not for human or
-                  veterinary use — the{" "}
+                  veterinary use, per the{" "}
                   <Link href="/research-use-only" target="_blank">
                     Research Use Only
                   </Link>{" "}

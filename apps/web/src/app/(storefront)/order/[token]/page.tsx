@@ -111,6 +111,12 @@ export default async function OrderStatusPage({
             <span>Subtotal</span>
             <span>{formatMoney(order.subtotal_cents)}</span>
           </div>
+          {order.discount_cents > 0 && (
+            <div className={styles.totalRow}>
+              <span>Discount{order.discount_code ? ` (${order.discount_code})` : ""}</span>
+              <span>&minus;{formatMoney(order.discount_cents)}</span>
+            </div>
+          )}
           <div className={styles.totalRow}>
             <span>Shipping</span>
             <span>{formatMoney(order.shipping_cents)}</span>

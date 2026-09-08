@@ -117,7 +117,7 @@ def test_configured_appends_header_and_row(monkeypatch):
     get_settings.cache_clear()
 
 
-def test_header_skipped_when_tab_not_empty(monkeypatch):
+def test_header_skipped_when_it_already_matches(monkeypatch):
     monkeypatch.setenv("GOOGLE_SHEETS_ORDERS_SPREADSHEET_ID", "SHEET123")
     monkeypatch.setenv("GOOGLE_SERVICE_ACCOUNT_JSON", "{}")
     from app.core.config import get_settings
@@ -131,7 +131,7 @@ def test_header_skipped_when_tab_not_empty(monkeypatch):
             return None
 
         def json(self):
-            return {"values": [["order_number"]]}
+            return {"values": [list(EXPORT_COLUMNS)]}
 
     def fake_get(url, **kwargs):
         calls.append(("get", url))
@@ -167,3 +167,44 @@ def test_google_error_returns_false_and_logs(monkeypatch, caplog):
         assert order_sheet.append_order_row({"order_number": "TCP-ERR1"}) is False
     assert any("sheet append for TCP-ERR1 failed" in rec.message for rec in caplog.records)
     get_settings.cache_clear()
+
+
+def test_export_row_carries_discount_code_beside_the_order_number():
+    order = _make_order()
+    assert order_export_row(order)["discount_code"] == ""
+    order.discount_code = "NATALIE"
+    order.discount_cents = 1290
+    assert order_export_row(order)["discount_code"] == "NATALIE"
+    assert EXPORT_COLUMNS[:3] == ["order_number", "discount_code", "placed_at"]
+    assert "discount" not in EXPORT_COLUMNS  # the amount is already in total
+
+
+def test_header_is_rewritten_when_columns_were_appended(monkeypatch):
+    monkeypatch.setenv("GOOGLE_SHEETS_ORDERS_SPREADSHEET_ID", "SHEET123")
+    monkeypatch.setenv("GOOGLE_SHEETS_ORDERS_TAB", "Orders")
+    monkeypatch.setenv("GOOGLE_SERVICE_ACCOUNT_JSON", "{}")
+    from app.core.config import get_settings
+    get_settings.cache_clear()
+    monkeypatch.setattr(order_sheet, "_access_token", lambda: "tok")
+
+    calls = []
+
+    class FakeResponse:
+        def __init__(self, payload=None):
+            self._payload = payload or {}
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return self._payload
+
+    # A header that is missing a column gets rewritten in place.
+    old_header = [c for c in EXPORT_COLUMNS if c != "discount_code"]
+    monkeypatch.setattr(httpx, "get", lambda url, **kw: FakeResponse({"values": [old_header]}))
+    monkeypatch.setattr(httpx, "put", lambda url, **kw: calls.append(("put", kw)) or FakeResponse())
+    monkeypatch.setattr(httpx, "post", lambda url, **kw: calls.append(("post", kw)) or FakeResponse())
+
+    assert order_sheet.append_order_row(order_export_row(_make_order())) is True
+    assert [c[0] for c in calls] == ["put", "post"]
+    assert calls[0][1]["json"]["values"] == [EXPORT_COLUMNS]

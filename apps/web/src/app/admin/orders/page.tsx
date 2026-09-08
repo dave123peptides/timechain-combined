@@ -34,6 +34,8 @@ type OrderDetail = OrderRow & {
   subtotal_cents: number;
   shipping_cents: number;
   tax_cents: number;
+  discount_code: string | null;
+  discount_cents: number;
   items: {
     display_name_at_purchase: string;
     sku_snapshot: string;
@@ -377,8 +379,14 @@ function FragmentRow({
                     </tbody>
                   </table>
                   <p className={styles.muted}>
-                    Subtotal {money(detail.subtotal_cents)} · Shipping {money(detail.shipping_cents)} · Total{" "}
-                    <strong>{money(detail.total_cents)}</strong> · memo the customer was told to use:{" "}
+                    Subtotal {money(detail.subtotal_cents)}
+                    {detail.discount_cents > 0 && (
+                      <>
+                        {" "}
+                        · Discount {detail.discount_code} &minus;{money(detail.discount_cents)}
+                      </>
+                    )}{" "}
+                    · Shipping {money(detail.shipping_cents)} · Total <strong>{money(detail.total_cents)}</strong> · memo the customer was told to use:{" "}
                     <span className={styles.mono}>{detail.public_order_number}</span>
                   </p>
                 </div>

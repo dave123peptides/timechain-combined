@@ -156,6 +156,10 @@ class OrderResponse(BaseModel):
     shipping_cents: int
     tax_cents: int
     total_cents: int
+    # Checkout discount code snapshot (normalized code + cents off the
+    # subtotal); total_cents already reflects it.
+    discount_code: str | None = None
+    discount_cents: int = 0
     items: list[OrderItemResponse]
     created_at: datetime
     # The provider of the most recent Payment row ("venmo", "zelle",
@@ -196,6 +200,8 @@ def order_response(order) -> OrderResponse:
         shipping_cents=order.shipping_cents,
         tax_cents=order.tax_cents,
         total_cents=order.total_cents,
+        discount_code=order.discount_code,
+        discount_cents=order.discount_cents or 0,
         items=[
             OrderItemResponse(
                 name=item.display_name_at_purchase,

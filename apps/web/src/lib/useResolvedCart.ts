@@ -22,8 +22,9 @@ export type ResolvedCartLine = {
 // app.constants.bulk_discounts), so bulk discounts, shipping and tax here
 // always match what checkout will actually charge. Shared by the /cart
 // page and the cart drawer; `enabled=false` (the drawer while closed)
-// skips both requests.
-export function useResolvedCart(enabled = true) {
+// skips both requests. `discountCode` (checkout only) rides along on the
+// quote so the server validates and prices it — see Quote.discount_*.
+export function useResolvedCart(enabled = true, discountCode: string | null = null) {
   const { lines, hydrated } = useCart();
   const [products, setProducts] = useState<ProductSummary[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -67,7 +68,7 @@ export function useResolvedCart(enabled = true) {
       return;
     }
     let cancelled = false;
-    quoteCheckout({ items })
+    quoteCheckout({ items, discount_code: discountCode })
       .then((result) => {
         if (!cancelled) {
           setQuote(result);
@@ -83,7 +84,7 @@ export function useResolvedCart(enabled = true) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, products, lines, lookup]);
+  }, [enabled, products, lines, lookup, discountCode]);
 
   const quoteLineByVariantId = useMemo(() => {
     const map = new Map<string, Quote["items"][number]>();

@@ -131,6 +131,10 @@ export type Order = {
   shipping_cents: number;
   tax_cents: number;
   total_cents: number;
+  // Checkout discount code snapshot: the normalized code and the cents
+  // it took off the subtotal. total_cents already reflects it.
+  discount_code: string | null;
+  discount_cents: number;
   items: OrderItem[];
   created_at: string;
   // Provider of the newest payment row — which instructions the order
@@ -288,6 +292,9 @@ export function createOrder(payload: {
   items: CartItemInput[];
   consent: ConsentInput;
   payment_method: PaymentMethod;
+  // The code the quote validated (Quote.discount_code); the server
+  // re-validates and re-prices it, and rejects the order if it isn't real.
+  discount_code?: string | null;
 }): Promise<Order> {
   return apiFetch<Order>("/api/v1/checkout/create", { method: "POST", body: JSON.stringify(payload) });
 }
@@ -325,6 +332,12 @@ export type Quote = {
   shipping_cents: number;
   tax_cents: number;
   total_cents: number;
+  // Set when the request's discount code is valid (normalized code +
+  // cents off the subtotal); discount_error, and no discount, when it
+  // isn't. The quote itself still succeeds either way.
+  discount_code: string | null;
+  discount_cents: number;
+  discount_error: string | null;
 };
 
 // Read-only preview, computed entirely server-side (price, sellability,
@@ -332,7 +345,11 @@ export type Quote = {
 // the same trust boundary as create_order itself. Used to drive the
 // checkout summary display so it can never drift from what the server
 // would actually charge.
-export function quoteCheckout(payload: { items: CartItemInput[]; country?: string }): Promise<Quote> {
+export function quoteCheckout(payload: {
+  items: CartItemInput[];
+  country?: string;
+  discount_code?: string | null;
+}): Promise<Quote> {
   return apiFetch<Quote>("/api/v1/checkout/quote", { method: "POST", body: JSON.stringify(payload) });
 }
 

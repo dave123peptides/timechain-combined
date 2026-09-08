@@ -186,6 +186,8 @@ class AdminOrderDetailResponse(BaseModel):
     shipping_cents: int
     tax_cents: int
     total_cents: int
+    discount_code: Optional[str] = None
+    discount_cents: int = 0
     currency: str
     created_at: str
     items: list[AdminOrderItemDetailResponse]

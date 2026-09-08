@@ -663,3 +663,90 @@ def test_create_order_stores_customer_name_and_phone_and_exports_them(session, m
 
     monkeypatch.setattr(get_settings(), "order_notify_webhook_url", "")
     assert order_notify.notify_new_order(payload) is False
+
+
+# --- discount codes (app.constants.discount_codes) ------------------------
+
+
+def test_build_quote_applies_discount_code_case_insensitively(session):
+    product = _make_product(session, "quote-code")
+    variant = _make_variant(session, product, "quote-code", price_cents=3000, sellable=True)
+    items = [storefront.OrderItemRequest(variant_id=variant.id, quantity=2)]
+
+    quote = storefront.build_quote(session, items=items, discount_code="  natalie ")
+
+    assert quote.discount_code == "NATALIE"
+    assert quote.discount_cents == 600  # 10% of the 6000 subtotal, before shipping
+    assert quote.discount_error is None
+    assert quote.subtotal_cents == 6000
+    assert quote.shipping_cents == 4000
+    assert quote.total_cents == 6000 - 600 + 4000
+
+
+def test_build_quote_applies_truth_code(session):
+    product = _make_product(session, "quote-truth")
+    variant = _make_variant(session, product, "quote-truth", price_cents=3000, sellable=True)
+    items = [storefront.OrderItemRequest(variant_id=variant.id, quantity=2)]
+
+    quote = storefront.build_quote(session, items=items, discount_code="truth")
+
+    assert quote.discount_code == "TRUTH"
+    assert quote.discount_cents == 600
+    assert quote.discount_error is None
+    assert quote.total_cents == 6000 - 600 + 4000
+
+
+def test_build_quote_reports_unknown_code_without_failing(session):
+    product = _make_product(session, "quote-badcode")
+    variant = _make_variant(session, product, "quote-badcode", price_cents=3000, sellable=True)
+    items = [storefront.OrderItemRequest(variant_id=variant.id, quantity=2)]
+
+    quote = storefront.build_quote(session, items=items, discount_code="NOPE")
+
+    assert quote.discount_code is None
+    assert quote.discount_cents == 0
+    assert quote.discount_error == storefront.INVALID_DISCOUNT_CODE_MESSAGE
+    assert quote.total_cents == 6000 + 4000
+
+    blank = storefront.build_quote(session, items=items, discount_code="   ")
+    assert blank.discount_code is None and blank.discount_cents == 0 and blank.discount_error is None
+
+
+def test_create_order_snapshots_discount_and_rejects_unknown_code(session):
+    from app.models.payments import Payment
+
+    product = _make_product(session, "order-code")
+    variant = _make_variant(session, product, "order-code", price_cents=1500, sellable=True)
+    items = [storefront.OrderItemRequest(variant_id=variant.id, quantity=3)]
+
+    order = storefront.create_order(
+        session,
+        email=_TEST_EMAIL,
+        shipping_address=_SHIPPING_ADDRESS,
+        items=items,
+        consent=_VALID_CONSENT,
+        payment_method="venmo",
+        discount_code="natalie",
+    )
+    assert order.subtotal_cents == 4500
+    assert order.discount_code == "NATALIE"
+    assert order.discount_cents == 450
+    assert order.total_cents == 4500 - 450 + 4000
+    payment = session.execute(select(Payment).where(Payment.order_id == order.id)).scalar_one()
+    assert payment.amount_cents == order.total_cents  # what the customer is told to send
+    assert order_response(order).discount_code == "NATALIE"
+    assert order_response(order).discount_cents == 450
+
+    before = session.execute(select(Order).where(Order.customer_email == _TEST_EMAIL)).scalars().all()
+    with pytest.raises(storefront.StorefrontError, match="discount code"):
+        storefront.create_order(
+            session,
+            email=_TEST_EMAIL,
+            shipping_address=_SHIPPING_ADDRESS,
+            items=items,
+            consent=_VALID_CONSENT,
+            payment_method="venmo",
+            discount_code="NOPE",
+        )
+    after = session.execute(select(Order).where(Order.customer_email == _TEST_EMAIL)).scalars().all()
+    assert len(after) == len(before)

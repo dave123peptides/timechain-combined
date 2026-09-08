@@ -360,6 +360,65 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* --- discount code (in the summary, above the totals) ------------------ */
+
+.discount {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.discountForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.discountRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.discountInput {
+  flex: 1;
+  min-width: 0;
+  text-transform: uppercase;
+}
+
+.discountInput::placeholder {
+  text-transform: none;
+}
+
+.discountApplied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: var(--text-sm);
+}
+
+.discountAppliedLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gold-deep);
+}
+
+.discountRemove {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--ink-faint);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.discountRemove:hover {
+  color: var(--ink);
+}
+
 .totals {
   margin: 1.5rem -1.75rem -1.75rem;
   padding: 1.25rem 1.75rem 1.5rem;

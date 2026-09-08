@@ -80,6 +80,8 @@ class AdminOrderDetail:
     shipping_cents: int
     tax_cents: int
     total_cents: int
+    discount_code: Optional[str]
+    discount_cents: int
     currency: str
     created_at: str
     items: list[AdminOrderItemDetail]
@@ -148,6 +150,8 @@ def get_admin_order_detail(session: Session, order_id: uuid.UUID) -> Optional[Ad
         shipping_cents=order.shipping_cents,
         tax_cents=order.tax_cents,
         total_cents=order.total_cents,
+        discount_code=order.discount_code,
+        discount_cents=order.discount_cents or 0,
         currency=order.currency,
         created_at=order.created_at.isoformat(),
         items=[
