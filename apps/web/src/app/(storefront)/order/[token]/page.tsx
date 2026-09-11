@@ -99,7 +99,7 @@ export default async function OrderStatusPage({ params }: { params: Promise<{ to
           </div>
         </header>
 
-        {pending && isLivePaymentMethod(method) && <PaymentInstructions order={order} method={method} />}
+        {pending && isLivePaymentMethod(method) && !hosted && <PaymentInstructions order={order} method={method} />}
 
         {hosted && (
           <section className={styles.card}>
