@@ -65,7 +65,9 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
   {
     id: "venmo",
     label: "Venmo",
-    live: true,
+    // Temporarily disabled — Venmo account was shut down (David, 9/11).
+    // Re-enable by setting live back to true once a new Venmo is set up.
+    live: false,
     kind: "transfer",
     steps: [
       "Place your order first. Your order number and a link to our Venmo profile appear on the next page.",
