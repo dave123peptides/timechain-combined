@@ -9,6 +9,7 @@ from app.constants.bulk_discounts import BULK_DISCOUNT_TIERS
 from app.core.config import get_settings
 from app.db.session import get_db
 from app.services import storefront
+from app.services.payments import display_payment
 
 router = APIRouter(prefix="/shop", tags=["shop"])
 
@@ -162,21 +163,52 @@ class OrderResponse(BaseModel):
     discount_cents: int = 0
     items: list[OrderItemResponse]
     created_at: datetime
-    # The provider of the most recent Payment row ("venmo", "zelle",
-    # "crypto", "ach") — the order page reads it to show the right
-    # payment instructions after checkout and on every later visit.
+    # The provider of the Payment row that describes this order ("venmo",
+    # "zelle", "bitcoin_opennode", "crypto", "ach") — the order page reads
+    # it to show the right payment instructions after checkout and on
+    # every later visit. See app.services.payments.display_payment for
+    # which row that is when a hosted checkout was re-minted.
     payment_method: str | None = None
+    # That row's status: pending | processing | underpaid | expired |
+    # failed | superseded | succeeded. The order page uses it to tell a
+    # Bitcoin customer "payment detected, waiting for confirmation" or
+    # "the payment page expired, start a new one".
+    payment_status: str | None = None
+    # For a PAYMENT_PENDING Bitcoin order: what the order page needs to
+    # show the payment itself on every visit (lightning_invoice,
+    # chain_address, bitcoin_uri, amount_sats, expires_at, checkout_url).
+    # None once the order is paid/failed or the payment row is no longer
+    # payable (expired/superseded), and for manual-transfer methods.
+    payment_details: dict | None = None
     payment: PaymentInstructionsResponse | None = None
 
 
 def latest_payment_method(order) -> str | None:
-    """Provider of the newest Payment row, or None for an order with no
-    payment row at all (which create_order never produces, but the
-    response must not 500 on a hand-edited database)."""
-    payments = list(order.payments or [])
-    if not payments:
+    """Provider of the Payment row that describes the order (the paid
+    one if any, else the newest), or None for an order with no payment
+    row at all (which create_order never produces, but the response must
+    not 500 on a hand-edited database)."""
+    payment = display_payment(order)
+    return payment.provider if payment is not None else None
+
+
+def latest_payment_status(order) -> str | None:
+    payment = display_payment(order)
+    return payment.status if payment is not None else None
+
+
+_PAYABLE_STATUSES = ("pending", "processing", "underpaid")
+
+
+def payable_payment_details(order) -> dict | None:
+    """The stored provider_data of the payment the customer can still
+    pay, or None."""
+    if order.status != "PAYMENT_PENDING":
         return None
-    return max(payments, key=lambda p: (p.created_at, str(p.id))).provider
+    payment = display_payment(order)
+    if payment is None or payment.status not in _PAYABLE_STATUSES:
+        return None
+    return dict(payment.provider_data) if payment.provider_data else None
 
 
 def order_response(order) -> OrderResponse:
@@ -185,7 +217,7 @@ def order_response(order) -> OrderResponse:
     of an Order, so both call sites stay in sync.
 
     `payment` is populated only when create_order attached transient
-    payment_instructions (a fresh Speed checkout session) — i.e. only in the
+    payment_instructions (a fresh checkout session) — i.e. only in the
     checkout-create response, never on the order-status page."""
     instructions = getattr(order, "payment_instructions", None)
     return OrderResponse(
@@ -213,6 +245,8 @@ def order_response(order) -> OrderResponse:
         ],
         created_at=order.created_at,
         payment_method=latest_payment_method(order),
+        payment_status=latest_payment_status(order),
+        payment_details=payable_payment_details(order),
         payment=(
             PaymentInstructionsResponse(
                 provider=instructions.provider,

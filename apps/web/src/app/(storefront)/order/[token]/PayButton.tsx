@@ -1,24 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { retryPayment } from "@/lib/api";
 import styles from "./page.module.css";
 
-// Pay button for a PAYMENT_PENDING crypto order. If a live checkout_url
-// is already in hand (checkout just happened), it's a plain link; the
-// fetch path mints a fresh Speed session server-side first.
-export default function PayButton({ token, checkoutUrl }: { token: string; checkoutUrl?: string }) {
-  const [url, setUrl] = useState(checkoutUrl);
+// "Start a new payment" for a PAYMENT_PENDING Bitcoin order whose charge
+// expired (or was never created). Mints a fresh OpenNode charge
+// server-side, then re-renders the page so the new QR shows in place.
+export default function PayButton({ token, label = "Start a new Bitcoin payment" }: { token: string; label?: string }) {
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  if (url) {
-    return (
-      <a href={url} className={`button ${styles.payNow}`}>
-        Pay with Bitcoin &rarr;
-      </a>
-    );
-  }
 
   return (
     <>
@@ -30,13 +23,8 @@ export default function PayButton({ token, checkoutUrl }: { token: string; check
           setError(null);
           setBusy(true);
           try {
-            const order = await retryPayment(token);
-            const fresh = order.payment?.details?.checkout_url;
-            if (fresh) {
-              setUrl(fresh);
-            } else {
-              setError("Payment session could not be created — please try again in a moment.");
-            }
+            await retryPayment(token);
+            router.refresh();
           } catch (err) {
             setError((err as Error).message);
           } finally {
@@ -44,7 +32,7 @@ export default function PayButton({ token, checkoutUrl }: { token: string; check
           }
         }}
       >
-        {busy ? "Creating payment session…" : "Pay with Bitcoin →"}
+        {busy ? "Setting up your payment…" : label}
       </button>
       {error && (
         <p className={styles.paymentError} role="alert">

@@ -44,6 +44,10 @@ def test_payload_is_customer_safe():
         "total": "129.00",
         "currency": "USD",
         "order_url": "https://buytcp.com/order/tok",
+        "event": "order.created",
+        "order_status": "",
+        "payment_method_label": "Venmo",
+        "pay_url": "https://buytcp.com/order/tok",
     }
     assert "items" not in payload
     assert "supplier" not in str(payload).lower()

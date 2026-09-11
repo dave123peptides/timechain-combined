@@ -694,10 +694,10 @@ def create_order(
     payment = Payment(
         order_id=order.id,
         # provider records what the customer selected at checkout
-        # ("crypto"/"ach"). For "crypto" (Speed), the checkout route
-        # creates the Speed checkout session right after this and stamps
-        # provider_payment_id + payment_instructions onto the order; if
-        # that fails or the provider isn't configured yet, status simply
+        # ("venmo"/"zelle"/"bitcoin_opennode"/...). For a hosted-checkout
+        # method (OpenNode), the charge is created right after this and
+        # provider_payment_id + payment_instructions are stamped onto the
+        # order; if that fails or the provider isn't configured yet, status simply
         # stays "pending" until app.services.payments.mark_order_paid
         # (admin action or a real webhook) confirms it actually cleared.
         provider=payment_method,
@@ -712,34 +712,49 @@ def create_order(
     # transitions PAYMENT_PENDING -> PAID.
     session.flush()
 
-    if payment_method == "crypto":
-        _attach_crypto_instructions(session, order, payment)
+    if _has_hosted_checkout(payment_method):
+        _attach_payment_instructions(session, order, payment, provider_key=payment_method)
 
     return order
 
 
-def _attach_crypto_instructions(session: Session, order: Order, payment: Payment) -> None:
-    """Create the Speed checkout session for a crypto order and attach the
-    payment instructions as a transient attribute on the order
+def _has_hosted_checkout(provider_key: str) -> bool:
+    """True for methods with a registered hosted-checkout provider
+    ("bitcoin_opennode" today, the dormant "crypto"); False for manual
+    transfers (venmo/zelle) and ach."""
+    from app.payments.registry import has_provider
+
+    return has_provider(provider_key)
+
+
+def _attach_payment_instructions(session: Session, order: Order, payment: Payment, *, provider_key: str) -> None:
+    """Create the hosted checkout (an OpenNode charge for
+    "bitcoin_opennode") for the order and attach the payment
+    instructions as a transient attribute on the order
     (order.payment_instructions) for the checkout response.
 
     Deliberately degrades: any failure — provider not configured yet
-    (blank SPEED_API_KEY), network trouble — is logged and swallowed.
-    The order exists and stays PAYMENT_PENDING; the order page falls
-    back to the manual "awaiting payment" note. Bitcoin payments
-    activate the moment the key is configured, with zero further code
+    (blank key / callback URL), network trouble — is logged and
+    swallowed. The order exists and stays PAYMENT_PENDING; the order
+    page's Pay button lets the customer try again. Bitcoin payments
+    activate the moment the env is configured, with zero further code
     changes.
     """
     from app.payments.registry import get_provider
 
     try:
-        provider = get_provider("crypto")
+        provider = get_provider(provider_key)
         instructions = provider.create_payment_instructions(order)
     except Exception as exc:  # noqa: BLE001 — degraded checkout beats a failed one; see docstring
-        logger.warning("Speed checkout session not created for order %s: %s", order.public_order_number, exc)
+        logger.warning(
+            "Hosted checkout (%s) not created for order %s: %s", provider_key, order.public_order_number, exc
+        )
         return
 
     payment.provider_payment_id = instructions.details["provider_payment_id"]
+    # Persisted so the order page can show the payment (QR, address,
+    # invoice, expiry) on every visit, not just the checkout response.
+    payment.provider_data = dict(instructions.details)
     # Transient — not a column. order_response() picks it up only when
     # present (i.e. only in the POST /checkout/create response).
     order.payment_instructions = instructions  # type: ignore[attr-defined]
@@ -747,9 +762,17 @@ def _attach_crypto_instructions(session: Session, order: Order, payment: Payment
         OrderEvent(
             order_id=order.id,
             event_type="payment_instructions_created",
-            data={"provider": "crypto", "session_id": instructions.details["provider_payment_id"]},
+            data={
+                "provider": provider_key,
+                "provider_payment_id": instructions.details["provider_payment_id"],
+                # Older readers of this event looked for session_id.
+                "session_id": instructions.details["provider_payment_id"],
+            },
         )
     )
+    # The session is autoflush=False: flush so the charge id is on the
+    # row for anything that reads it before the caller commits.
+    session.flush()
 
 
 def get_order_by_token(session: Session, token: str) -> Optional[Order]:
@@ -757,17 +780,20 @@ def get_order_by_token(session: Session, token: str) -> Optional[Order]:
 
 
 def recreate_payment_instructions(session: Session, order: Order) -> Order:
-    """Mint a fresh Speed checkout session for a still-unpaid crypto
-    order, on the customer's explicit request (the order page's Pay
-    button). The previous Payment row's session is superseded: a new
-    pending Payment row is created for the new session so webhook
-    correlation by provider_payment_id keeps working, and the new
-    instructions ride back on order.payment_instructions exactly like
-    checkout-create.
+    """Mint a fresh hosted checkout (a new OpenNode charge) for a
+    still-unpaid Bitcoin order, on the customer's explicit request (the
+    order page's Pay button, e.g. after the previous charge expired).
+    The previous Payment row is superseded: a new pending Payment row is
+    created for the new charge so webhook correlation by
+    provider_payment_id keeps working, and the new instructions ride
+    back on order.payment_instructions exactly like checkout-create.
 
-    Only valid for status=PAYMENT_PENDING crypto orders — a paid or
-    failed order raises StorefrontError, and ACH never has hosted
-    sessions at all.
+    Only valid for status=PAYMENT_PENDING orders whose latest payment
+    row belongs to a registered hosted-checkout provider — a paid or
+    failed order raises StorefrontError, and Venmo/Zelle/ACH never have
+    hosted checkouts at all. A row that is `processing` (an on-chain
+    payment seen but not yet confirmed) also refuses: re-minting over
+    money already in flight would strand it.
     """
     if order.status != "PAYMENT_PENDING":
         raise StorefrontError("This order is not awaiting payment.")
@@ -780,16 +806,19 @@ def recreate_payment_instructions(session: Session, order: Order) -> Order:
         )
         .scalar_one_or_none()
     )
-    if latest_payment is None or latest_payment.provider != "crypto":
-        raise StorefrontError("This order does not use hosted crypto checkout.")
+    if latest_payment is None or not _has_hosted_checkout(latest_payment.provider):
+        raise StorefrontError("This order does not use hosted Bitcoin checkout.")
+    if latest_payment.status == "processing":
+        raise StorefrontError("A payment for this order is already being confirmed. Please wait a few minutes.")
+    provider_key = latest_payment.provider
 
-    # Previous pending sessions are dead ends — mark them superseded so
+    # Previous unpaid attempts are dead ends — mark them superseded so
     # nothing reads them as the active payment attempt.
     for old in session.execute(
         select(Payment).where(
             Payment.order_id == order.id,
-            Payment.provider == "crypto",
-            Payment.status == "pending",
+            Payment.provider == provider_key,
+            Payment.status.in_(("pending", "expired")),
         )
     ).scalars():
         old.status = "superseded"
@@ -797,15 +826,15 @@ def recreate_payment_instructions(session: Session, order: Order) -> Order:
 
     new_payment = Payment(
         order_id=order.id,
-        provider="crypto",
+        provider=provider_key,
         status="pending",
         amount_cents=order.total_cents,
         currency="usd",
     )
     session.add(new_payment)
     session.flush()
-    _attach_crypto_instructions(session, order, new_payment)
+    _attach_payment_instructions(session, order, new_payment, provider_key=provider_key)
     if not hasattr(order, "payment_instructions"):
-        # Speed unconfigured / errored — nothing to pay with.
+        # Provider unconfigured / errored — nothing to pay with.
         raise StorefrontError("Bitcoin checkout is not available right now. Please try again later.")
     return order

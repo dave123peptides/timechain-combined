@@ -123,6 +123,41 @@ class Settings(BaseSettings):
     # Optional https URL to a logo shown on Speed's hosted payment page.
     public_site_logo_url: str = ""
 
+    # --- OpenNode (Bitcoin payments — see app/payments/opennode.py) ---
+    # Offer Bitcoin at checkout? False (the default) makes
+    # POST /checkout/create and the order page's retry-payment refuse
+    # payment_method "bitcoin_opennode" with a 400, while the webhook
+    # route keeps processing events for charges that already exist. The
+    # storefront has its own copy of this switch
+    # (NEXT_PUBLIC_BITCOIN_CHECKOUT_ENABLED) that hides the option as
+    # "Coming soon". David, 9/10: off in production until the OpenNode
+    # process is sorted out; on locally.
+    bitcoin_checkout_enabled: bool = False
+    # Dashboard → Developers → API keys, "invoices" permission only (never
+    # a withdrawals key). Blank = Bitcoin checkout degrades gracefully
+    # (order created, no hosted checkout). This same key is also the
+    # webhook HMAC key: OpenNode signs every webhook's `hashed_order`
+    # with the API key that created the charge, so there is no separate
+    # webhook secret. Rotate only when no charges are pending.
+    opennode_api_key: str = ""
+    # "live" → api.opennode.com / checkout.opennode.com;
+    # "dev"  → dev-api.opennode.com / checkout.dev.opennode.com (testnet).
+    opennode_environment: str = "live"
+    # Full public https URL OpenNode POSTs charge webhooks to, i.e. this
+    # API's POST /api/v1/webhooks/payments/bitcoin_opennode. Blank or
+    # non-https = charges are NOT created (a charge that can never
+    # confirm itself is worse than no charge) — checkout degrades exactly
+    # as with a blank key.
+    opennode_callback_url: str = ""
+
+    # GoHighLevel "payment confirmed" push (app/services/order_paid.py).
+    # Deliberately a SECOND inbound-webhook URL, separate from
+    # ghl_order_webhook_url: that workflow emails the how-to-pay steps
+    # when an order is placed; this one fires once the order is PAID
+    # (OpenNode webhook or admin Mark paid, every method) so a different
+    # workflow can send the confirmation email. Blank = no paid push.
+    ghl_order_paid_webhook_url: str = ""
+
     @property
     def cors_origins_list(self) -> list[str]:
         origins = [origin.strip().rstrip("/") for origin in self.api_cors_origins.split(",") if origin.strip()]

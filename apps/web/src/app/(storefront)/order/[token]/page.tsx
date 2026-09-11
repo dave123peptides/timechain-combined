@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ApiError, formatMoney, getOrder, isUnreachable } from "@/lib/api";
-import { isLivePaymentMethod, paymentOption } from "@/lib/paymentMethods";
+import QRCode from "qrcode";
+import { ApiError, formatMoney, getOrder, isUnreachable, type PaymentDetails } from "@/lib/api";
+import { SUPPORT_EMAIL, isHostedCheckoutMethod, isLivePaymentMethod, paymentMethodLabel } from "@/lib/paymentMethods";
 import SectionIcon from "@/components/SectionIcon";
+import AutoRefresh from "./AutoRefresh";
+import BitcoinPayment, { type BitcoinRail } from "./BitcoinPayment";
 import PayButton from "./PayButton";
 import PaymentInstructions from "./PaymentInstructions";
 import styles from "./page.module.css";
@@ -27,23 +30,32 @@ const STATUS_COPY: Record<string, { tone: "pending" | "paid" | "failed"; heading
   },
 };
 
+// The QR codes are drawn here, on the server, so the client bundle
+// carries no QR library and the page works without JavaScript.
+async function qrSvg(text: string): Promise<string> {
+  return QRCode.toString(text, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
+}
+
+async function bitcoinRails(details: PaymentDetails): Promise<{ lightning: BitcoinRail | null; onchain: BitcoinRail | null }> {
+  const invoice = details.lightning_invoice ?? null;
+  const address = details.chain_address ?? null;
+  const btc = details.amount_sats != null ? (details.amount_sats / 1e8).toFixed(8) : null;
+  const bitcoinUri = details.bitcoin_uri ?? (address ? `bitcoin:${address}${btc ? `?amount=${btc}` : ""}` : null);
+  // Upper-case BOLT11 keeps the QR in alphanumeric mode (a much smaller code).
+  const lightning = invoice ? { svg: await qrSvg(invoice.toUpperCase()), uri: `lightning:${invoice}`, value: invoice } : null;
+  const onchain = address && bitcoinUri ? { svg: await qrSvg(bitcoinUri), uri: bitcoinUri, value: address } : null;
+  return { lightning, onchain };
+}
+
 // The confirmation / status page (Instant Peptides reference, 9/4).
 // Reached right after checkout and again from the confirmation email's
 // link, so it has to make sense on every visit: pending Venmo/Zelle
-// orders show the transfer instructions, pending Bitcoin orders the
-// hosted-checkout button, paid and failed orders their status.
-export default async function OrderStatusPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ token: string }>;
-  searchParams: Promise<{ pay?: string }>;
-}) {
+// orders show the transfer instructions; pending Bitcoin orders show the
+// payment itself (QR, open in wallet) and refresh on their own until
+// OpenNode's webhook confirms (David, 9/11: no bounce to OpenNode); paid
+// and failed orders show their status.
+export default async function OrderStatusPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const { pay } = await searchParams;
-  // Only absolute-https URLs may be used as the Pay link; anything else
-  // is dropped.
-  const payParam = pay && /^https:\/\//.test(pay) ? pay : undefined;
 
   let order;
   try {
@@ -64,9 +76,12 @@ export default async function OrderStatusPage({
   const tone = status?.tone ?? "pending";
   const method = order.payment_method;
   const pending = order.status === "PAYMENT_PENDING";
-  // Checkout-create responses carry a Speed checkout_url only while the
-  // session is live; order-status fetches never do.
-  const payUrl = payParam ?? order.payment?.details?.checkout_url;
+  const hosted = pending && isHostedCheckoutMethod(method);
+  const paymentStatus = order.payment_status ?? "pending";
+  const sub = hosted ? "Thank you for your order. One more step: pay with Bitcoin below." : status?.sub;
+  const details = hosted ? order.payment_details ?? null : null;
+  const rails = details ? await bitcoinRails(details) : null;
+  const payable = rails !== null && (rails.lightning !== null || rails.onchain !== null);
 
   return (
     <main className="container">
@@ -76,24 +91,48 @@ export default async function OrderStatusPage({
             <SectionIcon name={tone === "failed" ? "warning" : "check"} size={30} />
           </span>
           <h1 className={styles.heading}>{status?.heading ?? "Order Status"}</h1>
-          <p className={styles.sub}>{status?.sub ?? "Payment status will update here once available."}</p>
+          <p className={styles.sub}>{sub ?? "Payment status will update here once available."}</p>
           <div className={styles.orderLine}>
             <span className={styles.orderLabel}>Order number</span>
             <span className={styles.orderNumber}>{order.public_order_number}</span>
-            {method && <span className={styles.method}>{paymentOption(method)?.label ?? method}</span>}
+            {method && <span className={styles.method}>{paymentMethodLabel(method) ?? method}</span>}
           </div>
         </header>
 
         {pending && isLivePaymentMethod(method) && <PaymentInstructions order={order} method={method} />}
 
-        {pending && method === "crypto" && (
+        {hosted && (
           <section className={styles.card}>
-            <div className={styles.cardHeading}>Payment</div>
-            <p className={styles.cardText}>
-              Your order is reserved but not paid yet. Complete the Bitcoin payment (Lightning or on-chain) to confirm
-              it — the status here updates automatically once payment is received.
-            </p>
-            <PayButton token={token} checkoutUrl={payUrl} />
+            <div className={styles.cardHeading}>Pay with Bitcoin</div>
+            {paymentStatus === "processing" ? (
+              <p className={styles.cardText}>
+                Payment detected. Waiting for the Bitcoin network to confirm it. This page updates on its own.
+              </p>
+            ) : paymentStatus === "underpaid" ? (
+              <p className={styles.cardText}>
+                We received a partial payment for this order. Email {SUPPORT_EMAIL} with your order number and we will
+                sort it out.
+              </p>
+            ) : payable && details ? (
+              <BitcoinPayment
+                amountSats={details.amount_sats ?? null}
+                usdTotalCents={order.total_cents}
+                lightning={rails.lightning}
+                onchain={rails.onchain}
+                expiresAt={details.expires_at ?? null}
+                hostedUrl={details.checkout_url ?? null}
+              />
+            ) : (
+              <>
+                <p className={styles.cardText}>
+                  {paymentStatus === "expired"
+                    ? "This payment request expired. Start a new one below; your order is still reserved."
+                    : "Your Bitcoin payment could not be set up. Try again below, or email us with your order number."}
+                </p>
+                <PayButton token={token} />
+              </>
+            )}
+            <AutoRefresh />
           </section>
         )}
 

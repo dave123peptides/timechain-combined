@@ -297,12 +297,15 @@ export default function CheckoutPage() {
                     </label>
                     {active && option.live && (
                       <div className={styles.paymentBody}>
+                        {option.intro && <p className={styles.howToIntro}>{option.intro}</p>}
                         <ol className={styles.howTo}>
                           {option.steps.map((text) => (
                             <li key={text}>{text}</li>
                           ))}
                         </ol>
-                        <p className={styles.howToWarn}>Do not leave notes or mention peptides in the memo.</p>
+                        {option.kind === "transfer" && (
+                          <p className={styles.howToWarn}>Do not leave notes or mention peptides in the memo.</p>
+                        )}
                       </div>
                     )}
                   </div>

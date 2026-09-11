@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models.orders import Order
 from app.models.payments import Payment
+from app.services.payments import display_payment
 
 # Column order is shared with the vial site (~/Desktop/timechain), whose
 # TCP- orders land in the same "Timechain Orders" sheet: both apps must
@@ -60,10 +61,9 @@ def _money(cents: int) -> str:
 
 
 def _latest_payment(order: Order) -> Optional[Payment]:
-    payments = list(order.payments or [])
-    if not payments:
-        return None
-    return max(payments, key=lambda p: (p.created_at, str(p.id)))
+    # The paid row when there is one, else the newest — see
+    # app.services.payments.display_payment.
+    return display_payment(order)
 
 
 def order_export_row(order: Order) -> dict:
@@ -104,10 +104,16 @@ def order_export_row(order: Order) -> dict:
     }
 
 
-def order_notification_payload(order: Order, *, order_url: Optional[str] = None) -> dict:
+def order_notification_payload(
+    order: Order, *, order_url: Optional[str] = None, event: str = "order.created"
+) -> dict:
     """The webhook body: the flat row plus the items as structured
-    objects (a Sheet gets the row; anything smarter can use the list)."""
+    objects (a Sheet gets the row; anything smarter can use the list).
+    `event` says why it is being sent — "order.created" when the order is
+    placed, "order.paid" from the post-payment fan-out
+    (app/services/order_paid.py) — so a receiver can tell the two apart."""
     row = order_export_row(order)
+    row["event"] = event
     row["items_detail"] = [
         {
             "name": item.display_name_at_purchase,

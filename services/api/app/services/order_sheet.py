@@ -124,19 +124,37 @@ def ensure_header() -> None:
 _header_checked = False
 
 
+def _ensure_header_once() -> None:
+    """ensure_header(), at most once per process (cheap: one GET)."""
+    global _header_checked
+    if not _header_checked:
+        ensure_header()
+        _header_checked = True
+
+
+def _row_values(row: dict) -> list[str]:
+    return ["" if row.get(col) is None else str(row.get(col)) for col in EXPORT_COLUMNS]
+
+
+def _column_letter(n: int) -> str:
+    """1 → A, 22 → V, 26 → Z, 27 → AA."""
+    letters = ""
+    while n > 0:
+        n, remainder = divmod(n - 1, 26)
+        letters = chr(ord("A") + remainder) + letters
+    return letters
+
+
 def append_order_row(row: dict) -> bool:
     """Append one order (an order_export_row dict) as a sheet row, in
     EXPORT_COLUMNS order. Returns True on success, False when unconfigured
     or on any failure. Never raises: this runs after checkout has already
     succeeded and must never affect the customer."""
-    global _header_checked
     if not _sheets_configured():
         return False
     try:
-        if not _header_checked:
-            ensure_header()
-            _header_checked = True
-        values = [["" if row.get(col) is None else str(row.get(col)) for col in EXPORT_COLUMNS]]
+        _ensure_header_once()
+        values = [_row_values(row)]
         response = httpx.post(
             _values_url("!A1:append"),
             params={"valueInputOption": "USER_ENTERED", "insertDataOption": "INSERT_ROWS"},
@@ -148,4 +166,51 @@ def append_order_row(row: dict) -> bool:
         return True
     except Exception as exc:  # noqa: BLE001 - log and drop, by design
         logger.warning("sheet append for %s failed: %s", row.get("order_number"), exc)
+        return False
+
+
+def update_order_row(row: dict) -> bool:
+    """Rewrite the sheet row for `row["order_number"]` in place (columns
+    A..<last EXPORT_COLUMNS column> only, so notes typed to the right of
+    the data survive), or append it when no such row exists. Used once
+    an order is PAID so the row's status / payment_status /
+    payment_method flip without ever creating a second row for the same
+    order (David, 9/10). Column A is scanned top to bottom, skipping the
+    header; TCP- rows from the vial site share the tab and simply never
+    match. Appends never shift existing rows, so the index read here
+    stays valid even if another order is appended meanwhile. Returns
+    True on success, False when unconfigured or on any failure. Never
+    raises."""
+    order_number = row.get("order_number")
+    if not _sheets_configured():
+        return False
+    try:
+        _ensure_header_once()
+        headers = {"Authorization": f"Bearer {_access_token()}"}
+        got = httpx.get(_values_url("!A:A"), headers=headers, timeout=_TIMEOUT_SECONDS)
+        got.raise_for_status()
+        column_a = got.json().get("values") or []
+        row_number = next(
+            (
+                index + 1
+                for index, cells in enumerate(column_a)
+                if index > 0 and cells and cells[0] == order_number
+            ),
+            None,
+        )
+        if row_number is None:
+            logger.info("sheet row for %s not found; appending instead", order_number)
+            return append_order_row(row)
+        last_column = _column_letter(len(EXPORT_COLUMNS))
+        put = httpx.put(
+            _values_url(f"!A{row_number}:{last_column}{row_number}"),
+            params={"valueInputOption": "USER_ENTERED"},
+            headers=headers,
+            json={"values": [_row_values(row)]},
+            timeout=_TIMEOUT_SECONDS,
+        )
+        put.raise_for_status()
+        return True
+    except Exception as exc:  # noqa: BLE001 - log and drop, by design
+        logger.warning("sheet update for %s failed: %s", order_number, exc)
         return False

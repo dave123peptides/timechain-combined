@@ -20,6 +20,12 @@ class Payment(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="pending", server_default="pending")
     amount_cents: Mapped[int] = mapped_column(Integer, nullable=False)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="usd", server_default="usd")
+    # What the customer needs to pay a hosted-checkout charge, kept so
+    # the order page can show it on every visit: for OpenNode the
+    # lightning_invoice, chain_address, bitcoin_uri, amount_sats,
+    # expires_at and checkout_url (see app/payments/opennode.py). Null
+    # for manual transfers.
+    provider_data: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
 
     order: Mapped["Order"] = relationship(back_populates="payments")
     events: Mapped[list["PaymentEvent"]] = relationship(back_populates="payment", cascade="all, delete-orphan")

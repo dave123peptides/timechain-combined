@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -65,10 +66,15 @@ class PaymentProvider(Protocol):
         successfully."""
         ...
 
-    def handle_event(self, session: Session, event: VerifiedEvent) -> None:
+    def handle_event(self, session: Session, event: VerifiedEvent) -> uuid.UUID | None:
         """Map a verified event to a call into
         app.services.payments.mark_order_paid / mark_order_payment_failed
         (or, eventually, a refund recorder). Does not commit — the
         caller's transaction boundary owns that, same as every other
-        service function in this codebase."""
+        service function in this codebase.
+
+        Returns the id of the order this event transitioned to PAID, or
+        None when nothing became paid. api/webhooks.py uses the return
+        value to schedule the post-payment fan-out
+        (app/services/order_paid.py) after its commit."""
         ...

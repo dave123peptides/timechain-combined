@@ -137,12 +137,33 @@ export type Order = {
   discount_cents: number;
   items: OrderItem[];
   created_at: string;
-  // Provider of the newest payment row — which instructions the order
-  // page shows. Null only for a hand-edited order with no payment row.
+  // Provider of the Payment row that describes the order (the paid one
+  // if any, else the newest) — which instructions the order page shows.
+  // Null only for a hand-edited order with no payment row.
   payment_method: string | null;
+  // That row's status: pending | processing | underpaid | expired |
+  // failed | superseded | succeeded. The order page uses it to tell a
+  // Bitcoin customer where their payment stands.
+  payment_status?: string | null;
+  // For a pending Bitcoin order: what the order page shows so the
+  // customer can pay right there (QR + open in wallet). Null for
+  // manual transfers, once paid, or once the charge expired.
+  payment_details?: PaymentDetails | null;
   // Only ever populated on the checkout-create response (see
   // PaymentInstructions) — null on order-status fetches.
   payment?: PaymentInstructions | null;
+};
+
+export type PaymentDetails = {
+  provider_payment_id?: string;
+  checkout_url?: string | null;
+  usd_total_cents?: number;
+  expires_in_seconds?: number;
+  expires_at?: string | null;
+  amount_sats?: number | null;
+  lightning_invoice?: string | null;
+  chain_address?: string | null;
+  bitcoin_uri?: string | null;
 };
 
 class ApiError extends Error {
@@ -264,16 +285,19 @@ export type ConsentInput = {
 
 export type CartItemInput = { variant_id: string; quantity: number };
 
-// "venmo" and "zelle" are the launch methods (David, 9/4): the customer
-// sends the transfer themselves with the order number as the memo and
-// an admin confirms it. "crypto" (Speed's hosted Bitcoin checkout) and
-// "ach" stay in the type for existing orders; the checkout lists them as
-// coming soon. Details and how-to copy: lib/paymentMethods.ts.
-export type PaymentMethod = "venmo" | "zelle" | "crypto" | "ach";
+// "venmo" and "zelle" (David, 9/4): the customer sends the transfer
+// themselves with the order number as the memo and an admin confirms it.
+// "bitcoin_opennode" (David, 9/10): OpenNode's hosted Bitcoin checkout;
+// the customer is sent there right after placing the order and the
+// order confirms itself from OpenNode's webhook. "crypto" (the dormant
+// Speed provider) and "ach" stay in the type for existing orders; the
+// checkout lists ACH as coming soon. Details and how-to copy:
+// lib/paymentMethods.ts.
+export type PaymentMethod = "venmo" | "zelle" | "bitcoin_opennode" | "crypto" | "ach";
 
 // Present only on the POST /checkout/create response — the provider's
-// instructions for how to pay (a Speed hosted checkout URL for crypto).
-// GET /shop/orders/{token} never returns it.
+// instructions for how to pay (the OpenNode hosted checkout URL for
+// Bitcoin). GET /shop/orders/{token} never returns it.
 export type PaymentInstructions = {
   provider: string;
   summary: string;
@@ -299,8 +323,8 @@ export function createOrder(payload: {
   return apiFetch<Order>("/api/v1/checkout/create", { method: "POST", body: JSON.stringify(payload) });
 }
 
-// Retry-payment: mints a fresh Speed checkout session for a still-unpaid
-// crypto order. Same response shape as checkout-create.
+// Retry-payment: mints a fresh hosted checkout (a new OpenNode charge)
+// for a still-unpaid Bitcoin order. Same response shape as checkout-create.
 export function retryPayment(token: string): Promise<Order> {
   return apiFetch<Order>(`/shop/orders/${encodeURIComponent(token)}/retry-payment`, { method: "POST" });
 }

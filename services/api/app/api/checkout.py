@@ -5,7 +5,12 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
 
-from app.api.shop import OrderResponse, ShippingAddressRequest, order_response
+from app.api.shop import (
+    OrderResponse,
+    ShippingAddressRequest,
+    latest_payment_method,
+    order_response,
+)
 from app.core.config import get_settings
 from app.db.session import get_db
 from app.services import ghl_notify, order_notify, order_sheet, storefront
@@ -76,14 +81,15 @@ class CreateCheckoutRequest(BaseModel):
     consent: ConsentRequest
     # What the customer says they'll pay with. Recorded on the Payment
     # row as `provider` at order-creation time. "venmo" and "zelle" are
-    # the launch methods (David, 9/4): manual transfers the customer
-    # sends themselves, matched to the order by its public order number
-    # in the memo, then confirmed by an admin
-    # (app.services.payments.mark_order_paid). "crypto" is Speed's hosted
-    # Bitcoin checkout; "ach" still has no provider. The storefront only
-    # offers the launch methods; the others stay accepted so existing
-    # orders and the admin flow keep working.
-    payment_method: Literal["venmo", "zelle", "crypto", "ach"]
+    # manual transfers (David, 9/4) the customer sends themselves,
+    # matched to the order by its public order number in the memo, then
+    # confirmed by an admin (app.services.payments.mark_order_paid).
+    # "bitcoin_opennode" is OpenNode's hosted Bitcoin checkout (David,
+    # 9/10): the order is created pending, the customer is sent to the
+    # hosted page, and OpenNode's webhook marks it paid. "crypto" is the
+    # dormant Speed provider and "ach" has no provider; both stay
+    # accepted so existing orders and the admin flow keep working.
+    payment_method: Literal["venmo", "zelle", "bitcoin_opennode", "crypto", "ach"]
     # Same code the quote validated; create_order re-validates and
     # re-prices it, and rejects the order outright if it isn't real.
     discount_code: str | None = Field(default=None, max_length=40)
@@ -132,6 +138,17 @@ def quote_checkout(body: QuoteRequest, db: Session = Depends(get_db)) -> QuoteRe
     )
 
 
+BITCOIN_UNAVAILABLE = "Bitcoin checkout is not available right now. Please choose another payment method."
+
+
+def _require_bitcoin_enabled(payment_method: str | None) -> None:
+    """The BITCOIN_CHECKOUT_ENABLED switch (David, 9/10): with it off, a
+    new Bitcoin order or a re-minted charge is refused here, before any
+    OpenNode call. Existing charges' webhooks are unaffected."""
+    if payment_method == "bitcoin_opennode" and not get_settings().bitcoin_checkout_enabled:
+        raise HTTPException(status_code=400, detail=BITCOIN_UNAVAILABLE)
+
+
 @router.post("/create", response_model=OrderResponse)
 def create_checkout(
     body: CreateCheckoutRequest, background: BackgroundTasks, db: Session = Depends(get_db)
@@ -149,6 +166,7 @@ def create_checkout(
     """
     if not get_settings().checkout_enabled:
         raise HTTPException(status_code=503, detail="Checkout is currently unavailable.")
+    _require_bitcoin_enabled(body.payment_method)
     try:
         order = storefront.create_order(
             db,
@@ -195,6 +213,7 @@ def retry_payment(token: str, db: Session = Depends(get_db)) -> OrderResponse:
     order = storefront.get_order_by_token(db, token)
     if order is None:
         raise HTTPException(status_code=404, detail="Order not found.")
+    _require_bitcoin_enabled(latest_payment_method(order))
     try:
         storefront.recreate_payment_instructions(db, order)
         db.commit()

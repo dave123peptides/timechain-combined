@@ -22,10 +22,30 @@ class PaymentActionError(RuntimeError):
     """
 
 
-def _get_order_and_payment(session: Session, order_id: uuid.UUID) -> tuple[Order, Payment]:
+def display_payment(order: Order) -> Payment | None:
+    """The Payment row that best describes an order's payment: the
+    `succeeded` row when one exists, otherwise the newest. An order whose
+    hosted checkout was re-minted has several rows; once one of them is
+    paid, that one — not the newest pending attempt — is the payment the
+    order page, the sheet and the CSV should report."""
+    payments = list(order.payments or [])
+    if not payments:
+        return None
+    return max(payments, key=lambda p: (p.status == "succeeded", p.created_at, str(p.id)))
+
+
+def _get_order_and_payment(
+    session: Session, order_id: uuid.UUID, *, payment_id: uuid.UUID | None = None
+) -> tuple[Order, Payment]:
     order = session.get(Order, order_id)
     if order is None:
         raise PaymentActionError(f"No such order: {order_id}")
+
+    if payment_id is not None:
+        payment = session.get(Payment, payment_id)
+        if payment is None or payment.order_id != order_id:
+            raise PaymentActionError(f"Payment {payment_id} does not belong to order {order_id}.")
+        return order, payment
 
     payment = session.execute(
         select(Payment).where(Payment.order_id == order_id).order_by(Payment.created_at.desc())
@@ -44,6 +64,7 @@ def mark_order_paid(
     provider_payment_id: Optional[str],
     source: str,
     note: Optional[str] = None,
+    payment_id: uuid.UUID | None = None,
 ) -> Order:
     """Transitions an order PAYMENT_PENDING -> PAID and — critically —
     this is what enqueues submit_supplier_order, not order creation (see
@@ -60,8 +81,16 @@ def mark_order_paid(
     perspective — nothing is written) if the order isn't still
     PAYMENT_PENDING, so a provider's retried webhook delivery can never
     double-enqueue fulfillment or double-write history.
+
+    `payment_id` (optional) targets the exact Payment row that was paid
+    instead of the newest one. A hosted-checkout provider passes the row
+    it matched by provider_payment_id: when a customer re-mints a charge
+    and then pays the OLD one, the old row is the one that succeeded, and
+    stamping the newest row with the old charge id would violate
+    provider_payment_id's UNIQUE constraint. The order's other unpaid
+    rows are marked `superseded` either way.
     """
-    order, payment = _get_order_and_payment(session, order_id)
+    order, payment = _get_order_and_payment(session, order_id, payment_id=payment_id)
     if order.status != OrderStatus.PAYMENT_PENDING:
         raise PaymentActionError(
             f"Order {order.public_order_number} is {order.status!r}, not PAYMENT_PENDING — refusing to mark paid again."
@@ -70,6 +99,15 @@ def mark_order_paid(
     payment.status = "succeeded"
     payment.provider = provider
     payment.provider_payment_id = provider_payment_id
+    for other in session.execute(
+        select(Payment).where(
+            Payment.order_id == order.id,
+            Payment.id != payment.id,
+            Payment.status.in_(("pending", "processing", "expired")),
+        )
+    ).scalars():
+        other.status = "superseded"
+        session.add(other)
 
     session.add(
         PaymentEvent(
