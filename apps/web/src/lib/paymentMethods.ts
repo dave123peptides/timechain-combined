@@ -33,10 +33,10 @@ export const ZELLE = {
 
 // Manual-transfer methods: the order page shows the send-it-yourself
 // instructions (PaymentInstructions) for these while the order is pending.
-export type LivePaymentMethod = Extract<PaymentMethod, "venmo" | "zelle">;
+export type LivePaymentMethod = Extract<PaymentMethod, "venmo" | "zelle" | "bitcoin_opennode">;
 
 export function isLivePaymentMethod(value: string | null | undefined): value is LivePaymentMethod {
-  return value === "venmo" || value === "zelle";
+  return value === "venmo" || value === "zelle" || value === "bitcoin_opennode";
 }
 
 // Hosted-checkout methods: the order page shows the Pay button / payment

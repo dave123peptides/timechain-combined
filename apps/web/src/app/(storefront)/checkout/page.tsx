@@ -75,14 +75,9 @@ export default function CheckoutPage() {
         discount_code: quote?.discount_code ?? null,
       });
       clear();
-      // Crypto (not offered today, kept for when it returns): Speed's
-      // hosted page, which redirects back to /order/{token}.
-      const checkoutUrl = order.payment?.details?.checkout_url;
-      router.push(
-        checkoutUrl
-          ? `/order/${order.access_token}?pay=${encodeURIComponent(checkoutUrl)}`
-          : `/order/${order.access_token}`
-      );
+      // The order page shows the Bitcoin payment itself (QR + open in
+      // wallet) — no redirect to a hosted checkout (David, 9/11).
+      router.push(`/order/${order.access_token}`);
     } catch (err) {
       setError((err as Error).message);
       setSubmitting(false);
