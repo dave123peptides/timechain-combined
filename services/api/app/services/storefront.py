@@ -807,7 +807,7 @@ def recreate_payment_instructions(session: Session, order: Order) -> Order:
         .scalar_one_or_none()
     )
     if latest_payment is None or not _has_hosted_checkout(latest_payment.provider):
-        raise StorefrontError("This order does not use hosted Bitcoin checkout.")
+        raise StorefrontError("This order does not use a hosted checkout.")
     if latest_payment.status == "processing":
         raise StorefrontError("A payment for this order is already being confirmed. Please wait a few minutes.")
     provider_key = latest_payment.provider
@@ -836,5 +836,5 @@ def recreate_payment_instructions(session: Session, order: Order) -> Order:
     _attach_payment_instructions(session, order, new_payment, provider_key=provider_key)
     if not hasattr(order, "payment_instructions"):
         # Provider unconfigured / errored — nothing to pay with.
-        raise StorefrontError("Bitcoin checkout is not available right now. Please try again later.")
+        raise StorefrontError("This payment method is not available right now. Please try again later.")
     return order

@@ -164,6 +164,10 @@ export type PaymentDetails = {
   lightning_invoice?: string | null;
   chain_address?: string | null;
   bitcoin_uri?: string | null;
+  // PayPal: the approval page the customer is sent to (valid for about
+  // three hours from creation) and PayPal's own status for the order.
+  approve_url?: string | null;
+  paypal_status?: string | null;
 };
 
 class ApiError extends Error {
@@ -289,11 +293,13 @@ export type CartItemInput = { variant_id: string; quantity: number };
 // themselves with the order number as the memo and an admin confirms it.
 // "bitcoin_opennode" (David, 9/10): OpenNode's hosted Bitcoin checkout;
 // the customer is sent there right after placing the order and the
-// order confirms itself from OpenNode's webhook. "crypto" (the dormant
-// Speed provider) and "ach" stay in the type for existing orders; the
+// order confirms itself from OpenNode's webhook. "paypal" (David, 9/13):
+// the customer approves on PayPal's page and lands back on the order
+// page, which captures the payment. "crypto" (the dormant Speed
+// provider) and "ach" stay in the type for existing orders; the
 // checkout lists ACH as coming soon. Details and how-to copy:
 // lib/paymentMethods.ts.
-export type PaymentMethod = "venmo" | "zelle" | "bitcoin_opennode" | "crypto" | "ach";
+export type PaymentMethod = "venmo" | "zelle" | "paypal" | "bitcoin_opennode" | "crypto" | "ach";
 
 // Present only on the POST /checkout/create response — the provider's
 // instructions for how to pay (the OpenNode hosted checkout URL for
@@ -327,6 +333,14 @@ export function createOrder(payload: {
 // for a still-unpaid Bitcoin order. Same response shape as checkout-create.
 export function retryPayment(token: string): Promise<Order> {
   return apiFetch<Order>(`/shop/orders/${encodeURIComponent(token)}/retry-payment`, { method: "POST" });
+}
+
+// PayPal return: the customer approved on PayPal and is back on the
+// order page. Captures the payment; the returned order is PAID when
+// PayPal reported the capture complete (or the webhook got there
+// first). Throws ApiError 409 when the buyer never approved.
+export function capturePayPal(token: string): Promise<Order> {
+  return apiFetch<Order>(`/shop/orders/${encodeURIComponent(token)}/paypal/capture`, { method: "POST" });
 }
 
 export function getOrder(token: string): Promise<Order> {

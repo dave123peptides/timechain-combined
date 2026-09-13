@@ -8,6 +8,7 @@ import AutoRefresh from "./AutoRefresh";
 import BitcoinPayment, { type BitcoinRail } from "./BitcoinPayment";
 import PayButton from "./PayButton";
 import PaymentInstructions from "./PaymentInstructions";
+import PayPalPayment from "./PayPalPayment";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -52,10 +53,22 @@ async function bitcoinRails(details: PaymentDetails): Promise<{ lightning: Bitco
 // link, so it has to make sense on every visit: pending Venmo/Zelle
 // orders show the transfer instructions; pending Bitcoin orders show the
 // payment itself (QR, open in wallet) and refresh on their own until
-// OpenNode's webhook confirms (David, 9/11: no bounce to OpenNode); paid
-// and failed orders show their status.
-export default async function OrderStatusPage({ params }: { params: Promise<{ token: string }> }) {
+// OpenNode's webhook confirms (David, 9/11: no bounce to OpenNode);
+// pending PayPal orders show Continue to PayPal and, on the way back
+// from PayPal, capture the payment (David, 9/13); paid and failed orders
+// show their status.
+export default async function OrderStatusPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ token: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { token } = await params;
+  const query = await searchParams;
+  // PayPal appends ?token=<PayPal order id>&PayerID=… when it sends the
+  // customer back to this page (token only when they cancelled).
+  const returnedPayPalOrderId = typeof query.token === "string" && query.token ? query.token : null;
 
   let order;
   try {
@@ -76,10 +89,17 @@ export default async function OrderStatusPage({ params }: { params: Promise<{ to
   const tone = status?.tone ?? "pending";
   const method = order.payment_method;
   const pending = order.status === "PAYMENT_PENDING";
-  const hosted = pending && isHostedCheckoutMethod(method);
+  const paypal = pending && method === "paypal";
+  // Bitcoin (and the dormant Speed "crypto" rows): the on-page payment card.
+  const hosted = pending && isHostedCheckoutMethod(method) && !paypal;
   const paymentStatus = order.payment_status ?? "pending";
-  const sub = hosted ? "Thank you for your order. One more step: pay with Bitcoin below." : status?.sub;
+  const sub = paypal
+    ? "Thank you for your order. One more step: approve the payment on PayPal below."
+    : hosted
+      ? "Thank you for your order. One more step: pay with Bitcoin below."
+      : status?.sub;
   const details = hosted ? order.payment_details ?? null : null;
+  const paypalDetails = paypal ? order.payment_details ?? null : null;
   const rails = details ? await bitcoinRails(details) : null;
   const payable = rails !== null && (rails.lightning !== null || rails.onchain !== null);
 
@@ -99,7 +119,28 @@ export default async function OrderStatusPage({ params }: { params: Promise<{ to
           </div>
         </header>
 
-        {pending && isLivePaymentMethod(method) && !hosted && <PaymentInstructions order={order} method={method} />}
+        {pending && isLivePaymentMethod(method) && !hosted && !paypal && <PaymentInstructions order={order} method={method} />}
+
+        {paypal && (
+          <section className={styles.card}>
+            <div className={styles.cardHeading}>Pay with PayPal</div>
+            {paymentStatus === "processing" ? (
+              <p className={styles.cardText}>
+                PayPal is still completing this payment. Nothing more to do on your end; this page updates on its own.
+              </p>
+            ) : (
+              <PayPalPayment
+                token={token}
+                usdTotalCents={order.total_cents}
+                approveUrl={paypalDetails?.approve_url ?? null}
+                expiresAt={paypalDetails?.expires_at ?? null}
+                paypalOrderId={paypalDetails?.provider_payment_id ?? null}
+                returnedOrderId={returnedPayPalOrderId}
+              />
+            )}
+            <AutoRefresh />
+          </section>
+        )}
 
         {hosted && (
           <section className={styles.card}>

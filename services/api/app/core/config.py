@@ -150,6 +150,33 @@ class Settings(BaseSettings):
     # as with a blank key.
     opennode_callback_url: str = ""
 
+    # --- PayPal (see app/payments/paypal.py) ---
+    # Offer PayPal at checkout? False (the default) makes
+    # POST /checkout/create and the order page's retry-payment refuse
+    # payment_method "paypal" with a 400, while the webhook route and the
+    # return-capture endpoint keep settling PayPal orders that already
+    # exist. The storefront has its own copy of this switch
+    # (NEXT_PUBLIC_PAYPAL_CHECKOUT_ENABLED) that hides the option as
+    # "Coming soon". David, 9/13: sandbox first, then live; off in
+    # production until he says otherwise.
+    paypal_checkout_enabled: bool = False
+    # REST app credentials from developer.paypal.com → Apps & Credentials
+    # (the Sandbox or Live tab must match paypal_environment). Blank =
+    # PayPal checkout degrades gracefully (order created, no approval
+    # link) and every PayPal webhook is rejected.
+    paypal_client_id: str = ""
+    paypal_client_secret: str = ""
+    # "sandbox" → api-m.sandbox.paypal.com; "live" → api-m.paypal.com.
+    paypal_environment: str = "sandbox"
+    # The id of the webhook registered in the PayPal dashboard (or via
+    # POST /v1/notifications/webhooks) that points at this API's
+    # POST /api/v1/webhooks/payments/paypal. Signature verification needs
+    # it; blank = every PayPal webhook is rejected 400.
+    paypal_webhook_id: str = ""
+    # Shown on PayPal's approval page and in the payer's PayPal record
+    # (with the order number). Never a product name.
+    paypal_brand_name: str = "TCP"
+
     # GoHighLevel "payment confirmed" push (app/services/order_paid.py).
     # Deliberately a SECOND inbound-webhook URL, separate from
     # ghl_order_webhook_url: that workflow emails the how-to-pay steps

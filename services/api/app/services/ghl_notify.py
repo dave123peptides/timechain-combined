@@ -80,6 +80,7 @@ def ghl_payload(row: dict) -> dict | None:
 _METHOD_LABELS = {
     "venmo": "Venmo",
     "zelle": "Zelle",
+    "paypal": "PayPal",
     "bitcoin_opennode": "Bitcoin",
     "crypto": "Bitcoin",
     "ach": "ACH",

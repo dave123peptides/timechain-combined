@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Literal
 
@@ -13,8 +14,12 @@ from app.api.shop import (
 )
 from app.core.config import get_settings
 from app.db.session import get_db
-from app.services import ghl_notify, order_notify, order_sheet, storefront
+from app.payments import paypal
+from app.payments.registry import get_provider
+from app.services import ghl_notify, order_notify, order_paid, order_sheet, storefront
 from app.services.order_export import order_notification_payload
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/checkout", tags=["checkout"])
 
@@ -86,10 +91,13 @@ class CreateCheckoutRequest(BaseModel):
     # confirmed by an admin (app.services.payments.mark_order_paid).
     # "bitcoin_opennode" is OpenNode's hosted Bitcoin checkout (David,
     # 9/10): the order is created pending, the customer is sent to the
-    # hosted page, and OpenNode's webhook marks it paid. "crypto" is the
-    # dormant Speed provider and "ach" has no provider; both stay
-    # accepted so existing orders and the admin flow keep working.
-    payment_method: Literal["venmo", "zelle", "bitcoin_opennode", "crypto", "ach"]
+    # hosted page, and OpenNode's webhook marks it paid. "paypal" (David,
+    # 9/13) sends the customer to PayPal's approval page and back to the
+    # order page, where the payment is captured; PayPal's webhook settles
+    # it as well. "crypto" is the dormant Speed provider and "ach" has no
+    # provider; both stay accepted so existing orders and the admin flow
+    # keep working.
+    payment_method: Literal["venmo", "zelle", "paypal", "bitcoin_opennode", "crypto", "ach"]
     # Same code the quote validated; create_order re-validates and
     # re-prices it, and rejects the order outright if it isn't real.
     discount_code: str | None = Field(default=None, max_length=40)
@@ -139,14 +147,22 @@ def quote_checkout(body: QuoteRequest, db: Session = Depends(get_db)) -> QuoteRe
 
 
 BITCOIN_UNAVAILABLE = "Bitcoin checkout is not available right now. Please choose another payment method."
+PAYPAL_UNAVAILABLE = "PayPal checkout is not available right now. Please choose another payment method."
+PAYPAL_NOT_APPROVED = "Your PayPal payment was not completed. Continue to PayPal to approve it, then come back here."
+PAYPAL_CAPTURE_FAILED = "We could not confirm your PayPal payment. Please try again, or email us with your order number."
 
 
-def _require_bitcoin_enabled(payment_method: str | None) -> None:
-    """The BITCOIN_CHECKOUT_ENABLED switch (David, 9/10): with it off, a
-    new Bitcoin order or a re-minted charge is refused here, before any
-    OpenNode call. Existing charges' webhooks are unaffected."""
-    if payment_method == "bitcoin_opennode" and not get_settings().bitcoin_checkout_enabled:
+def _require_method_enabled(payment_method: str | None) -> None:
+    """The BITCOIN_CHECKOUT_ENABLED (David, 9/10) and PAYPAL_CHECKOUT_ENABLED
+    (David, 9/13) switches: with one off, a new order or a re-minted
+    hosted checkout for that method is refused here, before any provider
+    call. Existing payments' webhooks and PayPal's return capture are
+    unaffected, so what was already started still settles."""
+    settings = get_settings()
+    if payment_method == "bitcoin_opennode" and not settings.bitcoin_checkout_enabled:
         raise HTTPException(status_code=400, detail=BITCOIN_UNAVAILABLE)
+    if payment_method == "paypal" and not settings.paypal_checkout_enabled:
+        raise HTTPException(status_code=400, detail=PAYPAL_UNAVAILABLE)
 
 
 @router.post("/create", response_model=OrderResponse)
@@ -166,7 +182,7 @@ def create_checkout(
     """
     if not get_settings().checkout_enabled:
         raise HTTPException(status_code=503, detail="Checkout is currently unavailable.")
-    _require_bitcoin_enabled(body.payment_method)
+    _require_method_enabled(body.payment_method)
     try:
         order = storefront.create_order(
             db,
@@ -213,7 +229,7 @@ def retry_payment(token: str, db: Session = Depends(get_db)) -> OrderResponse:
     order = storefront.get_order_by_token(db, token)
     if order is None:
         raise HTTPException(status_code=404, detail="Order not found.")
-    _require_bitcoin_enabled(latest_payment_method(order))
+    _require_method_enabled(latest_payment_method(order))
     try:
         storefront.recreate_payment_instructions(db, order)
         db.commit()
@@ -221,4 +237,47 @@ def retry_payment(token: str, db: Session = Depends(get_db)) -> OrderResponse:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     db.refresh(order)
+    return order_response(order)
+
+
+@orders_router.post("/{token}/paypal/capture", response_model=OrderResponse)
+def capture_paypal_payment(token: str, background: BackgroundTasks, db: Session = Depends(get_db)) -> OrderResponse:
+    """The customer is back from PayPal's approval page (David, 9/13):
+    capture the PayPal order and, when PayPal reports the capture
+    complete, mark the order paid (app/payments/paypal.py
+    capture_for_return). Idempotent with the webhook path — whichever
+    lands first marks the order paid, the other no-ops — so this simply
+    returns the order when it is already PAID.
+
+    409 = the buyer never approved on PayPal (they cancelled or came
+    back early); the order page offers Continue to PayPal again. 400 =
+    PayPal refused or could not be reached; nothing is written.
+
+    Deliberately not gated by PAYPAL_CHECKOUT_ENABLED: a PayPal order
+    that exists must be able to settle even after the method is switched
+    off, exactly like the webhook route.
+    """
+    order = storefront.get_order_by_token(db, token)
+    if order is None:
+        raise HTTPException(status_code=404, detail="Order not found.")
+    if latest_payment_method(order) != "paypal":
+        raise HTTPException(status_code=400, detail="This order does not use PayPal.")
+    if order.status != "PAYMENT_PENDING":
+        return order_response(order)
+    provider = get_provider("paypal")
+    try:
+        paid_order_id = provider.capture_for_return(db, order)  # type: ignore[attr-defined]
+        db.commit()
+    except paypal.PayPalOrderNotApproved as exc:
+        db.rollback()
+        raise HTTPException(status_code=409, detail=PAYPAL_NOT_APPROVED) from exc
+    except paypal.PayPalError as exc:
+        db.rollback()
+        logger.warning("PayPal return capture for order %s failed: %s", order.public_order_number, exc)
+        raise HTTPException(status_code=400, detail=PAYPAL_CAPTURE_FAILED) from exc
+    db.refresh(order)
+    if paid_order_id is not None:
+        # Same post-payment fan-out as the webhook route and admin Mark
+        # paid: sheet row rewritten in place, GHL "order.paid" push.
+        background.add_task(order_paid.run_order_paid_fanout, paid_order_id)
     return order_response(order)

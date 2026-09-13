@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { createOrder, formatMoney, type PaymentMethod } from "@/lib/api";
 import { useCart } from "@/lib/cart-context";
-import { PAYMENT_OPTIONS, isLivePaymentMethod } from "@/lib/paymentMethods";
+import { PAYMENT_OPTIONS, isSelectablePaymentMethod, paymentOption } from "@/lib/paymentMethods";
 import { useResolvedCart } from "@/lib/useResolvedCart";
 import ProductImagePlaceholder from "@/components/ProductImagePlaceholder";
 import SectionIcon from "@/components/SectionIcon";
@@ -42,7 +42,11 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [region, setRegion] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("venmo");
+  // Preselect the first method that can actually be chosen, so a method
+  // switched off (Venmo, 9/11) is never the silent default.
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    () => PAYMENT_OPTIONS.find((option) => option.live)?.id ?? "zelle",
+  );
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [ruoAcknowledged, setRuoAcknowledged] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -50,7 +54,9 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
 
   const consentComplete = ageConfirmed && ruoAcknowledged && termsAccepted;
-  const canPlace = consentComplete && quote !== null && !hasUnavailable && isLivePaymentMethod(paymentMethod) && !submitting;
+  const canPlace =
+    consentComplete && quote !== null && !hasUnavailable && isSelectablePaymentMethod(paymentMethod) && !submitting;
+  const selectedOption = paymentOption(paymentMethod);
 
   const placeOrder = async () => {
     setError(null);
@@ -76,7 +82,8 @@ export default function CheckoutPage() {
       });
       clear();
       // The order page shows the Bitcoin payment itself (QR + open in
-      // wallet) — no redirect to a hosted checkout (David, 9/11).
+      // wallet) — no redirect to a hosted checkout (David, 9/11). PayPal
+      // orders get their Continue to PayPal button there too.
       router.push(`/order/${order.access_token}`);
     } catch (err) {
       setError((err as Error).message);
@@ -448,8 +455,9 @@ export default function CheckoutPage() {
               </button>
               {error && <p className={styles.error}>{error}</p>}
               <p className={styles.note}>
-                Placing your order reserves it as pending. Payment instructions for {paymentMethod === "zelle" ? "Zelle" : "Venmo"} appear on
-                the next page; your order ships once the transfer is received.
+                {selectedOption?.kind === "hosted"
+                  ? `Placing your order reserves it as pending. You finish paying with ${selectedOption.label} on the next page; your order ships once the payment is confirmed.`
+                  : `Placing your order reserves it as pending. Payment instructions for ${selectedOption?.label ?? "your payment method"} appear on the next page; your order ships once the transfer is received.`}
               </p>
             </div>
           )}

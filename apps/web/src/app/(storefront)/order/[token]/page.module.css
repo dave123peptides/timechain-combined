@@ -417,3 +417,17 @@
   font-size: var(--text-xs);
   color: var(--ink-faint);
 }
+
+/* PayPal card (David, 9/13): one line of copy and the Continue button. */
+.paypal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: center;
+}
+
+.paypalButton {
+  min-width: 220px;
+  margin-top: 0.25rem;
+}

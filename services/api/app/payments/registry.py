@@ -9,6 +9,10 @@ from app.payments.base import PaymentProvider
 # checkout) — see app/payments/opennode.py. The live Bitcoin method
 # since 2026-09-10 (David).
 #
+# "paypal" is PayPal Checkout (hosted approval page, captured on the
+# customer's return or from the webhook) — see app/payments/paypal.py.
+# Added 2026-09-13 (David), gated by PAYPAL_CHECKOUT_ENABLED.
+#
 # "crypto" is Speed — see app/payments/speed.py. Dormant: the storefront
 # no longer offers it, but the key stays registered so any historical
 # "crypto" row (and its re-mint path) keeps working.
@@ -23,10 +27,12 @@ from app.payments.base import PaymentProvider
 # transfers (David, 9/4); the customer sends the transfer themselves
 # with the public order number as the memo.
 from app.payments.opennode import OpenNodeProvider
+from app.payments.paypal import PayPalProvider
 from app.payments.speed import SpeedProvider
 
 _PROVIDERS: dict[str, PaymentProvider] = {
     "bitcoin_opennode": OpenNodeProvider(),
+    "paypal": PayPalProvider(),
     "crypto": SpeedProvider(),
 }
 

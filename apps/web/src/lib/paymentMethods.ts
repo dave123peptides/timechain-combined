@@ -31,21 +31,22 @@ export const ZELLE = {
   accountName: "Timechain",
 };
 
-// Manual-transfer methods: the order page shows the send-it-yourself
-// instructions (PaymentInstructions) for these while the order is pending.
-export type LivePaymentMethod = Extract<PaymentMethod, "venmo" | "zelle" | "bitcoin_opennode">;
+// Methods this storefront knows how to show on the order page: the
+// send-it-yourself instructions (PaymentInstructions) for Venmo/Zelle,
+// the payment card for the hosted ones.
+export type LivePaymentMethod = Extract<PaymentMethod, "venmo" | "zelle" | "paypal" | "bitcoin_opennode">;
 
 export function isLivePaymentMethod(value: string | null | undefined): value is LivePaymentMethod {
-  return value === "venmo" || value === "zelle" || value === "bitcoin_opennode";
+  return value === "venmo" || value === "zelle" || value === "paypal" || value === "bitcoin_opennode";
 }
 
 // Hosted-checkout methods: the order page shows the Pay button / payment
 // status card for these. "crypto" is the dormant Speed provider, kept so
 // any old order still renders.
-export type HostedCheckoutMethod = Extract<PaymentMethod, "bitcoin_opennode" | "crypto">;
+export type HostedCheckoutMethod = Extract<PaymentMethod, "paypal" | "bitcoin_opennode" | "crypto">;
 
 export function isHostedCheckoutMethod(value: string | null | undefined): value is HostedCheckoutMethod {
-  return value === "bitcoin_opennode" || value === "crypto";
+  return value === "paypal" || value === "bitcoin_opennode" || value === "crypto";
 }
 
 export type PaymentOption = {
@@ -90,6 +91,22 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
       `Send your order total via Zelle. The recipient will show up as “${ZELLE.accountName}”.`,
       "Enter ONLY your order number in the memo. Do not mention peptides or product names.",
       "Your order ships once the payment is received and matched to your order number.",
+    ],
+  },
+  {
+    id: "paypal",
+    label: "PayPal",
+    // Offered only when the build has NEXT_PUBLIC_PAYPAL_CHECKOUT_ENABLED=true
+    // (David, 9/13: sandbox first, off on the public site until he says
+    // otherwise). The API has the matching switch, PAYPAL_CHECKOUT_ENABLED,
+    // which refuses PayPal orders outright.
+    live: process.env.NEXT_PUBLIC_PAYPAL_CHECKOUT_ENABLED === "true",
+    kind: "hosted",
+    intro: "Pay with PayPal. You'll be redirected to PayPal to approve, then back here. Your order confirms automatically.",
+    steps: [
+      "Place your order. A Continue to PayPal button appears on the next page.",
+      "Approve the payment on PayPal. You are sent straight back to your order page.",
+      "Your order is confirmed on its own once PayPal completes the payment. No memo or note is needed.",
     ],
   },
   {
