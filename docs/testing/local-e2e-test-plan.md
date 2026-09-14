@@ -5,10 +5,13 @@ pipeline against a real local `docker compose` stack. Last executed
 2026-08-14 against `main` (commit range up to `e88dcc9`), with results
 inline below each step.
 
-**Out of scope for this pass (explicitly deferred):** Whop webhook flow
-and duplicate-webhook protection. There is no Whop integration in the
-codebase yet (no route, no signature verification, no idempotency
-handling) — this section will be written once that work starts.
+**Whop (card / Apple Pay) webhook flow and duplicate-webhook protection**
+were out of scope for this pass; they were ported from the vial site on
+2026-09-14 and are covered by `docs/plans/whop-checkout.md` plus
+`services/api/tests/test_whop_provider.py`,
+`tests/test_whop_webhook_route.py` and `tests/test_whop_checkout_flag.py`
+(signature verification, replay window, idempotency on the delivery id,
+under/over-payment handling).
 
 ## 0. Setup
 
@@ -212,8 +215,9 @@ the running container, as above, or run natively per the README's
 
 ## Known gaps / follow-ups
 
-1. **Whop webhook flow + duplicate-webhook protection** — not
-   implemented at all; out of scope until that work starts.
+1. **Whop webhook flow + duplicate-webhook protection** — ported
+   2026-09-14; see `docs/plans/whop-checkout.md`. Not yet exercised
+   against a real Whop delivery in this plan.
 2. **Admin order visibility** — no UI/API surface for `MANUAL_REVIEW` (or
    any) order state; only reachable via direct DB query today.
 3. **Real AllianceTek sandbox order submission** — blocked on
