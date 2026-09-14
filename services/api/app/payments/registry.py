@@ -13,6 +13,11 @@ from app.payments.base import PaymentProvider
 # customer's return or from the webhook) — see app/payments/paypal.py.
 # Added 2026-09-13 (David), gated by PAYPAL_CHECKOUT_ENABLED.
 #
+# "whop" is Whop's hosted card / Apple Pay checkout — see
+# app/payments/whop.py. Added 2026-09-14 (David), gated by
+# WHOP_CHECKOUT_ENABLED; the order page's Pay Now button links to the
+# hosted page and Whop's payment.succeeded webhook confirms the order.
+#
 # "crypto" is Speed — see app/payments/speed.py. Dormant: the storefront
 # no longer offers it, but the key stays registered so any historical
 # "crypto" row (and its re-mint path) keeps working.
@@ -29,10 +34,12 @@ from app.payments.base import PaymentProvider
 from app.payments.opennode import OpenNodeProvider
 from app.payments.paypal import PayPalProvider
 from app.payments.speed import SpeedProvider
+from app.payments.whop import WhopProvider
 
 _PROVIDERS: dict[str, PaymentProvider] = {
     "bitcoin_opennode": OpenNodeProvider(),
     "paypal": PayPalProvider(),
+    "whop": WhopProvider(),
     "crypto": SpeedProvider(),
 }
 

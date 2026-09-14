@@ -164,7 +164,7 @@ class OrderResponse(BaseModel):
     items: list[OrderItemResponse]
     created_at: datetime
     # The provider of the Payment row that describes this order ("venmo",
-    # "zelle", "bitcoin_opennode", "crypto", "ach") — the order page reads
+    # "zelle", "paypal", "bitcoin_opennode", "whop", "crypto", "ach") — the order page reads
     # it to show the right payment instructions after checkout and on
     # every later visit. See app.services.payments.display_payment for
     # which row that is when a hosted checkout was re-minted.
@@ -174,9 +174,11 @@ class OrderResponse(BaseModel):
     # Bitcoin customer "payment detected, waiting for confirmation" or
     # "the payment page expired, start a new one".
     payment_status: str | None = None
-    # For a PAYMENT_PENDING Bitcoin order: what the order page needs to
-    # show the payment itself on every visit (lightning_invoice,
-    # chain_address, bitcoin_uri, amount_sats, expires_at, checkout_url).
+    # For a PAYMENT_PENDING hosted-checkout order: what the order page
+    # needs to show the payment on every visit — for Bitcoin the
+    # lightning_invoice, chain_address, bitcoin_uri, amount_sats,
+    # expires_at and checkout_url; for PayPal the approve_url; for a Whop
+    # card order the checkout_url behind its Pay Now button.
     # None once the order is paid/failed or the payment row is no longer
     # payable (expired/superseded), and for manual-transfer methods.
     payment_details: dict | None = None

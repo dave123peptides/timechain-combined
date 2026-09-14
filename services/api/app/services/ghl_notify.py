@@ -81,6 +81,7 @@ _METHOD_LABELS = {
     "venmo": "Venmo",
     "zelle": "Zelle",
     "paypal": "PayPal",
+    "whop": "Card / Apple Pay",
     "bitcoin_opennode": "Bitcoin",
     "crypto": "Bitcoin",
     "ach": "ACH",

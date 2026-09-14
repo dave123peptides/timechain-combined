@@ -720,8 +720,8 @@ def create_order(
 
 def _has_hosted_checkout(provider_key: str) -> bool:
     """True for methods with a registered hosted-checkout provider
-    ("bitcoin_opennode" today, the dormant "crypto"); False for manual
-    transfers (venmo/zelle) and ach."""
+    ("bitcoin_opennode", "paypal", "whop" since 9/14, the dormant
+    "crypto"); False for manual transfers (venmo/zelle) and ach."""
     from app.payments.registry import has_provider
 
     return has_provider(provider_key)
@@ -729,7 +729,8 @@ def _has_hosted_checkout(provider_key: str) -> bool:
 
 def _attach_payment_instructions(session: Session, order: Order, payment: Payment, *, provider_key: str) -> None:
     """Create the hosted checkout (an OpenNode charge for
-    "bitcoin_opennode") for the order and attach the payment
+    "bitcoin_opennode", a PayPal order for "paypal", a Whop checkout
+    configuration for "whop") for the order and attach the payment
     instructions as a transient attribute on the order
     (order.payment_instructions) for the checkout response.
 
@@ -780,9 +781,10 @@ def get_order_by_token(session: Session, token: str) -> Optional[Order]:
 
 
 def recreate_payment_instructions(session: Session, order: Order) -> Order:
-    """Mint a fresh hosted checkout (a new OpenNode charge) for a
-    still-unpaid Bitcoin order, on the customer's explicit request (the
-    order page's Pay button, e.g. after the previous charge expired).
+    """Mint a fresh hosted checkout (a new OpenNode charge, PayPal order
+    or Whop checkout configuration) for a still-unpaid hosted-checkout
+    order, on the customer's explicit request (the order page's Pay /
+    Try again button, e.g. after the previous charge expired).
     The previous Payment row is superseded: a new pending Payment row is
     created for the new charge so webhook correlation by
     provider_payment_id keeps working, and the new instructions ride
