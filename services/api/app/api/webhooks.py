@@ -18,7 +18,8 @@ async def receive_payment_webhook(
 ):
     """Inbound payment-provider webhooks. The provider named in the path
     must be registered in app/payments/registry.py ("bitcoin_opennode"
-    for OpenNode); it verifies the signature and maps the event onto the
+    for OpenNode, "paypal" for PayPal, "whop" for Whop card / Apple
+    Pay); it verifies the signature and maps the event onto the
     order-state machine (app/payments/base.py).
 
     Idempotency: relies on WebhookEvent's UNIQUE(source, external_id)

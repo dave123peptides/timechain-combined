@@ -177,6 +177,35 @@ class Settings(BaseSettings):
     # (with the order number). Never a product name.
     paypal_brand_name: str = "TCP"
 
+    # --- Whop (card / Apple Pay hosted checkout — see app/payments/whop.py) ---
+    # Offer "Credit / Debit Card or Apple Pay" at checkout? False (the
+    # default) makes POST /checkout/create and retry-payment refuse
+    # payment_method "whop" with a 400, while the webhook route keeps
+    # processing events for checkouts that already exist. The storefront
+    # has its own copy of this switch (NEXT_PUBLIC_WHOP_CHECKOUT_ENABLED)
+    # that shows the option as "Coming soon". David, 9/14: off in
+    # production until he has tested a live order.
+    whop_checkout_enabled: bool = False
+    # Account API key (Whop dashboard → Developer → API keys), sent as a
+    # Bearer token. Blank = card checkout degrades gracefully (order
+    # created, no Pay Now link) and a paid webhook cannot be re-checked
+    # (answers 500, nothing committed, Whop retries).
+    whop_api_key: str = ""
+    # The webhook endpoint's signing secret, "ws_..." exactly as the
+    # dashboard shows it — used verbatim as the HMAC key, never stripped
+    # or decoded. Blank = every Whop webhook is rejected 400.
+    whop_webhook_secret: str = ""
+    # "live" → api.whop.com; "sandbox" → sandbox-api.whop.com (cards
+    # only, no Apple Pay).
+    whop_environment: str = "live"
+    # Api-Version-Date header on every Whop call, so request and response
+    # shapes are deterministic. Blank = the key's stored pin.
+    whop_api_version_date: str = "2026-09-11-1"
+    # Optional "biz_..." account id, sent as top-level account_id on
+    # checkout creation only when set (an account key resolves it on its
+    # own; keep blank unless Whop refuses creation without it).
+    whop_account_id: str = ""
+
     # GoHighLevel "payment confirmed" push (app/services/order_paid.py).
     # Deliberately a SECOND inbound-webhook URL, separate from
     # ghl_order_webhook_url: that workflow emails the how-to-pay steps

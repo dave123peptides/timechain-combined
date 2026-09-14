@@ -94,10 +94,12 @@ class CreateCheckoutRequest(BaseModel):
     # hosted page, and OpenNode's webhook marks it paid. "paypal" (David,
     # 9/13) sends the customer to PayPal's approval page and back to the
     # order page, where the payment is captured; PayPal's webhook settles
-    # it as well. "crypto" is the dormant Speed provider and "ach" has no
-    # provider; both stay accepted so existing orders and the admin flow
-    # keep working.
-    payment_method: Literal["venmo", "zelle", "paypal", "bitcoin_opennode", "crypto", "ach"]
+    # it as well. "whop" (David, 9/14) is Whop's hosted card / Apple Pay
+    # checkout: the order page's Pay Now button links to it and Whop's
+    # webhook marks the order paid. "crypto" is the dormant Speed
+    # provider and "ach" has no provider; both stay accepted so existing
+    # orders and the admin flow keep working.
+    payment_method: Literal["venmo", "zelle", "paypal", "bitcoin_opennode", "whop", "crypto", "ach"]
     # Same code the quote validated; create_order re-validates and
     # re-prices it, and rejects the order outright if it isn't real.
     discount_code: str | None = Field(default=None, max_length=40)
@@ -150,19 +152,31 @@ BITCOIN_UNAVAILABLE = "Bitcoin checkout is not available right now. Please choos
 PAYPAL_UNAVAILABLE = "PayPal checkout is not available right now. Please choose another payment method."
 PAYPAL_NOT_APPROVED = "Your PayPal payment was not completed. Continue to PayPal to approve it, then come back here."
 PAYPAL_CAPTURE_FAILED = "We could not confirm your PayPal payment. Please try again, or email us with your order number."
+WHOP_UNAVAILABLE = "Card checkout is not available right now. Please choose another payment method."
+
+
+def _method_switches() -> dict[str, tuple[bool, str]]:
+    """The per-method kill switches and the message each refuses with.
+    Read at call time (not import time) so tests can flip them on the
+    cached Settings instance."""
+    settings = get_settings()
+    return {
+        "bitcoin_opennode": (settings.bitcoin_checkout_enabled, BITCOIN_UNAVAILABLE),
+        "paypal": (settings.paypal_checkout_enabled, PAYPAL_UNAVAILABLE),
+        "whop": (settings.whop_checkout_enabled, WHOP_UNAVAILABLE),
+    }
 
 
 def _require_method_enabled(payment_method: str | None) -> None:
-    """The BITCOIN_CHECKOUT_ENABLED (David, 9/10) and PAYPAL_CHECKOUT_ENABLED
-    (David, 9/13) switches: with one off, a new order or a re-minted
-    hosted checkout for that method is refused here, before any provider
-    call. Existing payments' webhooks and PayPal's return capture are
-    unaffected, so what was already started still settles."""
-    settings = get_settings()
-    if payment_method == "bitcoin_opennode" and not settings.bitcoin_checkout_enabled:
-        raise HTTPException(status_code=400, detail=BITCOIN_UNAVAILABLE)
-    if payment_method == "paypal" and not settings.paypal_checkout_enabled:
-        raise HTTPException(status_code=400, detail=PAYPAL_UNAVAILABLE)
+    """The BITCOIN_CHECKOUT_ENABLED (David, 9/10), PAYPAL_CHECKOUT_ENABLED
+    (David, 9/13) and WHOP_CHECKOUT_ENABLED (David, 9/14) switches: with
+    one off, a new order or a re-minted hosted checkout for that method
+    is refused here, before any provider call. Existing payments'
+    webhooks and PayPal's return capture are unaffected, so what was
+    already started still settles."""
+    switch = _method_switches().get(payment_method or "")
+    if switch is not None and not switch[0]:
+        raise HTTPException(status_code=400, detail=switch[1])
 
 
 @router.post("/create", response_model=OrderResponse)
@@ -221,9 +235,10 @@ def create_checkout(
 
 @orders_router.post("/{token}/retry-payment", response_model=OrderResponse)
 def retry_payment(token: str, db: Session = Depends(get_db)) -> OrderResponse:
-    """Customer-initiated re-mint of the hosted crypto checkout session
-    for a still-unpaid order (the order page's Pay button). Returns the
-    order with fresh payment instructions — same shape as
+    """Customer-initiated re-mint of the hosted checkout (a fresh
+    OpenNode charge, PayPal order or Whop checkout configuration) for a
+    still-unpaid order (the order page's Pay / Try again button).
+    Returns the order with fresh payment instructions — same shape as
     /checkout/create's response.
     """
     order = storefront.get_order_by_token(db, token)

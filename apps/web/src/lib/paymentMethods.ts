@@ -5,7 +5,10 @@ import type { PaymentMethod } from "@/lib/api";
 // order number as the memo, and an admin confirms it arrived. Bitcoin
 // (David, 9/10-11) is an OpenNode charge shown on our own order page as
 // a QR / open-in-wallet button; OpenNode's webhook confirms the order
-// on its own. ACH is listed as coming soon. Every
+// on its own. PayPal (David, 9/13) is PayPal's approval page, captured
+// on the way back. Card / Apple Pay (David, 9/14) is a Whop-hosted
+// checkout: the order page's Pay Now button links to it and Whop's
+// webhook confirms the order. ACH is listed as coming soon. Every
 // string shown at checkout and on the order page for these methods
 // comes from here, so the details live in one place.
 //
@@ -31,6 +34,14 @@ export const ZELLE = {
   accountName: "Timechain",
 };
 
+// Whop (card / Apple Pay, David 9/14): the hosted payment page is run by
+// Whop, and the merchant it shows (and the card statement carries) is
+// the Whop company name, not the storefront's.
+export const WHOP = {
+  processor: "Whop",
+  merchantName: "Timechain Consulting",
+};
+
 // Methods this storefront knows how to show on the order page: the
 // send-it-yourself instructions (PaymentInstructions) for Venmo/Zelle,
 // the payment card for the hosted ones.
@@ -41,12 +52,13 @@ export function isLivePaymentMethod(value: string | null | undefined): value is 
 }
 
 // Hosted-checkout methods: the order page shows the Pay button / payment
-// status card for these. "crypto" is the dormant Speed provider, kept so
-// any old order still renders.
-export type HostedCheckoutMethod = Extract<PaymentMethod, "paypal" | "bitcoin_opennode" | "crypto">;
+// status card for these. "whop" is the card / Apple Pay page (Pay Now
+// link); "crypto" is the dormant Speed provider, kept so any old order
+// still renders.
+export type HostedCheckoutMethod = Extract<PaymentMethod, "paypal" | "bitcoin_opennode" | "whop" | "crypto">;
 
 export function isHostedCheckoutMethod(value: string | null | undefined): value is HostedCheckoutMethod {
-  return value === "paypal" || value === "bitcoin_opennode" || value === "crypto";
+  return value === "paypal" || value === "bitcoin_opennode" || value === "whop" || value === "crypto";
 }
 
 export type PaymentOption = {
@@ -63,6 +75,23 @@ export type PaymentOption = {
 };
 
 export const PAYMENT_OPTIONS: PaymentOption[] = [
+  {
+    // First in the list, so it is the preselected default once live
+    // (David, 9/14). Offered only when the build has
+    // NEXT_PUBLIC_WHOP_CHECKOUT_ENABLED=true; the API has the matching
+    // switch, WHOP_CHECKOUT_ENABLED, which refuses card orders outright.
+    // Both are off on the public site until David has tested a live order.
+    id: "whop",
+    label: "Credit / Debit Card or Apple Pay",
+    live: process.env.NEXT_PUBLIC_WHOP_CHECKOUT_ENABLED === "true",
+    kind: "hosted",
+    intro: "Pay securely with a credit card, debit card, or Apple Pay.",
+    steps: [
+      "Place your order.",
+      `On the next page, click Pay Now to be taken to our secure payment processor (${WHOP.merchantName}).`,
+      "Once paid, your order confirms automatically.",
+    ],
+  },
   {
     id: "venmo",
     label: "Venmo",

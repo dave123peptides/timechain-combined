@@ -67,6 +67,13 @@ def test_payload_handles_missing_fields():
     assert payload["order_url"] == ""
 
 
+def test_payload_labels_whop_as_card():
+    payload = ghl_notify.ghl_payload(_row(payment_method="whop"))
+    assert payload is not None
+    assert payload["payment_method"] == "whop"
+    assert payload["payment_method_label"] == "Card / Apple Pay"
+
+
 def test_push_unconfigured_returns_false_without_http(monkeypatch):
     from app.core.config import get_settings
 

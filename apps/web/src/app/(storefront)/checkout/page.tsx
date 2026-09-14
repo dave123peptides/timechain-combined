@@ -83,7 +83,8 @@ export default function CheckoutPage() {
       clear();
       // The order page shows the Bitcoin payment itself (QR + open in
       // wallet) — no redirect to a hosted checkout (David, 9/11). PayPal
-      // orders get their Continue to PayPal button there too.
+      // orders get their Continue to PayPal button there too, and card
+      // orders their Pay Now link to Whop (David, 9/14).
       router.push(`/order/${order.access_token}`);
     } catch (err) {
       setError((err as Error).message);
@@ -456,7 +457,7 @@ export default function CheckoutPage() {
               {error && <p className={styles.error}>{error}</p>}
               <p className={styles.note}>
                 {selectedOption?.kind === "hosted"
-                  ? `Placing your order reserves it as pending. You finish paying with ${selectedOption.label} on the next page; your order ships once the payment is confirmed.`
+                  ? "Placing your order reserves it as pending. You complete the payment on the next page, and your order ships once it is confirmed."
                   : `Placing your order reserves it as pending. Payment instructions for ${selectedOption?.label ?? "your payment method"} appear on the next page; your order ships once the transfer is received.`}
               </p>
             </div>

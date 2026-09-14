@@ -431,3 +431,10 @@
   min-width: 220px;
   margin-top: 0.25rem;
 }
+
+/* Card / Apple Pay: the line under the Pay Now button. */
+.payHint {
+  margin-top: 0.75rem;
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
