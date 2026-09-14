@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 // Re-renders the (force-dynamic) order page every few seconds while a
-// Bitcoin payment is pending, so it flips to "Order Confirmed" on its
-// own once OpenNode's webhook lands — Lightning within seconds, on-chain
-// after one confirmation. Stops after maxMs, or when the pending card
+// Bitcoin, PayPal or card payment is pending, so it flips to "Order
+// Confirmed" on its own once the provider's webhook lands — Lightning
+// within seconds, on-chain after one confirmation, Whop a few seconds
+// after the customer is sent back. Stops after maxMs, or when the pending card
 // unmounts because the order is no longer pending. Renders nothing.
 export default function AutoRefresh({
   intervalMs = 8000,

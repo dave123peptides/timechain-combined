@@ -9,6 +9,7 @@ import BitcoinPayment, { type BitcoinRail } from "./BitcoinPayment";
 import PayButton from "./PayButton";
 import PaymentInstructions from "./PaymentInstructions";
 import PayPalPayment from "./PayPalPayment";
+import WhopPayment from "./WhopPayment";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -55,8 +56,10 @@ async function bitcoinRails(details: PaymentDetails): Promise<{ lightning: Bitco
 // payment itself (QR, open in wallet) and refresh on their own until
 // OpenNode's webhook confirms (David, 9/11: no bounce to OpenNode);
 // pending PayPal orders show Continue to PayPal and, on the way back
-// from PayPal, capture the payment (David, 9/13); paid and failed orders
-// show their status.
+// from PayPal, capture the payment (David, 9/13); pending card orders
+// (Whop, David 9/14) show a Pay Now link to Whop's hosted page and
+// refresh the same way until Whop's webhook confirms; paid and failed
+// orders show their status.
 export default async function OrderStatusPage({
   params,
   searchParams,
@@ -90,16 +93,23 @@ export default async function OrderStatusPage({
   const method = order.payment_method;
   const pending = order.status === "PAYMENT_PENDING";
   const paypal = pending && method === "paypal";
+  // Card / Apple Pay (Whop): a Pay Now link drawn from the stored
+  // checkout_url. Kept out of the Bitcoin branch below, which draws the
+  // payment itself (QR, invoice) from Bitcoin-only details.
+  const card = pending && method === "whop";
   // Bitcoin (and the dormant Speed "crypto" rows): the on-page payment card.
-  const hosted = pending && isHostedCheckoutMethod(method) && !paypal;
+  const hosted = pending && isHostedCheckoutMethod(method) && !paypal && !card;
   const paymentStatus = order.payment_status ?? "pending";
   const sub = paypal
     ? "Thank you for your order. One more step: approve the payment on PayPal below."
-    : hosted
-      ? "Thank you for your order. One more step: pay with Bitcoin below."
-      : status?.sub;
+    : card
+      ? "Thank you for your order. One more step: complete your payment below."
+      : hosted
+        ? "Thank you for your order. One more step: pay with Bitcoin below."
+        : status?.sub;
   const details = hosted ? order.payment_details ?? null : null;
   const paypalDetails = paypal ? order.payment_details ?? null : null;
+  const cardDetails = card ? order.payment_details ?? null : null;
   const rails = details ? await bitcoinRails(details) : null;
   const payable = rails !== null && (rails.lightning !== null || rails.onchain !== null);
 
@@ -119,7 +129,22 @@ export default async function OrderStatusPage({
           </div>
         </header>
 
-        {pending && isLivePaymentMethod(method) && !hosted && !paypal && <PaymentInstructions order={order} method={method} />}
+        {pending && isLivePaymentMethod(method) && !hosted && !paypal && !card && (
+          <PaymentInstructions order={order} method={method} />
+        )}
+
+        {card && (
+          <section className={styles.card}>
+            <div className={styles.cardHeading}>Pay by card or Apple Pay</div>
+            <WhopPayment
+              token={token}
+              checkoutUrl={cardDetails?.checkout_url ?? null}
+              paymentStatus={paymentStatus}
+              totalCents={order.total_cents}
+            />
+            <AutoRefresh />
+          </section>
+        )}
 
         {paypal && (
           <section className={styles.card}>

@@ -156,7 +156,12 @@ export type Order = {
 
 export type PaymentDetails = {
   provider_payment_id?: string;
+  // The hosted page: OpenNode's fallback link for Bitcoin, the Pay Now
+  // link for a Whop card order.
   checkout_url?: string | null;
+  // Whop only: the checkout configuration behind checkout_url.
+  checkout_configuration_id?: string;
+  plan_id?: string | null;
   usd_total_cents?: number;
   expires_in_seconds?: number;
   expires_at?: string | null;
@@ -295,11 +300,13 @@ export type CartItemInput = { variant_id: string; quantity: number };
 // the customer is sent there right after placing the order and the
 // order confirms itself from OpenNode's webhook. "paypal" (David, 9/13):
 // the customer approves on PayPal's page and lands back on the order
-// page, which captures the payment. "crypto" (the dormant Speed
-// provider) and "ach" stay in the type for existing orders; the
-// checkout lists ACH as coming soon. Details and how-to copy:
-// lib/paymentMethods.ts.
-export type PaymentMethod = "venmo" | "zelle" | "paypal" | "bitcoin_opennode" | "crypto" | "ach";
+// page, which captures the payment. "whop" (David, 9/14) is Whop's
+// hosted card / Apple Pay checkout: the order page's Pay Now button
+// links to it and Whop's webhook confirms the order. "crypto" (the
+// dormant Speed provider) and "ach" stay in the type for existing
+// orders; the checkout lists ACH as coming soon. Details and how-to
+// copy: lib/paymentMethods.ts.
+export type PaymentMethod = "venmo" | "zelle" | "paypal" | "bitcoin_opennode" | "whop" | "crypto" | "ach";
 
 // Present only on the POST /checkout/create response — the provider's
 // instructions for how to pay (the OpenNode hosted checkout URL for
@@ -329,8 +336,9 @@ export function createOrder(payload: {
   return apiFetch<Order>("/api/v1/checkout/create", { method: "POST", body: JSON.stringify(payload) });
 }
 
-// Retry-payment: mints a fresh hosted checkout (a new OpenNode charge)
-// for a still-unpaid Bitcoin order. Same response shape as checkout-create.
+// Retry-payment: mints a fresh hosted checkout (a new OpenNode charge,
+// PayPal order or Whop checkout) for a still-unpaid hosted-checkout
+// order. Same response shape as checkout-create.
 export function retryPayment(token: string): Promise<Order> {
   return apiFetch<Order>(`/shop/orders/${encodeURIComponent(token)}/retry-payment`, { method: "POST" });
 }

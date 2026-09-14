@@ -8,6 +8,8 @@ import styles from "./page.module.css";
 // "Start a new payment" for a PAYMENT_PENDING Bitcoin order whose charge
 // expired (or was never created). Mints a fresh OpenNode charge
 // server-side, then re-renders the page so the new QR shows in place.
+// Also the card order page's "Try again" (label prop): the same
+// retry-payment call mints a fresh Whop checkout for a Pay Now link.
 export default function PayButton({ token, label = "Start a new Bitcoin payment" }: { token: string; label?: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
