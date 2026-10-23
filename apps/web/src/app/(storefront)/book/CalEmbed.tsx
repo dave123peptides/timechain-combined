@@ -40,7 +40,11 @@ export default function CalEmbed({ calLink }: { calLink: string }) {
     const element = host.current;
     if (!element) return;
     const cal = loadCal();
-    cal("inline", { elementOrSelector: element, calLink, layout: "month_view" });
+    // `config` becomes query parameters on the frame the script builds;
+    // theme=light there is what the booking page actually honours (the
+    // "ui" call alone loses to the account's dark preference, checked
+    // 2026-10-23).
+    cal("inline", { elementOrSelector: element, calLink, layout: "month_view", config: { theme: "light", layout: "month_view" } });
     cal("ui", { theme: "light", layout: "month_view", hideEventTypeDetails: false, cssVarsPerTheme: { light: { "cal-brand": "#0f766e" } } });
     return () => {
       element.innerHTML = "";
