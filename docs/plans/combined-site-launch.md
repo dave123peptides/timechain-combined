@@ -38,9 +38,12 @@ Still David's:
 2. `ADMIN_BASIC_AUTH_PASSWORD` on BOTH projects (same value) if you want
    /admin; unset, admin is simply locked.
 3. `NEXT_PUBLIC_BOOKING_URL` on the web project when the scheduling link
-   exists, then redeploy the web project. Booking is the site's primary
-   action (2026-10-23): every Book a meeting button goes to `/book`, which
-   embeds that link in a frame and also links out to it. If the provider
+   exists, then redeploy the web project. DONE 2026-10-23 with
+   https://cal.com/timechain/30min. Booking is the site's primary action:
+   every Book a meeting button goes to `/book`, which embeds a cal.com
+   link through Cal.com's own inline script (CalEmbed.tsx, light theme
+   via the embed config; a bare frame follows the visitor's system theme)
+   and also links out to it. Any other provider gets a plain frame. If the provider
    refuses to load in a frame, add `NEXT_PUBLIC_BOOKING_EMBED=false` and
    the page links out only. Until the link is set, `/book` offers email.
    To set it from the CLI:
