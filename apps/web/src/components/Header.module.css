@@ -158,3 +158,25 @@
     gap: 0.25rem;
   }
 }
+
+/* " Peptides" after the TimeChain wordmark: ink, not gold, and dropped on
+   narrow bars where the search pill and menu button need the room. */
+.wordmark .wordmarkSuffix {
+  color: var(--ink);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+/* Inquiry mode's stand-in for the cart button (lib/site.ts). */
+.contactButton {
+  padding: 0.55rem 1.1rem;
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .wordmark .wordmarkSuffix,
+  .contactButton {
+    display: none;
+  }
+}

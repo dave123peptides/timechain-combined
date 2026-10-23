@@ -85,3 +85,11 @@
     gap: 1.75rem;
   }
 }
+
+/* The contact page's full-bleed panels run straight into the footer: it
+   marks its <main data-flush-footer>, and the footer's top gap would
+   otherwise show as a white strand between the panels and the dark
+   footer (vial site, David 9/5). */
+:global(#content:has(> main[data-flush-footer])) + .footer {
+  margin-top: 0;
+}

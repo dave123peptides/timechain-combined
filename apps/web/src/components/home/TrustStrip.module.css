@@ -44,3 +44,9 @@
     border-radius: 28px;
   }
 }
+
+.body a {
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: underline;
+}

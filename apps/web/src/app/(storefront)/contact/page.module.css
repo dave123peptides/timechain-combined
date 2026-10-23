@@ -1,0 +1,136 @@
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.panelInner {
+  max-width: 34rem;
+  padding: 4rem 3rem 4.5rem;
+}
+
+.dark {
+  display: flex;
+  justify-content: flex-end;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.title {
+  font-size: var(--text-3xl);
+  color: var(--gold);
+}
+
+.lede {
+  margin-top: 1rem;
+  color: color-mix(in srgb, var(--paper) 78%, transparent);
+}
+
+.asking {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid var(--gold);
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--paper) 85%, transparent);
+}
+
+.asking strong {
+  color: var(--paper);
+}
+
+.asking a {
+  color: var(--gold);
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  margin-top: 2rem;
+}
+
+.secondary {
+  font-size: var(--text-sm);
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* --- accent panel ------------------------------------------------------ */
+
+.accent {
+  background: linear-gradient(160deg, var(--gold) 0%, var(--gold-deep) 100%);
+  color: var(--paper);
+}
+
+.accentTitle {
+  font-size: var(--text-2xl);
+  color: var(--paper);
+  padding-bottom: 1rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--paper) 60%, transparent);
+  max-width: 24rem;
+}
+
+.accentLede {
+  margin-top: 1.25rem;
+  color: color-mix(in srgb, var(--paper) 85%, transparent);
+}
+
+.rows {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.row a {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.rowIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 15%, transparent);
+}
+
+.accentNote {
+  margin-top: 2.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--paper) 78%, transparent);
+}
+
+@media (max-width: 900px) {
+  .panels {
+    grid-template-columns: 1fr;
+  }
+
+  .dark {
+    justify-content: flex-start;
+  }
+
+  .panelInner {
+    max-width: none;
+    padding: 2.5rem 1.25rem 3rem;
+  }
+}

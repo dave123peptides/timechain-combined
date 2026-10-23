@@ -10,24 +10,24 @@ import styles from "./sections.module.css";
 const SHARED_FAQ: ProductFaqEntry[] = [
   {
     q: "What form does this ship in?",
-    a: "As a pre-filled 3 mL auto-injector pen. It is ready to use in a research setting — no reconstitution or diluent is involved.",
+    a: "In the format selected above. A pen is a pre-filled 3 mL auto-injector pen, ready to use in a research setting with no reconstitution or diluent involved. A vial holds lyophilized (freeze-dried) powder and is reconstituted with an appropriate diluent before use. Compounds offered in both formats show both.",
   },
   {
     q: "How should it be stored?",
-    a: "Store as directed on the pen label, away from heat and light. Standard laboratory practice is refrigeration and use within the window stated on the label.",
+    a: "Store as directed on the label, away from heat and light. Standard laboratory practice is refrigeration and use within the window stated on the label.",
   },
   {
     q: "Can I order multiple compounds together?",
-    a: "Yes — each product ships independently, and your cart can include any combination of items from the catalog. Quantity discounts apply per SKU (see the pricing table above).",
+    a: "Yes. This site takes no payments; tell us the compounds, formats and quantities you need when you contact us, and we arrange the order directly with you.",
   },
 ];
 
-// Rendered only for a product that actually holds certificates — the
-// answer must never outrun the documents. While the pen COAs are not
-// loaded yet (David, 2026-09-05) the question is left out entirely.
+// Rendered only for a product that actually holds certificates: the
+// answer must never outrun the documents. While no COAs are loaded the
+// question is left out entirely.
 const COA_FAQ_HELD: ProductFaqEntry = {
   q: "Is there a Certificate of Analysis for this product?",
-  a: "Yes. Third-party certificates for this compound are in the Lab reports tab on this page — one per strength and lot, each opening the laboratory's own copy with a verification code you can check with the lab. If the lot printed on your pen isn't listed, email support@timechainpeptides.com with the lot number.",
+  a: "Yes. Third-party certificates for this compound are in the Lab reports tab on this page, one per strength and lot, each opening the laboratory's own copy with a verification code you can check with the lab. If the lot printed on your pen or vial isn't listed, email support@timechainpeptides.com with the lot number.",
 };
 
 export default function ProductFaq({ faq, hasCoas }: { faq: ProductFaqEntry[]; hasCoas: boolean }) {
