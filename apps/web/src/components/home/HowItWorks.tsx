@@ -1,21 +1,22 @@
 import Link from "next/link";
-import { BOOK_PATH } from "@/lib/site";
+import { BOOKING_HREF, BOOKING_TARGET } from "@/lib/site";
 import styles from "./HowItWorks.module.css";
 
-// Three steps from the catalog to an arranged order. No turnaround
-// promise: none has been confirmed.
+// Three steps from the catalog to an arranged order (David, 2026-10-23:
+// the meeting is the only action on the site). No turnaround promise:
+// none has been confirmed.
 const STEPS = [
   {
-    title: "Review the catalog, or book a call",
-    body: "Browse by category and add compounds, formats, strengths and quantities to a request. Or book a meeting and we go through it with you.",
+    title: "Review the catalog",
+    body: "Browse by category. Every compound shows the formats it ships in and the strengths offered, with certificates where we hold them.",
   },
   {
-    title: "We review and reply",
-    body: "You hear back by email with availability, documentation and pricing for your quantities, from the people who run the catalog.",
+    title: "Book a meeting",
+    body: "A short call with the people who run the catalog: which formats and strengths fit your practice, quantities, documentation and pricing.",
   },
   {
     title: "The order is arranged directly",
-    body: "Fulfillment, documentation and terms are agreed with you. No payment is taken on this site.",
+    body: "Fulfillment, documentation and terms are agreed with you after the call. No payment is taken on this site.",
   },
 ];
 
@@ -24,16 +25,16 @@ export default function HowItWorks() {
     <section className={styles.section} id="how-it-works">
       <div className={`container ${styles.inner}`}>
         <div className={styles.head}>
-          <span className="eyebrow">How ordering works</span>
+          <span className="eyebrow">How it works</span>
           <h2>
             Three steps. <em>No checkout.</em>
           </h2>
           <div className={styles.actions}>
-            <Link href={BOOK_PATH} className="button buttonAccent">
+            <a href={BOOKING_HREF} {...BOOKING_TARGET} className="button buttonAccent">
               Book a meeting
-            </Link>
+            </a>
             <Link href="/shop" className="button buttonAccentOutline">
-              Start a request
+              Open the catalog
             </Link>
           </div>
         </div>

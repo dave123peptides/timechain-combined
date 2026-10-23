@@ -13,7 +13,7 @@ import type { ProductFaqEntry } from "@/lib/api";
 //  - Returns policy. Not decided.
 //  - Any purity percentage or third-party test result. None exist yet.
 //  - Prices and volume tiers. Hidden until the wholesale sheet exists
-//    (David, 2026-10-22); pricing is given per request.
+//    (David, 2026-10-22); pricing is given on the call.
 export const SITE_FAQ: ProductFaqEntry[] = [
   {
     q: "Who do you supply?",
@@ -21,15 +21,15 @@ export const SITE_FAQ: ProductFaqEntry[] = [
   },
   {
     q: "How do I order?",
-    a: "Build an order request. On any product page choose the format, strength and quantity and add it to your request; repeat for everything you need, then send the list with your contact details. We reply by email with availability, documentation and pricing for your quantities and arrange the order directly with you. No payment is taken on this site.",
+    a: "Book a meeting. On the call we go through the catalog for your practice, confirm formats, strengths and quantities, and arrange the order directly with you. No payment is taken on this site.",
   },
   {
     q: "Why are there no prices on the site?",
-    a: "Pricing depends on format, strength and quantity, and is quoted per request. Send your list and you get pricing for exactly those quantities.",
+    a: "Pricing depends on format, strength and quantity, and is given on the call for exactly what you need.",
   },
   {
     q: "What formats do the products come in?",
-    a: "Two. Pens are pre-filled 3 mL auto-injector pens, ready to use in a research setting with no reconstitution. Vials hold lyophilized (freeze-dried) powder and are reconstituted with an appropriate diluent before use. Many compounds are offered in both formats on one product page, and a request can mix formats and strengths freely. Those two formats are enforced in our systems, not just stated as policy.",
+    a: "Two. Pens are pre-filled 3 mL auto-injector pens, ready to use in a research setting with no reconstitution. Vials hold lyophilized (freeze-dried) powder and are reconstituted with an appropriate diluent before use. Many compounds are offered in both formats on one product page. Those two formats are enforced in our systems, not just stated as policy.",
   },
   {
     q: "Where are your products compounded and tested?",
@@ -37,14 +37,14 @@ export const SITE_FAQ: ProductFaqEntry[] = [
   },
   {
     q: "Do you provide a Certificate of Analysis?",
-    a: "Yes. Third-party certificates are published on each product page under Lab reports, and collected on the Certificates of Analysis page, one per strength and lot, each opening the laboratory's own copy with a verification code you can check with the lab. We link to the certificate rather than quoting a purity figure from it. For a lot that isn't listed yet, ask for it in your request or email support@timechainpeptides.com with the product and lot number.",
+    a: "Yes. Third-party certificates are published on each product page under Lab reports, and collected on the Certificates of Analysis page, one per strength and lot, each opening the laboratory's own copy with a verification code you can check with the lab. We link to the certificate rather than quoting a purity figure from it. For a lot that isn't listed yet, ask on the call or email support@timechainpeptides.com with the product and lot number.",
   },
   {
     q: "How should the products be stored?",
     a: "Store as directed on the label, away from heat and light. Standard laboratory practice is refrigeration and use within the window stated on the label.",
   },
   {
-    q: "Can we talk before ordering?",
-    a: "Yes, and most practices do. Book a meeting from any page and we go through the catalog with you: formats, strengths, quantities, documentation and pricing. Send an order request before or after, whichever suits you.",
+    q: "What happens on the call?",
+    a: "We go through the catalog with you: which compounds, formats and strengths fit your practice, the quantities you need, the documentation your compliance needs, and pricing. Then the order is arranged directly.",
   },
 ];

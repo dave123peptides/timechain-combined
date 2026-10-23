@@ -102,86 +102,15 @@
   font-weight: 500;
 }
 
-.action {
-  width: 100%;
+.details {
   margin-top: auto;
-  padding-top: 0.6rem;
-  padding-bottom: 0.6rem;
-}
-
-/* --- the on-demand chooser ---------------------------------------------- */
-
-.chooser {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: auto;
-}
-
-.chooserSelect,
-.chooserQuantity {
-  height: 2.5rem;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  padding: 0 0.7rem;
-}
-
-.chooserSelect {
-  width: 100%;
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--ink-faint) 50%), linear-gradient(135deg, var(--ink-faint) 50%, transparent 50%);
-  background-position: calc(100% - 1rem) 50%, calc(100% - 0.7rem) 50%;
-  background-size: 0.3rem 0.3rem, 0.3rem 0.3rem;
-  background-repeat: no-repeat;
-  padding-right: 1.8rem;
-}
-
-.chooserRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.chooserQuantity {
-  width: 4.25rem;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-
-.chooserQuantity::-webkit-outer-spin-button,
-.chooserQuantity::-webkit-inner-spin-button {
-  appearance: none;
-  margin: 0;
-}
-
-.chooserSelect:focus-visible,
-.chooserQuantity:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: -1px;
-}
-
-.chooserAdd {
-  flex: 1;
-  padding-top: 0.6rem;
-  padding-bottom: 0.6rem;
-}
-
-.chooserCancel {
-  border: none;
-  background: transparent;
-  color: var(--ink-faint);
+  padding-top: 0.25rem;
   font-family: var(--font-label);
   font-size: var(--text-sm);
-  cursor: pointer;
-  padding: 0 0.25rem;
+  font-weight: 600;
+  color: var(--gold-deep);
 }
 
-.chooserCancel:hover {
+.details:hover {
   color: var(--ink);
 }

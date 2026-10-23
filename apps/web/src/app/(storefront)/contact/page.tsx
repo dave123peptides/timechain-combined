@@ -2,17 +2,15 @@ import Link from "next/link";
 import SectionIcon from "@/components/SectionIcon";
 import { formatStrength, getProduct, type ProductDetail } from "@/lib/api";
 import { findForm } from "@/lib/forms";
-import { BOOK_PATH, SUPPORT_EMAIL } from "@/lib/site";
+import { BOOKING_HREF, BOOKING_TARGET, SUPPORT_EMAIL } from "@/lib/site";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Contact" };
 
-// The site's one call to action (David, 2026-10-22): no payments, no
-// checkout. A visitor browses the catalog, then books a short meeting
-// here. The Book a meeting button goes to the scheduling page David
-// supplies (NEXT_PUBLIC_BOOKING_URL); until that is set the button is an
-// email instead, so the page never dead-ends. Two panels, as on the
+// Contact: the Book a meeting link (the site's one action) and the
+// support address. The button goes straight to the calendar
+// (NEXT_PUBLIC_BOOKING_URL); until that is set it is an email instead. Two panels, as on the
 // vial site's contact page (Core reference, 9/4): dark with the action,
 // accent with the ways to reach us. No phone number and no hours:
 // neither exists.
@@ -58,8 +56,8 @@ export default async function ContactPage({
             <h1 className={styles.title}>Let&apos;s talk about what you need.</h1>
             <p className={styles.lede}>
               We supply research peptides in pre-filled auto-injector pens and lyophilized vials to research
-              organizations and medical practices, in quantity. Send an order request from the catalog, or book a
-              short meeting and we go over formats, quantities and documentation first.
+              organizations and medical practices. Book a short meeting and we go over formats, strengths,
+              quantities, documentation and pricing for your practice.
             </p>
             {asking && (
               <p className={styles.asking}>
@@ -73,12 +71,9 @@ export default async function ContactPage({
               </p>
             )}
             <div className={styles.actions}>
-              <Link href={BOOK_PATH} className="button buttonAccent">
+              <a href={BOOKING_HREF} {...BOOKING_TARGET} className="button buttonAccent">
                 Book a meeting
-              </Link>
-              <Link href="/shop" className={`button ${styles.outline}`}>
-                Build an order request
-              </Link>
+              </a>
               <a href={mailto} className={styles.secondary}>
                 or email {SUPPORT_EMAIL}
               </a>

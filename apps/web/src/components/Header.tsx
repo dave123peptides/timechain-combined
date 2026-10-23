@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
-import { useOrderRequest } from "@/lib/request-context";
-import { BOOK_PATH, ORDERING_ENABLED } from "@/lib/site";
+import { BOOKING_HREF, BOOKING_TARGET, ORDERING_ENABLED } from "@/lib/site";
 import SectionIcon from "@/components/SectionIcon";
 import HeaderSearch from "./HeaderSearch";
 import styles from "./Header.module.css";
 
 // A flat white bar (modern, minimal, 2026-10-22): wordmark, the primary
-// pages, search, and the one action on the site, the order request.
+// pages, search, and the one action on the site, Book a meeting, a plain
+// link to the calendar (David, 2026-10-23).
 const NAV = [
   { href: "/shop", label: "Catalog" },
   { href: "/shop?form=pen", label: "Pens" },
@@ -27,7 +27,6 @@ function isActive(pathname: string, href: string): boolean {
 
 export default function Header() {
   const { totalQuantity: cartQuantity, hydrated: cartHydrated, openDrawer: openCart } = useCart();
-  const { lineCount, hydrated, openDrawer } = useOrderRequest();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -65,13 +64,9 @@ export default function Header() {
               {cartHydrated && cartQuantity > 0 && <span className={styles.count}>{cartQuantity}</span>}
             </button>
           )}
-          <button type="button" className={styles.requestButton} onClick={openDrawer} aria-label="Open your order request">
-            <span className={styles.requestLabel}>Request</span>
-            <span className={`${styles.count} ${hydrated && lineCount > 0 ? "" : styles.countEmpty}`}>{hydrated ? lineCount : 0}</span>
-          </button>
-          <Link href={BOOK_PATH} className={styles.bookButton}>
+          <a href={BOOKING_HREF} {...BOOKING_TARGET} className={styles.bookButton}>
             Book a meeting
-          </Link>
+          </a>
           <button
             type="button"
             className={styles.menuToggle}

@@ -97,3 +97,17 @@ works, the request drawer and page, the confirmation page and contact;
 the order request is the secondary path. `/book` embeds the calendar
 (`NEXT_PUBLIC_BOOKING_URL`, `NEXT_PUBLIC_BOOKING_EMBED`) and states what
 the call covers; a homepage section (BookSection) makes the case for it.
+
+## One action only (2026-10-23)
+
+David: "remove the requests part ... remove the add to request, the only
+CTA I want is book a meeting and it goes straight to the calendly link".
+The storefront's order request flow is gone (drawer, context, /request,
+/request/sent, the sheet view, the on-card chooser, /admin/requests) and
+so is /book: every Book a meeting button is a plain link to
+`NEXT_PUBLIC_BOOKING_URL` (https://cal.com/timechain/30min) in a new tab,
+with an email fallback while the link is unset. Cards are informational
+with a Details link; the product page keeps Format and Strength as
+pickers for the spec rows and ends in the booking button. The API's
+order-request endpoints (`/api/v1/order-requests`, `/admin/order-requests`)
+remain, tested and unused, in case the flow returns.

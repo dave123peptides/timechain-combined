@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import { CartProvider } from "@/lib/cart-context";
-import { RequestProvider } from "@/lib/request-context";
 import "./globals.css";
 
 // Modern, clean, minimal (David, 2026-10-22): one family. Inter Tight at
@@ -37,9 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body>
-        <CartProvider>
-          <RequestProvider>{children}</RequestProvider>
-        </CartProvider>
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );

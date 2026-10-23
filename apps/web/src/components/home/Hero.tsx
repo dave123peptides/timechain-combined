@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ProductSummary } from "@/lib/api";
 import { groupByCategory } from "@/lib/categories";
 import { promotableOnly } from "@/lib/compliance";
-import { AUDIENCE, BOOK_PATH } from "@/lib/site";
+import { AUDIENCE, BOOKING_HREF, BOOKING_TARGET } from "@/lib/site";
 import styles from "./Hero.module.css";
 
 // Hero (2026-10-23): a plain statement on the left and, on the right, the
@@ -28,9 +28,9 @@ export default function Hero({ products, configurations }: { products: ProductSu
             pricing for your practice.
           </p>
           <div className={styles.actions}>
-            <Link href={BOOK_PATH} className="button buttonAccent">
+            <a href={BOOKING_HREF} {...BOOKING_TARGET} className="button buttonAccent">
               Book a meeting
-            </Link>
+            </a>
             <Link href="/shop" className="button buttonAccentOutline">
               Open the catalog
             </Link>

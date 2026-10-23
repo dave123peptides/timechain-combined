@@ -12,20 +12,18 @@ export const SUPPORT_EMAIL = "support@timechainpeptides.com";
 // cannot complete.
 export const ORDERING_ENABLED = process.env.NEXT_PUBLIC_ORDERING_ENABLED === "true";
 
-// Booking a meeting is the site's primary action (David, 2026-10-23: a
-// practice reviews the catalog, then books a call to go through it).
-// BOOKING_URL is the calendar link David supplies (Calendly, Cal.com, a
-// GoHighLevel calendar, any scheduling page); /book embeds it and every
-// Book a meeting button goes to /book. Until the link is set, /book
-// offers email instead. NEXT_PUBLIC_BOOKING_EMBED=false turns off the
-// embed for a provider that refuses to load in a frame; the page then
-// links out instead.
+// Booking a meeting is the site's ONLY action (David, 2026-10-23: "the
+// only CTA I want is book a meeting and it goes straight to the calendar
+// link"). Every Book a meeting button is a plain link to BOOKING_URL, the
+// Cal.com page David supplies, opened in a new tab. Until it is set the
+// buttons fall back to email so nothing dead-ends.
 export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL?.trim() || null;
-export const BOOKING_EMBED = process.env.NEXT_PUBLIC_BOOKING_EMBED !== "false";
-export const BOOK_PATH = "/book";
+export const BOOKING_HREF = BOOKING_URL ?? `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Meeting request")}`;
+// Link attributes for the booking button: a new tab for the calendar, the
+// mail app for the fallback.
+export const BOOKING_TARGET: { target?: string; rel?: string } = BOOKING_URL ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
 export const CONTACT_PATH = "/contact";
-export const REQUEST_PATH = "/request";
 
 // Redesign (David, 2026-10-22): no prices on the site until the wholesale
 // sheet exists. The API has the matching switch (CATALOG_PRICES_PUBLIC)

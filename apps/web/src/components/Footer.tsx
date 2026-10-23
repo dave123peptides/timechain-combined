@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ORDERING_ENABLED, SUPPORT_EMAIL } from "@/lib/site";
+import { BOOKING_HREF, BOOKING_TARGET, ORDERING_ENABLED, SUPPORT_EMAIL } from "@/lib/site";
 import styles from "./Footer.module.css";
 
 // Minimal footer: a thin rule, three link columns, the support address,
@@ -15,8 +15,8 @@ export default function Footer() {
               TimeChain <span>Peptides</span>
             </div>
             <p className={styles.tagline}>
-              Research peptides in pre-filled pens and lyophilized vials, supplied in quantity to research
-              organizations and medical practices.
+              Research peptides in pre-filled pens and lyophilized vials, supplied to research organizations and
+              medical practices. Book a meeting to go through the catalog with us.
             </p>
             <a href={`mailto:${SUPPORT_EMAIL}`} className={styles.email}>
               {SUPPORT_EMAIL}
@@ -33,11 +33,12 @@ export default function Footer() {
             </div>
           </div>
           <div>
-            <div className={styles.heading}>Ordering</div>
+            <div className={styles.heading}>Company</div>
             <div className={styles.linkList}>
-              <Link href="/book">Book a meeting</Link>
-              <Link href="/request">Your order request</Link>
-              <Link href="/#how-it-works">How ordering works</Link>
+              <a href={BOOKING_HREF} {...BOOKING_TARGET}>
+                Book a meeting
+              </a>
+              <Link href="/#how-it-works">How it works</Link>
               <Link href="/contact">Contact</Link>
               <Link href="/faq">FAQ</Link>
             </div>

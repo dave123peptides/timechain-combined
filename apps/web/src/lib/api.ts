@@ -404,35 +404,6 @@ export function quoteCheckout(payload: {
   return apiFetch<Quote>("/api/v1/checkout/quote", { method: "POST", body: JSON.stringify(payload) });
 }
 
-// The order request (David, 2026-10-22): the site's one conversion. The
-// API validates every line against the sellable catalog, stores a
-// snapshot and forwards it to the CRM; the reference is what the
-// requester keeps. `website` is the honeypot: always sent empty.
-export type OrderRequestItem = { variant_id: string; quantity: number };
-
-export type OrderRequestPayload = {
-  name: string;
-  organization: string;
-  email: string;
-  role?: string | null;
-  phone?: string | null;
-  region?: string | null;
-  notes?: string | null;
-  items: OrderRequestItem[];
-  source_path?: string | null;
-  website?: string | null;
-};
-
-export type OrderRequestResult = { reference: string; created_at: string };
-
-export function createOrderRequest(payload: OrderRequestPayload): Promise<OrderRequestResult> {
-  return apiFetch<OrderRequestResult>("/api/v1/order-requests", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-}
-
 export function formatMoney(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }

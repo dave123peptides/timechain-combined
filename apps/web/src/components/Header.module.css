@@ -95,28 +95,6 @@
   background: var(--surface);
 }
 
-.requestButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  height: 2.5rem;
-  padding: 0 0.5rem 0 0.9rem;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-label);
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease;
-}
-
-.requestButton:hover {
-  background: var(--surface);
-  border-color: #d3d7dd;
-}
-
 /* The primary action on every page (David, 2026-10-23). */
 .bookButton {
   display: inline-flex;
@@ -220,13 +198,8 @@
     gap: var(--space-3);
   }
 
-  .wordmarkSuffix,
-  .requestLabel {
+  .wordmarkSuffix {
     display: none;
-  }
-
-  .requestButton {
-    padding: 0 0.5rem;
   }
 
   .bookButton {

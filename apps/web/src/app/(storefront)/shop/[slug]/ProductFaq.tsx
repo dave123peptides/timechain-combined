@@ -18,7 +18,7 @@ const SHARED_FAQ: ProductFaqEntry[] = [
   },
   {
     q: "How do I order it, and in what quantities?",
-    a: "Choose the format, strength and quantity above and add it to your order request. Any quantity can be requested, and a request can hold any mix of compounds, formats and strengths. Send the list with your details and we reply by email with availability, documentation and pricing for those quantities.",
+    a: "Book a meeting. Any quantity and any mix of compounds, formats and strengths can be arranged; on the call we confirm availability, documentation and pricing for what you need, then arrange the order directly.",
   },
 ];
 

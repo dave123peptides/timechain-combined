@@ -1,6 +1,5 @@
 import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
-import { DEFAULT_VIEW, isView } from "@/components/catalog/view";
 import PageBanner from "@/components/PageBanner";
 import { listProductsOrEmpty } from "@/lib/api";
 import { findCategory } from "@/lib/categories";
@@ -15,14 +14,13 @@ export const dynamic = "force-dynamic";
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; sort?: string; category?: string; form?: string; view?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; category?: string; form?: string }>;
 }) {
   const params = await searchParams;
   const query = params.q?.trim() || undefined;
   const sort = isSort(params.sort) ? params.sort : "name";
   const category = findCategory(params.category);
   const form = findForm(params.form);
-  const view = isView(params.view) ? params.view : DEFAULT_VIEW;
 
   const products = await listProductsOrEmpty({ q: query, sort });
 
@@ -32,7 +30,7 @@ export default async function ShopPage({
         <p>
           {form
             ? form.description
-            : "Pre-filled auto-injector pens and lyophilized vials. Pick a format, narrow by category, and add what you need to your order request."}
+            : "Pre-filled auto-injector pens and lyophilized vials. Pick a format, narrow by category, and open any compound for the details."}
         </p>
       </PageBanner>
       <CatalogGrid
@@ -43,7 +41,6 @@ export default async function ShopPage({
         query={query}
         category={category}
         form={form}
-        view={view}
       />
     </main>
   );

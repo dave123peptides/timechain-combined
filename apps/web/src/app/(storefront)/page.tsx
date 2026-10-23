@@ -2,7 +2,6 @@ import Link from "next/link";
 import Faq from "@/components/Faq";
 import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
-import { DEFAULT_VIEW, isView } from "@/components/catalog/view";
 import BookSection from "@/components/home/BookSection";
 import Hero from "@/components/home/Hero";
 import HowItWorks from "@/components/home/HowItWorks";
@@ -18,21 +17,21 @@ export const dynamic = "force-dynamic";
 
 const HOMEPAGE_FAQ_COUNT = 5;
 
-// Homepage (modern, minimal, 2026-10-22): hero with a live catalog slice,
-// the facts row, the WHOLE catalog as an order sheet (no featured or
-// "popular" selection: lib/compliance.ts), how ordering works, quality,
-// a few questions. The Pens | Vials toggle and the category pills filter
-// the sheet in place (?form=, ?category=); ?view= switches sheet and grid.
+// Homepage: hero with the categories, the facts row, the WHOLE catalog
+// as cards by category (no featured or "popular" selection:
+// lib/compliance.ts), how it works, the case for the meeting, quality, a
+// few questions. The Pens | Vials toggle and the category pills filter
+// the catalog in place (?form=, ?category=). The one action everywhere is
+// the Book a meeting link (David, 2026-10-23).
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string; category?: string; form?: string; view?: string }>;
+  searchParams: Promise<{ sort?: string; category?: string; form?: string }>;
 }) {
   const params = await searchParams;
   const sort = isSort(params.sort) ? params.sort : "name";
   const category = findCategory(params.category);
   const form = findForm(params.form);
-  const view = isView(params.view) ? params.view : DEFAULT_VIEW;
   const products = await listProductsOrEmpty({ sort });
   const configurations = products.reduce((sum, product) => sum + product.variants.length, 0);
 
@@ -51,7 +50,6 @@ export default async function Home({
         sort={sort}
         category={category}
         form={form}
-        view={view}
       />
       <HowItWorks />
       <BookSection />

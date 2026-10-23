@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BOOK_PATH } from "@/lib/site";
+import { BOOKING_HREF, BOOKING_TARGET } from "@/lib/site";
 import styles from "./BookSection.module.css";
 
 // The homepage's case for the meeting (David, 2026-10-23: the primary
@@ -23,14 +23,14 @@ export default function BookSection() {
           </h2>
           <p className={styles.lede}>
             The fastest way to get answers for your practice is a short conversation with the people who run the
-            catalog. Come with your list, or let us build it with you.
+            catalog. Come with questions, or let us walk you through it.
           </p>
           <div className={styles.actions}>
-            <Link href={BOOK_PATH} className="button buttonAccent">
+            <a href={BOOKING_HREF} {...BOOKING_TARGET} className="button buttonAccent">
               Book a meeting
-            </Link>
+            </a>
             <Link href="/shop" className="button buttonAccentOutline">
-              Build an order request instead
+              Review the catalog first
             </Link>
           </div>
         </div>

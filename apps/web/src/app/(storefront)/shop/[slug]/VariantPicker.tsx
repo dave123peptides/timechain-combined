@@ -1,24 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import type { BulkDiscountTier, ProductCoa, Variant } from "@/lib/api";
 import { formatMoney, formatStrength } from "@/lib/api";
-import { useCart } from "@/lib/cart-context";
 import { distinctLabs, formatCoaDate, latestCoaForStrength } from "@/lib/coa";
 import { findForm, formsIn } from "@/lib/forms";
-import { useOrderRequest } from "@/lib/request-context";
-import { BOOK_PATH, ORDERING_ENABLED, PRICING_VISIBLE } from "@/lib/site";
+import { BOOKING_HREF, BOOKING_TARGET, PRICING_VISIBLE } from "@/lib/site";
 import { isSupply } from "@/lib/supplies";
 import FormatNotice from "@/components/FormatNotice";
-import QuantityStepper from "@/components/QuantityStepper";
 import LabReportLink from "./LabReportLink";
 import styles from "./page.module.css";
-
-// Multi-quantity presets (B2B redesign, 2026-10-22): the quantities a
-// practice or lab actually asks for. Typing any other number works too.
-const QUANTITY_PRESETS = [5, 10, 25, 50, 100];
-const DEFAULT_QUANTITY = 10;
 
 // The grid's ?form= carries into the product page: open on that format
 // when the product has it, otherwise on the first variant.
@@ -27,13 +18,13 @@ function pickInitial(variants: Variant[], initialForm?: string): string {
   return (match ?? variants[0])?.id ?? "";
 }
 
-// The request builder below the product title: Format (when the compound
-// ships as both a pen and a vial), Strength, Quantity, Add to request.
-// No price unless pricing is on (lib/site.ts) and the API sent one. Spec
-// rows are derived from data the catalog holds or from a constraint
-// enforced in code (SELLABLE_FORMS on the API's catalog model). No
-// purity, no storage or shelf-life figures, no internal SKU. With
-// ordering on the old Add to Cart returns in place of the request button.
+// What is offered, and one thing to do about it (David, 2026-10-23: the
+// only call to action is Book a meeting). Format (when the compound
+// ships as both a pen and a vial) and Strength are pickers so the spec
+// rows and the notice follow the selection; there is no quantity and no
+// cart. Spec rows are derived from data the catalog holds or from a
+// constraint enforced in code (SELLABLE_FORMS on the API's catalog
+// model). No purity, no storage or shelf-life figures, no internal SKU.
 export default function VariantPicker({
   variants,
   coas,
@@ -51,10 +42,6 @@ export default function VariantPicker({
   initialForm?: string;
 }) {
   const [selectedId, setSelectedId] = useState(() => pickInitial(variants, initialForm));
-  const [quantity, setQuantity] = useState(DEFAULT_QUANTITY);
-  const [justAdded, setJustAdded] = useState(false);
-  const { addItem: addToCart, openDrawer: openCart } = useCart();
-  const { addItem, openDrawer } = useOrderRequest();
 
   const selected = variants.find((v) => v.id === selectedId) ?? variants[0];
   if (!selected) return null;
@@ -74,17 +61,6 @@ export default function VariantPicker({
     const ofForm = variants.filter((v) => v.form === key);
     const next = ofForm.find((v) => v.strength === selected.strength) ?? ofForm[0];
     if (next) setSelectedId(next.id);
-  };
-
-  const handleAdd = () => {
-    if (ORDERING_ENABLED) {
-      addToCart(selected.id, quantity);
-      openCart();
-      return;
-    }
-    addItem(selected.id, quantity);
-    setJustAdded(true);
-    openDrawer();
   };
 
   return (
@@ -129,40 +105,6 @@ export default function VariantPicker({
         </>
       )}
 
-      <span className={styles.fieldLabel}>Quantity</span>
-      <div className={styles.quantityRow}>
-        <QuantityStepper value={quantity} onChange={setQuantity} label="Quantity" />
-        <div className={styles.presets} role="group" aria-label="Quantity presets">
-          {QUANTITY_PRESETS.map((preset) => (
-            <button
-              key={preset}
-              type="button"
-              className={`${styles.preset} ${quantity === preset ? styles.presetActive : ""}`}
-              onClick={() => setQuantity(preset)}
-              aria-pressed={quantity === preset}
-            >
-              {preset}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.buyRow}>
-        <button type="button" className={`button buttonAccent ${styles.addButton}`} onClick={handleAdd}>
-          {ORDERING_ENABLED ? "Add to Cart" : justAdded ? "Added. Add more" : "Add to request"}
-        </button>
-      </div>
-      <p className={styles.builderNote}>
-        {ORDERING_ENABLED ? (
-          "Quantity discounts apply at checkout."
-        ) : (
-          <>
-            Build your list, then send it with your details. We reply by email with availability, documentation and
-            pricing for your quantities. <Link href={BOOK_PATH}>Prefer to talk first? Book a meeting.</Link>
-          </>
-        )}
-      </p>
-
       <dl className={styles.specs}>
         <div className={styles.specRow}>
           <dt>Strength</dt>
@@ -201,6 +143,16 @@ export default function VariantPicker({
       </dl>
 
       <FormatNotice form={selected.form} productSlug={productSlug} />
+
+      <div className={styles.buyRow}>
+        <a href={BOOKING_HREF} {...BOOKING_TARGET} className={`button buttonAccent ${styles.addButton}`}>
+          Book a meeting
+        </a>
+      </div>
+      <p className={styles.builderNote}>
+        Interested in {productName}? Book a short call and we go through formats, strengths, quantities, documentation
+        and pricing for your practice. No payment is taken on this site.
+      </p>
     </div>
   );
 }

@@ -3,17 +3,15 @@ import type { ProductSummary } from "@/lib/api";
 import { formatMoney, formatStrength } from "@/lib/api";
 import { formSingular, formsIn, strengthList, type FormKey } from "@/lib/forms";
 import { PRICING_VISIBLE } from "@/lib/site";
-import ProductCardActions from "./ProductCardActions";
 import ProductImagePlaceholder from "./ProductImagePlaceholder";
 import styles from "./ProductCard.module.css";
 
-// Catalog card (2026-10-23): the compound first. A generous image area,
-// the name, its chemistry line, one quiet line of facts (formats and
-// strengths) and one button. The configuration picker appears only when
-// that button is pressed (ProductCardActions). No price unless pricing is
-// on (lib/site.ts) and the API sent one. The image and name link to the
-// product page; when the grid is narrowed to one format the links carry
-// ?form= so the page opens on it.
+// Catalog card (2026-10-23): the compound first, and nothing to do but
+// look. A generous image area, the name, its chemistry line, one quiet
+// line of facts (formats and strengths) and a details link; the whole
+// card opens the product page. No button: the site's one action is the
+// Book a meeting link in the header (David, 2026-10-23). No price unless
+// pricing is on (lib/site.ts) and the API sent one.
 export default function ProductCard({ product, form }: { product: ProductSummary; form?: FormKey }) {
   const image = product.images[0];
   const href = `/shop/${product.slug}${form ? `?form=${form}` : ""}`;
@@ -48,7 +46,9 @@ export default function ProductCard({ product, form }: { product: ProductSummary
           {strengths.length > 0 && <span>{strengths.map(formatStrength).join(", ")}</span>}
           {showPrice && <span>From {formatMoney(product.starting_price_cents as number)}</span>}
         </p>
-        <ProductCardActions product={product} form={form} />
+        <Link href={href} className={styles.details}>
+          Details
+        </Link>
       </div>
     </article>
   );
