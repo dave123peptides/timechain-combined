@@ -21,6 +21,14 @@ Steps 0 to 5 below are DONE (run from the CLI in David's session):
   at either, the flag wins). Neither is connected to GitHub yet, so a
   push alone changes nothing live.
 
+Redesign deployed the same evening (commits 11e00dd, 4c45eae): the B2B
+look, no prices, and the order request flow. Two more API settings exist,
+both unset in production so far: `CATALOG_PRICES_PUBLIC` (keep off until
+the wholesale sheet; the web's `NEXT_PUBLIC_PRICING_VISIBLE` is its
+twin) and `ORDER_REQUEST_WEBHOOK_URL` (a GHL inbound webhook; until set,
+requests are stored only and read at /admin/requests, which needs the
+admin password below).
+
 Still David's:
 
 1. Review at https://timechain-combined-web.vercel.app. The gate is on
