@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SectionIcon from "@/components/SectionIcon";
+import CalEmbed from "./CalEmbed";
 import { BOOKING_EMBED, BOOKING_URL, SUPPORT_EMAIL } from "@/lib/site";
 import styles from "./page.module.css";
 
@@ -19,21 +20,16 @@ const COVERS = [
   { icon: "chat", title: "Pricing and terms", body: "Pricing for your quantities, how ordering is arranged, and how to reach us afterwards." },
 ] as const;
 
-// Cal.com's plain booking page follows the visitor's system theme and
-// ignores ?theme=; its /embed route honours it (checked 2026-10-23) and
-// lays the month and the time slots side by side, which is what the
-// frame wants. The new-tab link stays as given.
-function embedSrc(url: string): string {
+// A cal.com link embeds through Cal.com's own script (CalEmbed), which
+// honours the light theme; any other provider gets a plain frame.
+function calLink(url: string): string | null {
   try {
     const parsed = new URL(url);
-    if (parsed.hostname === "cal.com" || parsed.hostname.endsWith(".cal.com")) {
-      if (!parsed.pathname.endsWith("/embed")) parsed.pathname = `${parsed.pathname.replace(/\/$/, "")}/embed`;
-      if (!parsed.searchParams.has("theme")) parsed.searchParams.set("theme", "light");
-      if (!parsed.searchParams.has("layout")) parsed.searchParams.set("layout", "month_view");
-    }
-    return parsed.toString();
+    if (parsed.hostname !== "cal.com" && !parsed.hostname.endsWith(".cal.com")) return null;
+    const path = parsed.pathname.replace(/^\/+|\/+$/g, "");
+    return path || null;
   } catch {
-    return url;
+    return null;
   }
 }
 
@@ -76,8 +72,12 @@ export default function BookPage() {
         <section className={styles.calendar} aria-label="Pick a time">
           {BOOKING_URL ? (
             <>
-              {BOOKING_EMBED ? (
-                <iframe src={embedSrc(BOOKING_URL)} title="Book a meeting" className={styles.frame} loading="lazy" allow="payment *" />
+              {BOOKING_EMBED && calLink(BOOKING_URL) ? (
+                <div className={styles.frame}>
+                  <CalEmbed calLink={calLink(BOOKING_URL) as string} />
+                </div>
+              ) : BOOKING_EMBED ? (
+                <iframe src={BOOKING_URL} title="Book a meeting" className={styles.frame} loading="lazy" allow="payment *" />
               ) : (
                 <div className={styles.fallback}>
                   <p>Pick a time on our calendar.</p>

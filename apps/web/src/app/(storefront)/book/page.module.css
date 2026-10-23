@@ -104,6 +104,7 @@
   min-height: 44rem;
   border: 0;
   background: var(--paper);
+  padding: 0.5rem;
 }
 
 .calendarActions {
