@@ -8,9 +8,8 @@
 }
 
 .faq {
-  padding: 4rem 0 5rem;
-  border-top: 1px solid var(--line);
-  background: var(--surface);
+  padding: 5rem 0;
+  background: var(--paper);
 }
 
 /* The accordion is a stack of full-width rules; capping the width keeps

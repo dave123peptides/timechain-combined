@@ -17,6 +17,16 @@ export const ORDERING_ENABLED = process.env.NEXT_PUBLIC_ORDERING_ENABLED === "tr
 export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL?.trim() || null;
 
 export const CONTACT_PATH = "/contact";
+export const REQUEST_PATH = "/request";
+
+// Redesign (David, 2026-10-22): no prices on the site until the wholesale
+// sheet exists. The API has the matching switch (CATALOG_PRICES_PUBLIC)
+// that nulls the price fields, so flipping only this one shows nothing.
+export const PRICING_VISIBLE = process.env.NEXT_PUBLIC_PRICING_VISIBLE === "true";
+
+// Who the site is for, in David's words (2026-10-22). TODO(attorney-review):
+// "medical practices" alongside the research-use-only language.
+export const AUDIENCE = "research organizations and medical practices";
 
 // /contact?product=<slug>&variant=<id>: the page names what the visitor
 // was looking at so the conversation can start from it.

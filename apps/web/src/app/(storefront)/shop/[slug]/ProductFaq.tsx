@@ -17,8 +17,8 @@ const SHARED_FAQ: ProductFaqEntry[] = [
     a: "Store as directed on the label, away from heat and light. Standard laboratory practice is refrigeration and use within the window stated on the label.",
   },
   {
-    q: "Can I order multiple compounds together?",
-    a: "Yes. This site takes no payments; tell us the compounds, formats and quantities you need when you contact us, and we arrange the order directly with you.",
+    q: "How do I order it, and in what quantities?",
+    a: "Choose the format, strength and quantity above and add it to your order request. Any quantity can be requested, and a request can hold any mix of compounds, formats and strengths. Send the list with your details and we reply by email with availability, documentation and pricing for those quantities.",
   },
 ];
 

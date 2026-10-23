@@ -14,10 +14,10 @@ export const dynamic = "force-dynamic";
 const BANNER_PENS = ["/products/hero/tb-500.png", "/products/hero/bpc-157.png", "/products/hero/ghk-cu.png"];
 
 // One flat, alphabetical catalog with the Pens | Vials toggle
-// (lib/forms.ts, David 2026-10-22) and a benefit-category pill row
-// (lib/categories.ts) on top. ?form= narrows to one line, ?category=
-// narrows within it; an unknown value for either means "all".
-// Product.category (the internal taxonomy) still never renders.
+// (lib/forms.ts) and the benefit-category pill row (lib/categories.ts)
+// on top. ?form= narrows to one line, ?category= narrows within it; an
+// unknown value for either means "all". Product.category (the internal
+// taxonomy) still never renders.
 export default async function ShopPage({
   searchParams,
 }: {
@@ -29,29 +29,34 @@ export default async function ShopPage({
   const category = findCategory(params.category);
   const form = findForm(params.form);
 
-  // Degrades to empty rather than crashing the page if the API is
-  // unreachable.
   const products = await listProductsOrEmpty({ q: query, sort });
 
-  const title = query ? `Results for “${query}”` : form ? `Research Peptide ${form.label}` : "Research Peptides For Sale";
+  const title = query ? (
+    <>
+      Results for <em>“{query}”</em>
+    </>
+  ) : form ? (
+    <>
+      Research peptide <em>{form.label.toLowerCase()}</em>
+    </>
+  ) : (
+    <>
+      The <em>catalog</em>
+    </>
+  );
 
   return (
     <main>
-      <PageBanner
-        variant="dark"
-        eyebrow="Research use only"
-        title={title}
-        images={form?.key === "lyophilized" ? undefined : BANNER_PENS}
-      >
+      <PageBanner eyebrow="Research use only" title={title} images={form?.key === "lyophilized" ? undefined : BANNER_PENS}>
         <p>
           {form
             ? form.description
-            : "Pre-filled auto-injector pens and lyophilized vials. Pick a format, or browse the whole catalog."}
+            : "Pre-filled auto-injector pens and lyophilized vials. Pick a format, narrow by category, and add what you need to your order request."}
         </p>
       </PageBanner>
       <CatalogGrid
         products={products}
-        title={query ? "Search results" : "The Collection"}
+        title={query ? "Search results" : "Every compound we supply"}
         basePath="/shop"
         sort={sort}
         query={query}

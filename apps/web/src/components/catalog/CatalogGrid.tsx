@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { ProductSort, ProductSummary } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
 import { inCategory, type StorefrontCategory } from "@/lib/categories";
@@ -32,7 +33,7 @@ export default function CatalogGrid({
   form,
 }: {
   products: ProductSummary[];
-  title: string;
+  title: ReactNode;
   basePath: string;
   sort: ProductSort;
   query?: string;

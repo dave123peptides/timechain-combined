@@ -1,72 +1,53 @@
-/* TimeChain Peptides — light, bold, consumer-DTC visual direction:
-   white ground, near-black ink, bold indigo accent, Inter Tight display.
-   This is David's committed identity (restored 8/31 after a one-day
-   "ledger & gold" serif/cream/gold experiment he reviewed and declined —
-   see git history if that direction is ever wanted back).
-   A single committed presentation (no dark-mode variant).
-
-   Token NAMES are unchanged from the prior theme on purpose — every
-   consumer CSS Module below references these by name, not by literal
-   value, so re-skinning the whole site is this one values swap plus the
-   font swap in layout.tsx, not a per-file rewrite. `--gold*` holds the
-   bold indigo accent (not literally gold) — kept as-is rather than
-   renamed to avoid touching ~12 downstream files for no functional gain. */
+/* TimeChain Peptides, combined site: the B2B redesign (David, 2026-10-22,
+   brief in docs/plans/redesign-b2b.md). Warm paper, navy ink, a brass
+   accent, serif display type with one italic accent word. The token NAMES
+   are unchanged from the earlier themes on purpose: every CSS Module
+   references them by name, so this file plus the font swap in layout.tsx
+   is the re-skin. `--gold*` is literal brass at last. A single committed
+   presentation (no dark-mode variant). */
 
 :root {
-  --ink: #14151a;
-  --ink-soft: #52555f;
-  --ink-faint: #8b8e98;
-  --paper: #ffffff;
-  --surface: #f5f6fa;
-  --line: #e7e8ec;
-  --line-soft: #f0f1f5;
+  --ink: #15213a;
+  --ink-soft: #4b5468;
+  --ink-faint: #8a8f9c;
+  --paper: #f7f4ee;
+  --surface: #efeae0;
+  --line: #e2dccf;
+  --line-soft: #ece7dc;
+  --navy-deep: #0f172b;
 
-  --gold: #2952e3;
-  --gold-deep: #1f3fb8;
-  --gold-pale: #e9edfc;
+  --gold: #b4893a;
+  --gold-deep: #8f6b26;
+  --gold-pale: #f2e8d3;
 
   --danger: #b3261e;
 
-  --font-display: var(--font-display-sans), -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display-serif), "Iowan Old Style", "Times New Roman", serif;
+  --font-label: var(--font-label-sans), -apple-system, "Segoe UI", sans-serif;
   --font-body: var(--font-body-sans), -apple-system, "Segoe UI", sans-serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.15rem;
-  --text-xl: 1.4rem;
-  --text-2xl: 1.85rem;
-  --text-3xl: 2.5rem;
-  --text-4xl: 3.4rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2.1rem;
+  --text-3xl: 2.9rem;
+  --text-4xl: 4rem;
 
   --max-width: 1240px;
-  --radius: 10px;
+  --radius: 14px;
+  --radius-lg: 26px;
 
-  /* --- Layout / stacking scales (added for the storefront parity build) ---
-     These exist for NEW components. Existing modules keep their ad-hoc rem
-     values on purpose — a mass refactor is churn with no functional gain
-     (same reasoning this file already gives for keeping the `--gold*` names).
-
-     --header-h is derived, not guessed: Header.module.css `.bar` is an
-     explicit 4.5rem tall (set as a height, not padding, precisely so this
-     token cannot drift when the bar's contents change) plus the header's
-     1px bottom border. The bar is the same height at every viewport, so
-     there is deliberately no narrow-viewport override. */
-  --header-h: calc(4.5rem + 1px);
+  /* Header.module.css: a 4rem floating bar inside 0.75rem of vertical
+     padding. Everything that offsets against the sticky header (the PDP
+     gallery, the drawer) reads this. */
+  --header-h: 5.5rem;
   --sticky-gap: 0.65rem;
-
-  /* Offset for page content that is itself position:sticky (the PDP gallery,
-     the cart and checkout summaries) — clears the sticky header. This used
-     to also add a --category-nav-h term; the sticky category strip was
-     unmounted in David's 8/30 review, so the term is gone — leaving it
-     would float every sticky panel 59px too low. */
   --sticky-top: calc(var(--header-h) + var(--sticky-gap));
 
   /* Header is position:sticky with a non-auto z-index, so it CREATES A
-     STACKING CONTEXT. Anything rendered inside Header can never paint above
-     something outside it, no matter how high its z-index — --z-dropdown only
-     orders siblings within the header. A future cart drawer must therefore be
-     rendered from (storefront)/layout.tsx or a portal, not from Header.tsx. */
+     STACKING CONTEXT. Drawers render from (storefront)/layout.tsx. */
   --z-sticky-nav: 20;
   --z-header: 30;
   --z-buy-bar: 40;
@@ -74,9 +55,6 @@
   --z-drawer-scrim: 55;
   --z-drawer: 60;
 
-  /* Values chosen to match numbers already hardcoded across the modules
-     (.container 1.75rem, section heads 3.5rem, footer 5rem) so new
-     components sit flush against old ones. */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -87,13 +65,9 @@
   --space-8: 3.5rem;
   --space-9: 5rem;
 
-  /* The design is border-based and shadow-free by default; keep it that way.
-     These are for the three places elevation is genuinely load-bearing:
-     card hover, the search dropdown, and the fixed buy bar (which casts
-     upward, hence the negative y on --shadow-lg). */
-  --shadow-sm: 0 1px 2px rgba(20, 21, 26, 0.06);
-  --shadow-md: 0 4px 16px rgba(20, 21, 26, 0.08);
-  --shadow-lg: 0 -8px 28px rgba(20, 21, 26, 0.1);
+  --shadow-sm: 0 1px 2px rgba(21, 33, 58, 0.06);
+  --shadow-md: 0 8px 24px rgba(21, 33, 58, 0.08);
+  --shadow-lg: 0 -8px 28px rgba(21, 33, 58, 0.1);
 }
 
 * {
@@ -102,8 +76,6 @@
 
 html {
   background: var(--paper);
-  /* For the /shop category anchors (#cat-…). Disabled under
-     prefers-reduced-motion at the bottom of this file. */
   scroll-behavior: smooth;
 }
 
@@ -117,14 +89,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Serif display at regular weight; the accent word is an <em>. */
 h1,
 h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
   margin: 0;
   text-wrap: balance;
   color: var(--ink);
@@ -140,6 +113,14 @@ h2 {
 
 h3 {
   font-size: var(--text-xl);
+}
+
+h1 em,
+h2 em,
+h3 em,
+.accent {
+  font-style: italic;
+  color: var(--gold-deep);
 }
 
 p {
@@ -162,9 +143,9 @@ img {
 }
 
 .eyebrow {
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  letter-spacing: 0.14em;
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--gold-deep);
   font-weight: 600;
@@ -176,20 +157,23 @@ img {
   padding: 0 1.75rem;
 }
 
+/* Pill buttons by default now; .buttonPill is kept as a no-op modifier so
+   the older markup composes unchanged. */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.85rem 1.75rem;
-  font-size: var(--text-sm);
+  padding: 0.85rem 1.6rem;
+  font-family: var(--font-label);
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  border-radius: var(--radius);
+  border-radius: 999px;
   border: 1px solid var(--ink);
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, transform 150ms ease;
 }
 
 .buttonPrimary {
@@ -198,8 +182,8 @@ img {
 }
 
 .buttonPrimary:hover:not(:disabled) {
-  background: var(--gold-deep);
-  border-color: var(--gold-deep);
+  background: var(--navy-deep);
+  border-color: var(--navy-deep);
 }
 
 .buttonSecondary {
@@ -218,34 +202,31 @@ img {
   cursor: not-allowed;
 }
 
-/* Core-reference (9/4) button shapes. Modifiers, not replacements: the
-   storefront's new surfaces use pills in the accent colour, while the
-   checkout flow — out of scope for that redesign — keeps the 10px
-   ink buttons above. Compose as `button buttonPill buttonAccent`. */
 .buttonPill {
   border-radius: 999px;
 }
 
+/* The brass call to action. */
 .buttonAccent {
-  background: var(--gold);
-  border-color: var(--gold);
+  background: var(--gold-deep);
+  border-color: var(--gold-deep);
   color: var(--paper);
 }
 
 .buttonAccent:hover:not(:disabled) {
-  background: var(--gold-deep);
-  border-color: var(--gold-deep);
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .buttonAccentOutline {
   background: transparent;
-  border-color: var(--gold-deep);
-  color: var(--gold-deep);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .buttonAccentOutline:hover:not(:disabled) {
-  background: var(--gold-deep);
-  border-color: var(--gold-deep);
+  background: var(--ink);
+  border-color: var(--ink);
   color: var(--paper);
 }
 
@@ -266,9 +247,13 @@ img {
   font-variant-numeric: tabular-nums;
 }
 
-/* Keyboard/screen-reader escape hatch rendered by the storefront layout.
-   Off-screen until focused, then drops in above the sticky header (hence
-   the z-index above --z-header). */
+/* Product photography is shot on white; multiply blends that white into
+   the paper so a vial sits on the page instead of in a white box. Pen
+   renders are transparent cut-outs and are unaffected. */
+.productPhoto {
+  mix-blend-mode: multiply;
+}
+
 .skipLink {
   position: absolute;
   left: 1rem;
@@ -286,10 +271,6 @@ img {
   top: 0;
 }
 
-/* Visible to screen readers only. Used for control labels that would be
-   redundant on screen (the shop sort <select>, the search combobox) and
-   for aria-live result announcements. Not `display: none` — that would
-   hide it from assistive tech too, which is the opposite of the point. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -304,8 +285,9 @@ img {
 
 @media (max-width: 720px) {
   :root {
-    --text-4xl: 2.5rem;
-    --text-3xl: 2rem;
+    --text-4xl: 2.7rem;
+    --text-3xl: 2.2rem;
+    --text-2xl: 1.7rem;
   }
 
   .container {
@@ -313,8 +295,6 @@ img {
   }
 }
 
-/* Global motion opt-out — the backstop for every transition and animation
-   on the site (the cart drawer's slide, the card image swap, etc.). */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

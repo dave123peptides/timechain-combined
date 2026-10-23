@@ -134,3 +134,15 @@
     padding: 2.5rem 1.25rem 3rem;
   }
 }
+
+.outline {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--paper) 55%, transparent);
+  color: var(--paper);
+}
+
+.outline:hover:not(:disabled) {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--paper);
+}

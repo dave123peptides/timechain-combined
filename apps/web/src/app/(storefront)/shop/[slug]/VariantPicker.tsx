@@ -1,58 +1,41 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import type { BulkDiscountTier, ProductCoa, Variant } from "@/lib/api";
-import { discountedUnitPriceCents, formatMoney, formatStrength } from "@/lib/api";
+import { formatMoney, formatStrength } from "@/lib/api";
 import { useCart } from "@/lib/cart-context";
 import { distinctLabs, formatCoaDate, latestCoaForStrength } from "@/lib/coa";
 import { findForm, formsIn } from "@/lib/forms";
-import { ORDERING_ENABLED, contactHref } from "@/lib/site";
+import { useOrderRequest } from "@/lib/request-context";
+import { BOOKING_URL, CONTACT_PATH, ORDERING_ENABLED, PRICING_VISIBLE } from "@/lib/site";
 import { isSupply } from "@/lib/supplies";
 import FormatNotice from "@/components/FormatNotice";
 import QuantityStepper from "@/components/QuantityStepper";
 import LabReportLink from "./LabReportLink";
-import StickyBuyBar from "./StickyBuyBar";
 import styles from "./page.module.css";
 
-// [min, max] quantity range per row, derived from the ascending tier
-// list; max is undefined for the top ("20+") row.
-function bulkPricingRows(bulkTiers: BulkDiscountTier[]) {
-  const breaks = [{ min: 1, percentOff: 0 }, ...bulkTiers.map((t) => ({ min: t.min_quantity, percentOff: t.percent_off }))];
-  return breaks.map((row, i) => ({ ...row, max: breaks[i + 1] ? breaks[i + 1].min - 1 : undefined }));
-}
-
-function rangeLabel(row: { min: number; max?: number }): string {
-  return row.max === undefined ? `${row.min}+` : `${row.min} – ${row.max}`;
-}
+// Multi-quantity presets (B2B redesign, 2026-10-22): the quantities a
+// practice or lab actually asks for. Typing any other number works too.
+const QUANTITY_PRESETS = [5, 10, 25, 50, 100];
+const DEFAULT_QUANTITY = 10;
 
 // The grid's ?form= carries into the product page: open on that format
-// when the product has it, otherwise on the first (cheapest) variant.
+// when the product has it, otherwise on the first variant.
 function pickInitial(variants: Variant[], initialForm?: string): string {
   const match = initialForm ? variants.find((v) => v.form === initialForm) : undefined;
   return (match ?? variants[0])?.id ?? "";
 }
 
-// The buy box below the product title (Core reference, 9/4): price, a
-// Format picker when the compound ships as both a pen and a vial (one
-// product row per compound, David 2026-10-22), the strengths of the
-// chosen format, the call to action, a plain spec list and the format
-// notice. Everything here keys off the selected variant, which is why
-// one client component owns the lot.
-//
-// The call to action depends on lib/site.ts: in inquiry mode (the
-// default) it is a link to the contact page naming this exact variant;
-// with ordering on it is quantity + Add to Cart, the bulk-discount table
-// and the sticky buy bar, as before.
-//
-// Spec rows are derived from data the catalog actually holds or from a
-// constraint enforced in code (the form: SELLABLE_FORMS on the API's
-// catalog model). No purity, no storage or shelf-life figures, no
-// internal SKU: a spec list is exactly where an unconfirmed number would
-// read as a promise.
+// The request builder below the product title: Format (when the compound
+// ships as both a pen and a vial), Strength, Quantity, Add to request.
+// No price unless pricing is on (lib/site.ts) and the API sent one. Spec
+// rows are derived from data the catalog holds or from a constraint
+// enforced in code (SELLABLE_FORMS on the API's catalog model). No
+// purity, no storage or shelf-life figures, no internal SKU. With
+// ordering on the old Add to Cart returns in place of the request button.
 export default function VariantPicker({
   variants,
-  bulkTiers,
   coas,
   productName,
   productSlug,
@@ -68,13 +51,10 @@ export default function VariantPicker({
   initialForm?: string;
 }) {
   const [selectedId, setSelectedId] = useState(() => pickInitial(variants, initialForm));
-  const [quantity, setQuantity] = useState(1);
-  const tierGroup = useId();
-  // The desktop buy bar watches this button to know when it has scrolled
-  // out of view. It observes the button itself rather than an empty
-  // marker div: a zero-height element is unreliable to observe.
-  const addButtonRef = useRef<HTMLButtonElement>(null);
-  const { addItem, openDrawer } = useCart();
+  const [quantity, setQuantity] = useState(DEFAULT_QUANTITY);
+  const [justAdded, setJustAdded] = useState(false);
+  const { addItem: addToCart, openDrawer: openCart } = useCart();
+  const { addItem, openDrawer } = useOrderRequest();
 
   const selected = variants.find((v) => v.id === selectedId) ?? variants[0];
   if (!selected) return null;
@@ -82,14 +62,14 @@ export default function VariantPicker({
   const forms = formsIn(variants);
   const selectedForm = findForm(selected.form);
   const sameForm = variants.filter((v) => v.form === selected.form);
-  const pricingRows = bulkPricingRows(bulkTiers);
   const strengthText = selected.strength ? formatStrength(selected.strength) : selected.format;
   const formText = isSupply(productSlug) ? "Sterile diluent in a sealed vial" : (selectedForm?.shipsAs ?? selected.format);
   const coasForStrength = coas.filter((coa) => coa.strength === selected.strength);
   const latestForStrength = latestCoaForStrength(coas, selected.strength);
+  const showPrice = PRICING_VISIBLE && selected.price_cents !== null;
 
-  // Switching format keeps the strength where both formats offer it,
-  // otherwise lands on that format's first (cheapest) variant.
+  // Switching format keeps the strength where both offer it, otherwise
+  // lands on that format's first variant.
   const selectForm = (key: string) => {
     const ofForm = variants.filter((v) => v.form === key);
     const next = ofForm.find((v) => v.strength === selected.strength) ?? ofForm[0];
@@ -97,13 +77,19 @@ export default function VariantPicker({
   };
 
   const handleAdd = () => {
+    if (ORDERING_ENABLED) {
+      addToCart(selected.id, quantity);
+      openCart();
+      return;
+    }
     addItem(selected.id, quantity);
+    setJustAdded(true);
     openDrawer();
   };
 
   return (
-    <div>
-      <span className={styles.priceNow}>{formatMoney(selected.price_cents)}</span>
+    <div className={styles.builder}>
+      {showPrice && <span className={styles.priceNow}>{formatMoney(selected.price_cents as number)}</span>}
 
       {forms.length > 1 && (
         <>
@@ -143,78 +129,46 @@ export default function VariantPicker({
         </>
       )}
 
-      {ORDERING_ENABLED ? (
-        // Quantity + Add to Cart sit directly under the price so they are
-        // on the first screen without scrolling (David, 9/5).
-        <div className={styles.buyRow}>
-          <QuantityStepper value={quantity} onChange={setQuantity} label="Quantity" />
-          <button
-            ref={addButtonRef}
-            type="button"
-            className={`button buttonPill buttonAccentOutline ${styles.desktopAddButton} ${styles.addButton}`}
-            onClick={handleAdd}
-          >
-            Add to Cart
-          </button>
+      <span className={styles.fieldLabel}>Quantity</span>
+      <div className={styles.quantityRow}>
+        <QuantityStepper value={quantity} onChange={setQuantity} label="Quantity" />
+        <div className={styles.presets} role="group" aria-label="Quantity presets">
+          {QUANTITY_PRESETS.map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              className={`${styles.preset} ${quantity === preset ? styles.presetActive : ""}`}
+              onClick={() => setQuantity(preset)}
+              aria-pressed={quantity === preset}
+            >
+              {preset}
+            </button>
+          ))}
         </div>
-      ) : (
-        <div className={styles.inquiry}>
-          <Link href={contactHref(productSlug, selected.id)} className={`button buttonPill buttonAccent ${styles.inquiryButton}`}>
-            Contact us about this product
-          </Link>
-          <p className={styles.inquiryNote}>
-            Orders are arranged directly with us. Book a meeting or email, and we go over formats, quantities and
-            documentation.
-          </p>
-        </div>
-      )}
+      </div>
 
-      {ORDERING_ENABLED && pricingRows.length > 1 && (
-        <div className={styles.bulkPricing} role="radiogroup" aria-label="Quantity pricing tier">
-          <table className={styles.bulkTable}>
-            <thead>
-              <tr>
-                <th scope="col">
-                  <span className="sr-only">Selected</span>
-                  <span aria-hidden="true">✓</span>
-                </th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Discount</th>
-                <th scope="col">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pricingRows.map((row) => {
-                const active = quantity >= row.min && (row.max === undefined || quantity <= row.max);
-                const rowId = `${tierGroup}-${row.min}`;
-                return (
-                  <tr key={row.min} className={active ? styles.bulkRowActive : undefined}>
-                    <td>
-                      {/* Checked state is DERIVED from the quantity, so the
-                          stepper and the sticky bar move it too; picking a
-                          row sets the quantity to that tier's minimum. */}
-                      <input
-                        type="radio"
-                        id={rowId}
-                        name={tierGroup}
-                        className={styles.bulkRadio}
-                        checked={active}
-                        onChange={() => setQuantity(row.min)}
-                        aria-label={`${rangeLabel(row)} units`}
-                      />
-                    </td>
-                    <td>
-                      <label htmlFor={rowId}>{rangeLabel(row)}</label>
-                    </td>
-                    <td>{row.percentOff > 0 ? `${row.percentOff}%` : "—"}</td>
-                    <td className={styles.bulkPrice}>{formatMoney(discountedUnitPriceCents(selected.price_cents, row.percentOff))}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className={styles.buyRow}>
+        <button type="button" className={`button buttonAccent ${styles.addButton}`} onClick={handleAdd}>
+          {ORDERING_ENABLED ? "Add to Cart" : justAdded ? "Added. Add more" : "Add to request"}
+        </button>
+      </div>
+      <p className={styles.builderNote}>
+        {ORDERING_ENABLED ? (
+          "Quantity discounts apply at checkout."
+        ) : (
+          <>
+            Build your list, then send it with your details. We reply by email with availability, documentation and
+            pricing for your quantities.{" "}
+            {BOOKING_URL ? (
+              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
+                Prefer to talk first? Book a meeting.
+              </a>
+            ) : (
+              <Link href={CONTACT_PATH}>Prefer to talk first? Contact us.</Link>
+            )}
+          </>
+        )}
+      </p>
 
       <dl className={styles.specs}>
         <div className={styles.specRow}>
@@ -229,9 +183,6 @@ export default function VariantPicker({
           <dt>Form</dt>
           <dd>{formText}</dd>
         </div>
-        {/* Certificates row only once a product holds them (David,
-            2026-09-05): nothing on the page mentions COAs until they are
-            loaded. */}
         {(coas.length > 0 || sdsUrl) && (
           <div className={styles.specRow}>
             <dt>{coas.length > 0 ? "Certificates" : "Documents"}</dt>
@@ -257,16 +208,6 @@ export default function VariantPicker({
       </dl>
 
       <FormatNotice form={selected.form} productSlug={productSlug} />
-
-      {ORDERING_ENABLED && (
-        <StickyBuyBar
-          watchRef={addButtonRef}
-          priceCents={selected.price_cents}
-          quantity={quantity}
-          onQuantityChange={setQuantity}
-          onAdd={handleAdd}
-        />
-      )}
     </div>
   );
 }

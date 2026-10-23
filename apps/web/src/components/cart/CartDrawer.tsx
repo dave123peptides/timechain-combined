@@ -122,7 +122,7 @@ export default function CartDrawer() {
                     )}
                     {line.variant ? (
                       <span className={styles.linePrice}>
-                        {formatMoney(line.quoteLine?.total_price_cents ?? line.variant.price_cents * line.quantity)}
+                        {formatMoney(line.quoteLine?.total_price_cents ?? (line.variant.price_cents ?? 0) * line.quantity)}
                       </span>
                     ) : (
                       <span className={styles.lineUnavailable}>No longer available — remove to continue.</span>

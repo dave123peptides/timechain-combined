@@ -20,7 +20,8 @@
   border-radius: 999px;
   background: var(--paper);
   color: var(--ink);
-  font-size: var(--text-sm);
+  font-family: var(--font-label);
+  font-size: 0.8rem;
   font-weight: 500;
   line-height: 1.2;
   text-decoration: none;
@@ -34,8 +35,8 @@
 
 .pillActive,
 .pillActive:hover {
-  background: var(--gold);
-  border-color: var(--gold);
+  background: var(--ink);
+  border-color: var(--ink);
   color: var(--paper);
 }
 

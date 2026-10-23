@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
-import { Inter, Inter_Tight } from "next/font/google";
+import { Instrument_Serif, Inter, Inter_Tight } from "next/font/google";
 import { CartProvider } from "@/lib/cart-context";
+import { RequestProvider } from "@/lib/request-context";
 import "./globals.css";
 
-// Bold grotesque sans for headlines — David's committed display register
-// (restored 8/31 after a brief Fraunces serif experiment he declined; see
-// globals.css's theme note).
-const displayFont = Inter_Tight({
+// B2B redesign (David, 2026-10-22): a serif display face with an italic
+// for the accent word, Inter for body copy, Inter Tight for the uppercase
+// labels, nav and buttons. See globals.css for the tokens.
+const displayFont = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-display-sans",
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-display-serif",
+  display: "swap",
+});
+
+const labelFont = Inter_Tight({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-label-sans",
   display: "swap",
 });
 
@@ -26,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s | TimeChain Peptides",
   },
   description:
-    "Research peptides in pre-filled auto-injector pens and lyophilized vials, for laboratory and research use.",
+    "Research peptides in pre-filled auto-injector pens and lyophilized vials, supplied to research organizations and medical practices. For laboratory research use only.",
 };
 
 export default function RootLayout({
@@ -35,9 +44,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang="en" className={`${displayFont.variable} ${labelFont.variable} ${bodyFont.variable}`}>
       <body>
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          <RequestProvider>{children}</RequestProvider>
+        </CartProvider>
       </body>
     </html>
   );

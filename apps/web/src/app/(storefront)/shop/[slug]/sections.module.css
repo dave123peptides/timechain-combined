@@ -61,8 +61,6 @@
 
 .relatedTitle {
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   font-size: var(--text-2xl);
   margin-bottom: 2rem;
 }
@@ -129,9 +127,9 @@
   flex-shrink: 0;
   margin-bottom: -1px;
   padding: 0.75rem 1rem;
-  font-family: var(--font-display);
-  font-size: var(--text-sm);
-  font-weight: 700;
+  font-family: var(--font-label);
+  font-size: 0.78rem;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);

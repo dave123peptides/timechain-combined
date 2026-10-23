@@ -3,37 +3,41 @@
 import Link from "next/link";
 import type { Variant } from "@/lib/api";
 import { useCart } from "@/lib/cart-context";
-import { ORDERING_ENABLED, contactHref } from "@/lib/site";
+import { useOrderRequest } from "@/lib/request-context";
+import { ORDERING_ENABLED } from "@/lib/site";
 import styles from "./ProductCard.module.css";
 
-const BUTTON_CLASS = `button buttonPill buttonAccentOutline ${styles.action}`;
+const BUTTON_CLASS = `button buttonAccentOutline ${styles.action}`;
 
-// Inquiry mode (David, 2026-10-22, the default): there is no cart, so
-// every card's button opens the contact page pre-filled with the
-// product.
-//
-// With ordering on, every card button reads "Add to Cart" (David, 8/30
-// review). For single-variant products it adds directly and opens the
-// cart drawer, which is the confirmation. For multi-variant products it
-// deliberately does NOT add anything (silently picking a strength on the
-// customer's behalf would put the wrong item in the cart); it links to
-// the PDP to choose, same destination as clicking the product itself.
+// Every card button builds the order request (B2B redesign, 2026-10-22).
+// A single-configuration product adds one unit and opens the drawer,
+// where the quantity is set; a product with several formats or strengths
+// links to its page to choose, same destination as clicking the product.
+// With ordering on (lib/site.ts) the old Add to Cart behaviour returns.
 export default function ProductCardAddButton({ slug, variants, href }: { slug: string; variants: Variant[]; href: string }) {
-  const { addItem, openDrawer } = useCart();
+  const { addItem: addToCart, openDrawer: openCart } = useCart();
+  const { addItem, openDrawer } = useOrderRequest();
 
-  if (!ORDERING_ENABLED) {
+  if (variants.length !== 1) {
     return (
-      <Link href={contactHref(slug)} className={BUTTON_CLASS} aria-label={`Contact us about ${slug}`}>
-        Contact us
+      <Link href={href} className={BUTTON_CLASS} aria-label={`Choose a format and strength for ${slug}`}>
+        Choose options
       </Link>
     );
   }
 
-  if (variants.length !== 1) {
+  if (ORDERING_ENABLED) {
     return (
-      <Link href={href} className={BUTTON_CLASS} aria-label={`Add to cart — choose strength for ${slug}`}>
+      <button
+        type="button"
+        className={BUTTON_CLASS}
+        onClick={() => {
+          addToCart(variants[0].id, 1);
+          openCart();
+        }}
+      >
         Add to Cart
-      </Link>
+      </button>
     );
   }
 
@@ -46,7 +50,7 @@ export default function ProductCardAddButton({ slug, variants, href }: { slug: s
         openDrawer();
       }}
     >
-      Add to Cart
+      Add to request
     </button>
   );
 }

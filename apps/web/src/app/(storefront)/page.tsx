@@ -2,24 +2,29 @@ import Link from "next/link";
 import Faq from "@/components/Faq";
 import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
-import HomeHero from "@/components/home/HomeHero";
-import TrustStrip from "@/components/home/TrustStrip";
+import FormatsSection from "@/components/home/FormatsSection";
+import Hero from "@/components/home/Hero";
+import HowItWorks from "@/components/home/HowItWorks";
+import QualitySection from "@/components/home/QualitySection";
+import RequestBand from "@/components/home/RequestBand";
+import StatsStrip from "@/components/home/StatsStrip";
 import { listProductsOrEmpty } from "@/lib/api";
 import { findCategory } from "@/lib/categories";
 import { SITE_FAQ } from "@/lib/faqContent";
-import { findForm } from "@/lib/forms";
+import { findForm, formsIn } from "@/lib/forms";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
-const HOMEPAGE_FAQ_COUNT = 6;
+const HOMEPAGE_FAQ_COUNT = 5;
 
-// Core-reference homepage (David, 9/4): hero, the black trust strip, then
-// the WHOLE catalog as a grid. No featured or "popular" selection, which
-// is also what lib/compliance.ts wants: with every product listed
-// alphabetically there is no curated surface that could promote a
-// GLP-class product. The Pens | Vials toggle and the category pills
-// filter that grid in place (?form=, ?category=).
+// Homepage (B2B redesign, 2026-10-22): hero, the live stats band, how
+// ordering works, the WHOLE catalog as a grid (no featured or "popular"
+// selection, which is also what lib/compliance.ts wants: with every
+// product listed alphabetically there is no curated surface that could
+// promote a GLP-class product), quality, the two formats, a few
+// questions, and the closing request band. The Pens | Vials toggle and
+// the category pills filter the grid in place (?form=, ?category=).
 export default async function Home({
   searchParams,
 }: {
@@ -30,35 +35,45 @@ export default async function Home({
   const category = findCategory(params.category);
   const form = findForm(params.form);
   const products = await listProductsOrEmpty({ sort });
+  const configurations = products.reduce((sum, product) => sum + product.variants.length, 0);
+  const formats = formsIn(products.flatMap((product) => product.variants)).length;
 
   return (
-    <main>
-      <HomeHero />
-      <TrustStrip />
+    <main data-flush-footer>
+      <Hero />
+      {products.length > 0 && <StatsStrip compounds={products.length} configurations={configurations} formats={formats} />}
+      <HowItWorks />
       <CatalogGrid
         products={products}
-        title="Research Peptides For Sale"
+        title={
+          <>
+            Every compound <em>we supply</em>
+          </>
+        }
         basePath="/"
         sort={sort}
         category={category}
         form={form}
       />
+      <QualitySection />
+      <FormatsSection />
       <section className={styles.faq}>
         <div className={`container ${styles.faqInner}`}>
           <div className={styles.sectionHead}>
             <span className="eyebrow">Questions</span>
-            <h2>Frequently Asked</h2>
+            <h2>
+              Asked <em>often.</em>
+            </h2>
           </div>
-          {/* A subset here; /faq carries the full list. Both read the same
-              constant so they can never disagree. */}
           <Faq entries={SITE_FAQ.slice(0, HOMEPAGE_FAQ_COUNT)} />
           <div className={styles.faqActions}>
-            <Link href="/faq" className="button buttonPill buttonAccentOutline">
+            <Link href="/faq" className="button buttonAccentOutline">
               All questions
             </Link>
           </div>
         </div>
       </section>
+      <RequestBand />
     </main>
   );
 }

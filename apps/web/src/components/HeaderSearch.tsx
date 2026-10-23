@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatMoney, listProducts, type ProductSummary } from "@/lib/api";
+import { formSingular, formsIn } from "@/lib/forms";
+import { PRICING_VISIBLE } from "@/lib/site";
 import SectionIcon from "@/components/SectionIcon";
 import styles from "./HeaderSearch.module.css";
 
@@ -152,7 +154,11 @@ export default function HeaderSearch() {
                     onMouseDown={(event) => event.preventDefault()}
                   >
                     <span className={styles.resultName}>{product.name}</span>
-                    <span className={styles.resultPrice}>{formatMoney(product.starting_price_cents)}</span>
+                    <span className={styles.resultPrice}>
+                      {PRICING_VISIBLE && product.starting_price_cents !== null
+                        ? formatMoney(product.starting_price_cents)
+                        : formsIn(product.variants).map((form) => formSingular(form.key)).join(" · ")}
+                    </span>
                   </a>
                 </li>
               ))}

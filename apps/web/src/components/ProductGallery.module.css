@@ -4,18 +4,20 @@
   aspect-ratio: 4 / 3;
   padding: 1.5rem;
   box-sizing: border-box;
-  background: var(--line-soft);
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
 }
 
 .mainImage {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  mix-blend-mode: multiply;
 }
 
 .thumbs {
@@ -33,7 +35,7 @@
   border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
-  background: var(--line-soft);
+  background: var(--surface);
 }
 
 .thumbActive {
@@ -45,6 +47,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  mix-blend-mode: multiply;
   padding: 0.35rem;
   box-sizing: border-box;
 }

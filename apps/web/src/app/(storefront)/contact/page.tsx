@@ -57,9 +57,9 @@ export default async function ContactPage({
           <div className={styles.panelInner}>
             <h1 className={styles.title}>Let&apos;s talk about what you need.</h1>
             <p className={styles.lede}>
-              We supply research peptides in pre-filled auto-injector pens and lyophilized vials. This site takes
-              no orders directly. Book a short meeting and we go over formats, quantities and documentation for
-              your clinic or laboratory, then arrange the order with you.
+              We supply research peptides in pre-filled auto-injector pens and lyophilized vials to research
+              organizations and medical practices, in quantity. Send an order request from the catalog, or book a
+              short meeting and we go over formats, quantities and documentation first.
             </p>
             {asking && (
               <p className={styles.asking}>
@@ -73,12 +73,15 @@ export default async function ContactPage({
               </p>
             )}
             <div className={styles.actions}>
+              <Link href="/shop" className="button buttonOnDark">
+                Build an order request
+              </Link>
               {BOOKING_URL ? (
-                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="button buttonPill buttonAccent">
+                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className={`button ${styles.outline}`}>
                   Book a meeting
                 </a>
               ) : (
-                <a href={mailto} className="button buttonPill buttonAccent">
+                <a href={mailto} className={`button ${styles.outline}`}>
                   Email us to book a meeting
                 </a>
               )}

@@ -1,6 +1,8 @@
 .banner {
   position: relative;
   overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--paper) 100%);
 }
 
 .inner {
@@ -9,14 +11,23 @@
   grid-template-columns: 1.1fr 0.9fr;
   align-items: center;
   gap: 2rem;
-  min-height: 22rem;
+  min-height: 19rem;
   padding-top: 3rem;
   padding-bottom: 3rem;
 }
 
+.copy {
+  max-width: 34rem;
+}
+
+.copy p {
+  margin-top: 1rem;
+  max-width: 30rem;
+  color: var(--ink-soft);
+}
+
 .title {
-  text-transform: uppercase;
-  font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
   line-height: 1.02;
 }
 
@@ -25,90 +36,37 @@
   margin-bottom: 0.9rem;
 }
 
-/* --- dark (shop) ------------------------------------------------------ */
-
-.dark {
-  color: var(--paper);
-  /* Dark under the copy, white under the pens. The fade has to finish
-     before the left-most pen (David, 9/5), so it sits in the column
-     gap (~45–56%) and the copy is capped so it never runs into it. */
-  background:
-    radial-gradient(34rem 22rem at 8% 110%, rgba(41, 82, 227, 0.3), transparent 65%),
-    linear-gradient(96deg, #14151a 0%, #1b1f2e 45%, #ffffff 56%, #ffffff 100%);
-}
-
-.dark .title {
-  color: var(--paper);
-}
-
-.dark .eyebrow {
-  color: color-mix(in srgb, var(--gold) 55%, var(--paper));
-}
-
-.dark p {
-  max-width: 30rem;
-  color: color-mix(in srgb, var(--paper) 75%, transparent);
-}
-
 .pens {
   position: relative;
-  height: 20rem;
+  height: 17rem;
 }
 
-/* Landscape cut-outs (830x195), sized by width and fanned diagonally on
-   the white side of the fade — three parallel pens stepping down-right. */
+/* Landscape cut-outs (830x195), sized by width and fanned diagonally. */
 .pen {
   position: absolute;
-  width: 74%;
+  width: 72%;
   height: auto;
   transform: rotate(-22deg);
-  filter: drop-shadow(0 18px 24px rgba(20, 21, 26, 0.28));
+  filter: drop-shadow(0 18px 24px rgba(21, 33, 58, 0.22));
 }
 
 .pen0 {
   left: 0;
-  top: 10%;
+  top: 8%;
   z-index: 1;
 }
 
 .pen1 {
   left: 13%;
-  top: 36%;
-  width: 80%;
+  top: 34%;
+  width: 78%;
   z-index: 2;
 }
 
 .pen2 {
   left: 26%;
-  top: 62%;
+  top: 60%;
   z-index: 1;
-}
-
-/* --- light (about) ---------------------------------------------------- */
-
-.light {
-  background: var(--paper);
-}
-
-.light .title {
-  color: var(--gold-deep);
-}
-
-.light .copy {
-  max-width: 34rem;
-}
-
-.panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 52%;
-  overflow: hidden;
-  background:
-    radial-gradient(30rem 20rem at 80% 100%, rgba(41, 82, 227, 0.4), transparent 65%),
-    linear-gradient(160deg, #14151a 0%, #1b1f2e 60%, #232c47 100%);
-  clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%);
 }
 
 @media (max-width: 900px) {
@@ -119,31 +77,10 @@
     padding-bottom: 2rem;
   }
 
-  .dark {
-    background: linear-gradient(180deg, #14151a 0%, #1b1f2e 46%, #ffffff 66%, #ffffff 100%);
-  }
-
   .pens {
-    height: 11rem;
+    height: 10rem;
     max-width: 20rem;
     margin: 0 auto;
     width: 100%;
-  }
-
-  .pen {
-    width: 72%;
-  }
-
-  .pen1 {
-    width: 78%;
-  }
-
-  /* The dark panel precedes .inner in the DOM, so once static it sits
-     above the copy as a short band. */
-  .panel {
-    position: static;
-    width: auto;
-    height: 5rem;
-    clip-path: none;
   }
 }

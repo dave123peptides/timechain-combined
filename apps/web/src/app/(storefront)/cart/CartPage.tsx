@@ -54,8 +54,8 @@ export default function CartPage() {
         <div className={styles.lines}>
           {lines.map((line) => {
             const bulkSavingsPercent =
-              line.quoteLine && line.variant && line.quoteLine.unit_price_cents < line.variant.price_cents
-                ? Math.round((1 - line.quoteLine.unit_price_cents / line.variant.price_cents) * 100)
+              line.quoteLine && line.variant && line.quoteLine.unit_price_cents < (line.variant.price_cents ?? 0)
+                ? Math.round((1 - line.quoteLine.unit_price_cents / (line.variant.price_cents ?? 0)) * 100)
                 : 0;
             return (
               <div key={line.variantId} className={styles.line}>
@@ -71,7 +71,7 @@ export default function CartPage() {
                   <div className={styles.lineName}>{line.variant?.name ?? "Item"}</div>
                   {line.variant ? (
                     <div className={styles.lineMeta}>
-                      {formatMoney(line.quoteLine?.unit_price_cents ?? line.variant.price_cents)} each
+                      {formatMoney(line.quoteLine?.unit_price_cents ?? (line.variant.price_cents ?? 0))} each
                       {bulkSavingsPercent > 0 && <span className={styles.bulkBadge}> Save {bulkSavingsPercent}%</span>}
                     </div>
                   ) : (

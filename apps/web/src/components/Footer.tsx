@@ -1,40 +1,46 @@
 import Link from "next/link";
-import { ORDERING_ENABLED } from "@/lib/site";
+import { ORDERING_ENABLED, SUPPORT_EMAIL } from "@/lib/site";
 import styles from "./Footer.module.css";
 
-// Core-reference footer (9/4): brand + tagline, Quick links, Legal. No
-// payment column (David, 9/5), and on this site no payments at all. No
-// entity line: the LLC name stays off the storefront (David,
-// 2026-09-06).
-//
-// No Shipping or Returns link: /shipping is deliberately not built. The
-// carrier, cutoff and processing times are unconfirmed, and a
-// linked-but-vague shipping page is a published shipping claim by another
-// name. Add both once David supplies the facts.
+// Four columns on navy (B2B redesign, 2026-10-22): the brand with the
+// one-line proposition and the support address, the catalog, the company
+// pages, and legal. The research-use-only disclaimer closes every page.
+// No entity line: the LLC name stays off the storefront (David,
+// 2026-09-06). No Shipping or Returns link: the facts are unconfirmed.
 export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className="container">
         <div className={styles.grid}>
-          <div>
+          <div className={styles.brand}>
             <div className={styles.wordmark}>
-              Time<span>Chain</span>
+              TimeChain<span>Peptides</span>
             </div>
             <p className={styles.tagline}>
-              Research peptides in pre-filled auto-injector pens and lyophilized vials, for laboratory and
-              research use.
+              Research peptides in pre-filled auto-injector pens and lyophilized vials, supplied to research
+              organizations and medical practices.
             </p>
+            <a href={`mailto:${SUPPORT_EMAIL}`} className={styles.email}>
+              {SUPPORT_EMAIL}
+            </a>
           </div>
           <div>
-            <div className={styles.heading}>Quick links</div>
+            <div className={styles.heading}>Catalog</div>
             <div className={styles.linkList}>
-              <Link href="/shop">Shop</Link>
+              <Link href="/shop">All compounds</Link>
               <Link href="/shop?form=pen">Pens</Link>
               <Link href="/shop?form=lyophilized">Vials</Link>
               <Link href="/coa">Certificates of Analysis</Link>
-              <Link href="/faq">FAQ</Link>
-              <Link href="/contact">Contact</Link>
               {ORDERING_ENABLED && <Link href="/cart">Cart</Link>}
+            </div>
+          </div>
+          <div>
+            <div className={styles.heading}>Ordering</div>
+            <div className={styles.linkList}>
+              <Link href="/request">Your order request</Link>
+              <Link href="/#how-it-works">How ordering works</Link>
+              <Link href="/contact">Contact and meetings</Link>
+              <Link href="/faq">FAQ</Link>
             </div>
           </div>
           <div>

@@ -113,7 +113,7 @@ export default async function ProductDetailPage({
 
   return (
     <main className={`container ${styles.page}`}>
-      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Shop", href: "/shop" }, { label: product.name }]} />
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Catalog", href: "/shop" }, { label: product.name }]} />
       <div className={styles.layout}>
         <div className={styles.imageWrap}>
           <ProductGallery images={product.images} name={product.name} />

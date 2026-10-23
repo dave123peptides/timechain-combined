@@ -61,6 +61,26 @@ export function narrowToForm(products: ProductSummary[], form: StorefrontForm): 
   return products.flatMap((product) => {
     const variants = product.variants.filter((variant) => variant.form === form.key);
     if (variants.length === 0) return [];
-    return [{ ...product, variants, starting_price_cents: Math.min(...variants.map((v) => v.price_cents)) }];
+    const prices = variants.map((v) => v.price_cents).filter((p): p is number => p !== null);
+    return [{ ...product, variants, starting_price_cents: prices.length ? Math.min(...prices) : null }];
   });
+}
+
+/** "Pen" / "Vial" for a raw form key, falling back to the key itself. */
+export function formSingular(form: string | null | undefined): string {
+  return findForm(form)?.singular ?? form ?? "";
+}
+
+/**
+ * Distinct strengths of a variant list, ascending by their leading number
+ * ("1.5", "10", "10/10/50", "10mL"), so a compound sold as pens and vials
+ * reads "1.5mg, 3.5mg, 10mg" rather than in the API's per-form order.
+ */
+export function strengthList(variants: Pick<Variant, "strength">[]): string[] {
+  const seen = new Set<string>();
+  for (const variant of variants) {
+    if (variant.strength) seen.add(variant.strength);
+  }
+  const leading = (strength: string) => Number.parseFloat(strength) || 0;
+  return [...seen].sort((a, b) => leading(a) - leading(b) || a.localeCompare(b));
 }

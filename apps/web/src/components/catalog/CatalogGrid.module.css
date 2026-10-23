@@ -8,6 +8,11 @@
   margin-bottom: 2rem;
 }
 
+.title em {
+  font-style: italic;
+  color: var(--gold-deep);
+}
+
 .toolbar {
   display: flex;
   align-items: center;

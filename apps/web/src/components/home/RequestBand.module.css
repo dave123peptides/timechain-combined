@@ -1,0 +1,46 @@
+.band {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+.eyebrow {
+  color: var(--gold);
+}
+
+.title {
+  margin-top: 0.75rem;
+  max-width: 30rem;
+  color: var(--paper);
+}
+
+.title em {
+  color: var(--gold);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.outline {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--paper) 55%, transparent);
+  color: var(--paper);
+}
+
+.outline:hover:not(:disabled) {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--paper);
+}
