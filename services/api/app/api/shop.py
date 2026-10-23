@@ -25,7 +25,9 @@ class VariantResponse(BaseModel):
     # (reconstitution instructions vs. ready-to-use copy) off this instead.
     form: str | None
     strength: str | None
-    price_cents: int
+    # Null while CATALOG_PRICES_PUBLIC is off (David, 2026-10-22: no prices
+    # on the site until the wholesale sheet exists). See _hide_prices.
+    price_cents: int | None
 
 
 class CoaResponse(BaseModel):
@@ -55,7 +57,8 @@ class ProductSummaryResponse(BaseModel):
     description: str | None
     category: str | None
     images: list[str]
-    starting_price_cents: int
+    # Null while prices are hidden, see VariantResponse.price_cents.
+    starting_price_cents: int | None
     variants: list[VariantResponse]
     # Certificate rollup on the summary so the product-card badge and
     # /coa avoid an N+1 of detail fetches; the certificates themselves
@@ -271,6 +274,30 @@ class BulkDiscountTierResponse(BaseModel):
     percent_off: int
 
 
+def _prices_public() -> bool:
+    return get_settings().catalog_prices_public
+
+
+def _summary_response(summary: storefront.StorefrontProductSummary) -> ProductSummaryResponse:
+    """CATALOG_PRICES_PUBLIC off (the default): the price fields go out as
+    null. Done on the response object, after validation, so the service
+    layer and its sorting keep working on the real numbers."""
+    response = ProductSummaryResponse.model_validate(summary)
+    if not _prices_public():
+        response.starting_price_cents = None
+        for variant in response.variants:
+            variant.price_cents = None
+    return response
+
+
+def _detail_response(detail: storefront.StorefrontProductDetail) -> ProductDetailResponse:
+    response = ProductDetailResponse.model_validate(detail)
+    if not _prices_public():
+        for variant in response.variants:
+            variant.price_cents = None
+    return response
+
+
 @router.get("/products", response_model=list[ProductSummaryResponse])
 def list_products(
     category: str | None = Query(default=None),
@@ -282,13 +309,13 @@ def list_products(
     # bookmarked URLs; a typo'd sort key must not error the page.
     sort: str | None = Query(default=None),
     db: Session = Depends(get_db),
-) -> list[storefront.StorefrontProductSummary]:
+) -> list[ProductSummaryResponse]:
     # CHECKOUT_ENABLED=false: present an empty storefront rather than a
     # 503 — a go-live safety switch, not an outage, so it should look
     # like "nothing for sale yet," not "something is broken."
     if not get_settings().checkout_enabled:
         return []
-    return storefront.list_sellable_products(db, category=category, form=form, q=q, sort=sort)
+    return [_summary_response(summary) for summary in storefront.list_sellable_products(db, category=category, form=form, q=q, sort=sort)]
 
 
 @router.get("/filter-options", response_model=ShopFilterOptionsResponse)
@@ -316,13 +343,13 @@ def get_bulk_discount_tiers() -> list[BulkDiscountTierResponse]:
 
 
 @router.get("/products/{slug}", response_model=ProductDetailResponse)
-def get_product(slug: str, db: Session = Depends(get_db)) -> storefront.StorefrontProductDetail:
+def get_product(slug: str, db: Session = Depends(get_db)) -> ProductDetailResponse:
     if not get_settings().checkout_enabled:
         raise HTTPException(status_code=404, detail="Product not found.")
     product = storefront.get_sellable_product_by_slug(db, slug)
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found.")
-    return product
+    return _detail_response(product)
 
 
 @router.get("/coas", response_model=list[CoaIndexEntryResponse])

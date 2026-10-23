@@ -20,6 +20,7 @@ from app.models.fulfillment import (
     TrackingEvent,
 )
 from app.models.jobs import BackgroundJob
+from app.models.order_requests import OrderRequest
 from app.models.orders import Order, OrderEvent, OrderItem
 from app.models.payments import Payment, PaymentEvent, Refund
 from app.models.settings import SystemSetting
@@ -33,6 +34,7 @@ __all__ = [
     "Order",
     "OrderItem",
     "OrderEvent",
+    "OrderRequest",
     "Payment",
     "PaymentEvent",
     "Refund",

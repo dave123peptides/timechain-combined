@@ -63,6 +63,16 @@ class Settings(BaseSettings):
     # switch (NEXT_PUBLIC_ORDERING_ENABLED) that hides the cart and
     # checkout UI; both must be on for ordering to work end to end.
     ordering_enabled: bool = False
+    # Redesign (David, 2026-10-22): no prices on the site until the
+    # wholesale sheet exists. With this off (the default) every price
+    # field on the public catalog endpoints is null; the numbers stay in
+    # the database and the admin CSV. The storefront has its own copy,
+    # NEXT_PUBLIC_PRICING_VISIBLE, that decides whether to render them.
+    catalog_prices_public: bool = False
+    # Where a submitted order request (app/api/order_requests.py) is
+    # forwarded as a flat JSON POST, e.g. a GoHighLevel inbound webhook
+    # (same pattern as GHL_ORDER_WEBHOOK_URL). Blank: stored only.
+    order_request_webhook_url: str = ""
 
     # Blank by default — admin_auth.py fails closed (401) whenever either
     # is blank, so an unconfigured deployment locks admin out rather than
