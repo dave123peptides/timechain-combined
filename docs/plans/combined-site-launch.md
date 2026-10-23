@@ -1,5 +1,42 @@
 # Combined site: launch runbook (for David)
 
+## Status, 2026-10-22 evening
+
+Steps 0 to 5 below are DONE (run from the CLI in David's session):
+
+- GitHub: `dave123peptides/timechain-combined`, branch `combined-site`.
+- Neon: project `timechain-combined` (id `raspy-water-53643716`,
+  aws-us-east-1, Postgres 18) in David's own Neon org. Its connection
+  string lives only on Vercel as the API's `DATABASE_URL`.
+- Vercel `timechain-combined-api`: Root Directory `services/api`,
+  production at https://timechain-combined-api.vercel.app. Build ran all
+  migrations, both seeds (35+6 products, 52 pens + 48 vials) and the COA
+  sync. Env set: DATABASE_URL, PUBLIC_SITE_URL, API_CORS_ORIGINS (www +
+  the web alias), ADMIN_BASIC_AUTH_USER, FULFILLMENT_MODE, CHECKOUT_ENABLED.
+- Vercel `timechain-combined-web`: Root Directory `apps/web`, Next.js,
+  production at https://timechain-combined-web.vercel.app. Env set:
+  NEXT_PUBLIC_API_BASE_URL, API_INTERNAL_BASE_URL, ADMIN_BASIC_AUTH_USER.
+- Both projects deploy from the CLI (`vercel deploy --prod --yes
+  --project <name>` from the repo root; the root `.vercel/` link may point
+  at either, the flag wins). Neither is connected to GitHub yet, so a
+  push alone changes nothing live.
+
+Still David's:
+
+1. Review at https://timechain-combined-web.vercel.app. The gate is on
+   with the code default password (`health123`) because
+   `SITE_ACCESS_PASSWORD` is unset; set your own or remove the gate in
+   the web project's env before launch (needs a redeploy).
+2. `ADMIN_BASIC_AUTH_PASSWORD` on BOTH projects (same value) if you want
+   /admin; unset, admin is simply locked.
+3. `NEXT_PUBLIC_BOOKING_URL` on the web project when the scheduling link
+   exists, then redeploy the web project.
+4. Step 6: move the domain (below).
+5. Team plan: still Hobby.
+
+---
+
+
 Everything below needs the Vercel, Neon and GitHub accounts, so it is
 yours to run. The code side is done on branch `combined-site`.
 
