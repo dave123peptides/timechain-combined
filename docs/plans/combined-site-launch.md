@@ -31,10 +31,10 @@ admin password below).
 
 Still David's:
 
-1. Review at https://timechain-combined-web.vercel.app. The gate is on
-   with the code default password (`health123`) because
-   `SITE_ACCESS_PASSWORD` is unset; set your own or remove the gate in
-   the web project's env before launch (needs a redeploy).
+1. Review at https://timechain-combined-web.vercel.app. The password
+   gate is OFF (David, 2026-10-23): the lock is opt-in now, so the site
+   is open unless `SITE_ACCESS_PASSWORD` is set on the web project. The
+   age gate stays.
 2. `ADMIN_BASIC_AUTH_PASSWORD` on BOTH projects (same value) if you want
    /admin; unset, admin is simply locked.
 3. `NEXT_PUBLIC_BOOKING_URL` on the web project when the scheduling link

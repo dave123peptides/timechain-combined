@@ -51,7 +51,7 @@ cd services/api
 .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8100
 
 cd apps/web
-npm run dev -- -p 3100                                # http://localhost:3100 (gate password in .env.local)
+npm run dev -- -p 3100                                # http://localhost:3100 (SITE_ACCESS_PASSWORD in .env.local locks it; unset = open)
 ```
 
 Checks: `DATABASE_URL=...tcp_combined_test services/api/.venv/bin/python -m pytest -q`,
