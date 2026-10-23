@@ -1,100 +1,79 @@
-# TimeChain Peptides — Pens (TCP)
+# TimeChain Peptides, combined storefront (pens + vials)
 
-The TimeChain Peptides storefront for **pre-filled 3 mL auto-injector
-pens**. Forked on 2026-09-05 from the lyophilized-vial storefront
-(`~/Desktop/timechain`, `timechain-storefront` on GitHub) as an independent
-project: same brand, cart, three-step checkout, Venmo/Zelle manual payment
-and Google Sheets order feed, with a pens-only catalog. The vial repo is
-not touched by anything in here. Decisions and the side-by-side setup are
-recorded in [`docs/plans/pens-fork.md`](docs/plans/pens-fork.md).
+The TimeChain Peptides storefront for **both** product lines: pre-filled
+3 mL auto-injector pens and lyophilized vials, one product page per
+compound with a Pen | Vial picker and a Pens | Vials toggle over the
+catalog. Forked on 2026-10-22 from the pens site (`~/Desktop/TCP`,
+buytcp.com), itself a 2026-09-05 fork of the vial site
+(`~/Desktop/timechain`, www.timechainpeptides.com). Neither ancestor is
+touched by anything in here. The plan, David's decisions and the launch
+runbook are in [`docs/plans/combined-site-plan.md`](docs/plans/combined-site-plan.md)
+and [`docs/plans/combined-site-launch.md`](docs/plans/combined-site-launch.md).
 
-**Status:** local storefront complete (35 products, 52 pens, every product
-has a render); deployment to its own Vercel projects still to do.
+**This site takes no payments** (David, 2026-10-22). It is a showcase:
+visitors browse the catalog and book a meeting from `/contact`. The
+cart, checkout and payment providers inherited from the pens site are
+still in the tree behind two switches that are off by default:
+`ORDERING_ENABLED` on the API (checkout writes answer 503, the catalog is
+unaffected) and `NEXT_PUBLIC_ORDERING_ENABLED` on the web (no cart
+drawer, no Add to Cart; `/cart` and `/checkout` redirect to `/contact`).
 
-## Running it locally (native, side by side with the vial site)
+**Status:** local storefront complete (41 products: 52 pens + 48 vials,
+29 compounds in both formats, every product has a photo); deployment to
+its own Vercel projects and the domain move are still to do (runbook
+above). The scheduling link for the Book a meeting button
+(`NEXT_PUBLIC_BOOKING_URL`) is still to come from David; until it is set
+the button is an email.
 
-The vial site owns ports 3000/8000 and the `timechain` database; this one
-uses 3100/8100 and `tcp`.
+## Running it locally (native, side by side with the other two sites)
+
+The vial site owns ports 3000/8000 and the `timechain` database, the pens
+site 3100/8100 and `tcp`; this one reuses 3100/8100 (run one at a time)
+with the `tcp_combined` database.
 
 ```sh
 # once: databases (Postgres.app, role timechain), venv, node modules
 PG=/Applications/Postgres.app/Contents/Versions/latest/bin
-$PG/createdb -h localhost -U postgres -O timechain tcp
-$PG/createdb -h localhost -U postgres -O timechain tcp_test
+$PG/createdb -h localhost -U postgres -O timechain tcp_combined
+$PG/createdb -h localhost -U postgres -O timechain tcp_combined_test
 cd services/api && python3.12 -m venv .venv && .venv/bin/pip install -e ".[dev]" pillow && cd ../..
 cd apps/web && npm ci && cd ../..
 
-# .env at the repo root (copied from the vial site, edited: DB tcp, ports
-# 8100/3100, same Google Sheets values) and apps/web/.env.local
-# (NEXT_PUBLIC_API_BASE_URL, API_INTERNAL_BASE_URL, ADMIN_BASIC_AUTH_*,
-# SITE_ACCESS_PASSWORD) — next dev does not read the root .env.
+# .env at the repo root (DB tcp_combined, ports 8100/3100) and
+# apps/web/.env.local (NEXT_PUBLIC_API_BASE_URL, API_INTERNAL_BASE_URL,
+# ADMIN_BASIC_AUTH_*, SITE_ACCESS_PASSWORD). next dev does not read the
+# root .env.
 
 cd services/api
 .venv/bin/alembic upgrade head
-.venv/bin/python -m app.scripts.seed_pen_catalog      # idempotent; the catalog's source of truth
+.venv/bin/python -m app.scripts.seed_pen_catalog      # idempotent; pens
+.venv/bin/python -m app.scripts.seed_lyo_catalog      # idempotent; vials (either order, rerun freely)
 .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8100
 
 cd apps/web
 npm run dev -- -p 3100                                # http://localhost:3100 (gate password in .env.local)
 ```
 
-Checks: `services/api/.venv/bin/python -m pytest -q` (against `tcp_test`
-via `DATABASE_URL=...`), `npm run lint && npm run typecheck && npm run build`
-in `apps/web`.
+Checks: `DATABASE_URL=...tcp_combined_test services/api/.venv/bin/python -m pytest -q`,
+`npm run lint && npm run typecheck && npm run build` in `apps/web`.
+
+Quick API sanity after seeding:
+
+```sh
+curl -s 'localhost:8100/shop/products?format=lyophilized' | jq length   # 35
+curl -s 'localhost:8100/shop/products?format=pen' | jq length           # 35
+curl -s localhost:8100/shop/filter-options                              # formats: lyophilized, pen
+```
 
 ## Deploying to Vercel
 
-Two Vercel projects from this one repo, both importing the GitHub repo
-`tcp-storefront` with **Automatically deploy on push** (unlike the vial
-site, which deploys from the CLI). Never link this repo to the vial site's
-`timechain-storefront` / `timechain-api` projects.
-
-**1. Database.** Create a NEW Postgres database for this site (e.g. Neon
-from the Vercel Marketplace). Do not reuse the vial site's database. Copy
-its connection string; the API accepts `postgres://` or `postgresql://`.
-
-**2. API project** (`tcp-api`): Root Directory `services/api`. The
-`vercel.json` there sets the build command (migrations + catalog seed +
-certificate sync run inside the build) and rewrites every path to the
-FastAPI app. Environment variables:
-
-```
-DATABASE_URL=<the new database's connection string>
-PUBLIC_SITE_URL=https://<the web project's domain>     # bare or www — both are allowed for CORS
-API_CORS_ORIGINS=https://<the web project's domain>
-ADMIN_BASIC_AUTH_USER=<pick>
-ADMIN_BASIC_AUTH_PASSWORD=<pick>
-FULFILLMENT_MODE=manual
-CHECKOUT_ENABLED=true
-GOOGLE_SHEETS_ORDERS_SPREADSHEET_ID=<same as the vial site>
-GOOGLE_SHEETS_ORDERS_TAB=Orders
-GOOGLE_SHEETS_REFRESH_TOKEN_JSON=<same one-line JSON as the vial site>
-```
-
-**3. Web project** (`tcp-storefront`): Root Directory `apps/web`,
-framework Next.js. Environment variables:
-
-```
-NEXT_PUBLIC_API_BASE_URL=https://<the API project's domain>
-API_INTERNAL_BASE_URL=https://<the API project's domain>
-SITE_ACCESS_PASSWORD=health123            # the pre-launch gate; also the code default
-ADMIN_BASIC_AUTH_USER=<same as the API>
-ADMIN_BASIC_AUTH_PASSWORD=<same as the API>
-```
-
-Deploy the API first (so its domain is known), then the web project, then
-set `PUBLIC_SITE_URL` / `API_CORS_ORIGINS` on the API to the web domain
-and redeploy the API — a CORS mismatch breaks the cart and checkout (this
-exact mistake took the vial site's cart down on 2026-09-05). Verify with:
-
-```sh
-curl -s https://<api-domain>/healthz
-curl -s https://<api-domain>/shop/products | head -c 300
-curl -sD - -o /dev/null -H "Origin: https://<web-domain>" https://<api-domain>/shop/products | grep -i access-control-allow-origin
-```
-
-Then open the web domain, pass the gate with the password, and place a
-test order to confirm a `PEN-` row lands in the Orders sheet.
+Two new Vercel projects from this repo, a new Neon database, then the
+domain moves over from the vial site's `timechain-storefront` project.
+Step by step, with the environment variables, in
+[`docs/plans/combined-site-launch.md`](docs/plans/combined-site-launch.md).
+Never link this repo to `tcp-api` / `tcp-storefront` (pens) or
+`timechain-api` / `timechain-storefront` (vials); delete any `.vercel/`
+directory carried over from the fork before running `vercel`.
 
 ## Structure
 
