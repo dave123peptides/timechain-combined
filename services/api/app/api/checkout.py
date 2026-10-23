@@ -105,6 +105,18 @@ class CreateCheckoutRequest(BaseModel):
     discount_code: str | None = Field(default=None, max_length=40)
 
 
+ORDERING_UNAVAILABLE = "Ordering through this site is not available. Please contact us to arrange an order."
+
+
+def _require_ordering_enabled() -> None:
+    """ORDERING_ENABLED (David, 2026-10-22): the combined site shows the
+    catalog but takes no orders; clinics book a meeting instead. Read at
+    call time so tests can flip it on the cached Settings instance.
+    Distinct from CHECKOUT_ENABLED, which also blanks the catalog."""
+    if not get_settings().ordering_enabled:
+        raise HTTPException(status_code=503, detail=ORDERING_UNAVAILABLE)
+
+
 @router.post("/quote", response_model=QuoteResponse)
 def quote_checkout(body: QuoteRequest, db: Session = Depends(get_db)) -> QuoteResponse:
     """Read-only preview — writes nothing. All money returned in integer
@@ -117,6 +129,7 @@ def quote_checkout(body: QuoteRequest, db: Session = Depends(get_db)) -> QuoteRe
     """
     if not get_settings().checkout_enabled:
         raise HTTPException(status_code=503, detail="Checkout is currently unavailable.")
+    _require_ordering_enabled()
     try:
         quote = storefront.build_quote(
             db,
@@ -196,6 +209,7 @@ def create_checkout(
     """
     if not get_settings().checkout_enabled:
         raise HTTPException(status_code=503, detail="Checkout is currently unavailable.")
+    _require_ordering_enabled()
     _require_method_enabled(body.payment_method)
     try:
         order = storefront.create_order(

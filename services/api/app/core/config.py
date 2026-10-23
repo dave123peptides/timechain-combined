@@ -54,6 +54,15 @@ class Settings(BaseSettings):
     # run production catalog/mapping work (e.g. a production supplier
     # sync) ahead of actually opening the storefront to real customers.
     checkout_enabled: bool = True
+    # Combined site (David, 2026-10-22): the storefront takes no payments
+    # at all. Clinics browse the catalog and book a meeting from /contact;
+    # orders are arranged off-site. Off by default so a fresh deployment
+    # can never accept an order by accident: with it off, POST
+    # /checkout/quote and /checkout/create answer 503 while the catalog
+    # (/shop/*) keeps working. The storefront has its own copy of the
+    # switch (NEXT_PUBLIC_ORDERING_ENABLED) that hides the cart and
+    # checkout UI; both must be on for ordering to work end to end.
+    ordering_enabled: bool = False
 
     # Blank by default — admin_auth.py fails closed (401) whenever either
     # is blank, so an unconfigured deployment locks admin out rather than
