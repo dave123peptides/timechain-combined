@@ -1,13 +1,17 @@
-// Pre-launch site lock. While a password is configured, every new browser
+// Optional site lock. While SITE_ACCESS_PASSWORD is set, every new browser
 // session must pass /enter before anything else (including the age gate)
-// is reachable. The password lives in SITE_ACCESS_PASSWORD; the hardcoded
-// value is the pre-launch default (David, 2026-09-05) so the lock is never
-// accidentally absent. Replace this module with the email-code login when
-// that is built; remove it at public launch.
+// is reachable. Unset or blank, there is no lock at all (David,
+// 2026-10-23: "remove the site password"); the earlier hardcoded default
+// is gone, so opening the site is a matter of leaving the variable unset.
 export const ACCESS_COOKIE = "tcp_access"; // not the vial site's tc_access: cookies ignore ports on localhost
 
 export function siteAccessPassword(): string {
-  return process.env.SITE_ACCESS_PASSWORD ?? "health123";
+  return process.env.SITE_ACCESS_PASSWORD?.trim() ?? "";
+}
+
+/** True only while a password is configured. */
+export function siteLocked(): boolean {
+  return siteAccessPassword().length > 0;
 }
 
 // The cookie carries a token derived from the password, not a bare "1",

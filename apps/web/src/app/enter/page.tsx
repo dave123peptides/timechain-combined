@@ -1,6 +1,8 @@
+import { redirect } from "next/navigation";
+import { siteLocked } from "@/lib/access";
 import styles from "./page.module.css";
 
-// Pre-launch lock page. Deliberately plain — no branding, no hints about
+// Optional lock page (shown only while SITE_ACCESS_PASSWORD is set). Deliberately plain — no branding, no hints about
 // what's behind it, just the password field.
 export default async function EnterPage({
   searchParams,
@@ -9,6 +11,8 @@ export default async function EnterPage({
 }) {
   const { next, error } = await searchParams;
   const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  // No password configured: nothing to enter, carry on to the page.
+  if (!siteLocked()) redirect(safeNext);
 
   return (
     <main className={styles.wrap}>

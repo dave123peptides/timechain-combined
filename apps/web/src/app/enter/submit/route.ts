@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
-import { ACCESS_COOKIE, accessToken, siteAccessPassword } from "@/lib/access";
+import { ACCESS_COOKIE, accessToken, siteAccessPassword, siteLocked } from "@/lib/access";
 
 // Pre-launch lock: compare the submitted password in constant time and,
 // on success, grant a session-scoped cookie (no maxAge — a fresh browser
@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
   const supplied = String(form.get("password") ?? "");
   const nextRaw = String(form.get("next") ?? "/");
   const next = nextRaw.startsWith("/") && !nextRaw.startsWith("//") ? nextRaw : "/";
+  if (!siteLocked()) return NextResponse.redirect(new URL(next, request.url), 303);
 
   const expected = Buffer.from(siteAccessPassword());
   const given = Buffer.from(supplied);
