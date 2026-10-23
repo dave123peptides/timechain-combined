@@ -118,6 +118,11 @@ class ProductCoa(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     product: Mapped["Product"] = relationship(back_populates="coas")
 
 
+# The forms this storefront sells (see ProductVariant._validate_is_sellable
+# for the policy history). Display labels live in app.constants.forms.
+SELLABLE_FORMS: tuple[str, ...] = ("pen", "lyophilized")
+
+
 class ProductVariant(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     """A purchasable SKU of a product (e.g. a specific size/strength).
     Retail price and wholesale cost live here, not on `SupplierProduct` —
@@ -169,19 +174,24 @@ class ProductVariant(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         Fires on every assignment through the ORM (constructor kwargs
         included), which is the only way this app ever writes the column.
 
-        This storefront (TCP, forked from the TimeChain vial site on
-        2026-09-05) sells pre-filled auto-injector pens and nothing else.
-        Every other form (lyophilized, vial, preconstituted, rx_vial) is
-        blocked here unconditionally, before the mapping-status check, so
-        the pens-only line can never regress via a catalog import or an
-        admin mis-click. The vial site carries the mirror-image rule.
+        This storefront (the combined site, forked from the TCP pens site
+        on 2026-10-22, which was itself forked from the TimeChain vial site
+        on 2026-09-05) sells exactly two forms: pre-filled auto-injector
+        pens and lyophilized vials, the union of the two ancestor sites'
+        product-line decisions (pens only, David 2026-09-05; lyophilized
+        vials only, David 2026-08-22). Every other form (vial,
+        preconstituted, rx_vial, other) is blocked here unconditionally,
+        before the mapping-status check, so neither line can regress via
+        a catalog import or an admin mis-click. SELLABLE_FORMS is the one
+        place that list lives; the seed scripts import it.
         """
         if not value:
             return value
 
-        if self.form != "pen":
+        if self.form not in SELLABLE_FORMS:
             raise ValueError(
-                f"Cannot set is_sellable=True on variant {self.sku!r}: only auto-injector pens are sold on this site."
+                f"Cannot set is_sellable=True on variant {self.sku!r}: form {self.form!r} is not sold on this site "
+                f"(only {', '.join(SELLABLE_FORMS)})."
             )
 
         session = object_session(self)

@@ -161,17 +161,46 @@ def test_setting_is_sellable_false_is_always_allowed(session):
     assert variant.is_sellable is False
 
 
-def test_lyophilized_form_can_never_be_sellable_even_when_verified_mapped(session):
-    """This storefront sells auto-injector pens only — every other form is
-    excluded by product-line decision, not a sourcing gap — so a verified
-    MAPPED mapping must not be enough to make a vial sellable."""
+def test_lyophilized_variant_can_be_sellable_when_mapped(session):
+    """The combined site sells both ancestor lines: a verified MAPPED
+    lyophilized vial is sellable exactly like a pen (the pens site
+    blocked it; the vial site blocked pens)."""
     supplier_product = _make_supplier_product(session, _TEST_SUPPLIER_PRODUCT_IDS[0], sku="SKU-LYO", name="Widget Lyo 10mg")
     variant = _make_variant(session, "lyo", form="lyophilized")
     _make_mapping(session, variant, supplier_product)
 
     assert get_mapping_status(session, variant.id) == "MAPPED"
-    with pytest.raises(ValueError, match="only auto-injector pens are sold"):
+    variant.is_sellable = True
+    session.flush()
+    assert variant.is_sellable is True
+
+
+def test_lyophilized_variant_still_needs_a_mapped_supplier_row(session):
+    """Allowing the form must not weaken the mapping gate for it."""
+    variant = _make_variant(session, "lyo-unmapped", form="lyophilized")
+    with pytest.raises(ValueError, match="MISSING"):
         variant.is_sellable = True
+
+
+@pytest.mark.parametrize("form", ["vial", "preconstituted", "rx_vial", "other"])
+def test_other_forms_can_never_be_sellable_even_when_verified_mapped(session, form):
+    """Neither ancestor site sold these (plain/pre-constituted/rx vials
+    and the importer's catch-all), so a verified MAPPED mapping must not
+    be enough. The check runs before the mapping check, so the message
+    names the form, not the status."""
+    supplier_product = _make_supplier_product(session, _TEST_SUPPLIER_PRODUCT_IDS[1], sku=f"SKU-{form}", name=f"Widget {form} 10mg")
+    variant = _make_variant(session, f"blocked-{form.replace('_', '-')}", form=form)
+    _make_mapping(session, variant, supplier_product)
+
+    assert get_mapping_status(session, variant.id) == "MAPPED"
+    with pytest.raises(ValueError, match=f"form {form!r} is not sold"):
+        variant.is_sellable = True
+
+
+def test_sellable_forms_constant_is_exactly_pens_and_lyophilized():
+    from app.models.catalog import SELLABLE_FORMS
+
+    assert set(SELLABLE_FORMS) == {"pen", "lyophilized"}
 
 
 def test_is_sellable_true_on_unattached_variant_raises():
