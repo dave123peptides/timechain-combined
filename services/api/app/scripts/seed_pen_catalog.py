@@ -1,9 +1,18 @@
 """Manual entrypoint: python -m app.scripts.seed_pen_catalog
 
-The pen catalog's source of truth. This storefront (TCP, forked from the
-TimeChain vial site on 2026-09-05) sells pre-filled 3 mL auto-injector
-pens only; `_PENS` below is David's 2026-09-05 pen price sheet, one
-entry per product, one `PenSize` per purchasable pen.
+The pen catalog's source of truth. `_PENS` below is David's 2026-09-05
+pen price sheet, one entry per product, one `PenSize` per purchasable pen.
+
+Combined site (2026-10-22): this storefront sells pens AND lyophilized
+vials, one product row per compound. This script owns the pen side of
+every product: the pen variants, the pen renders at the front of
+`Product.images`, and (because David's TCP Guide copy is the newer brand
+voice) the product's name, tagline and About overview. The vial side is
+app.scripts.seed_lyo_catalog, which adds lyophilized variants to the same
+rows and fills in the structured copy this script leaves empty. Each
+script hides only stray variants of ITS OWN form, and merges rather than
+replaces `images`/`content`, so the two can run in either order and as
+often as needed.
 
 What one run does, idempotently:
 
@@ -19,7 +28,8 @@ What one run does, idempotently:
   name ("Semaglutide Month 1") is kept on that placeholder supplier row
   so it reaches the fulfillment spreadsheet's `items` column without ever
   appearing on the storefront;
-- sets is_sellable=False on any variant whose SKU is not in the table.
+- sets is_sellable=False on any PEN variant whose SKU is not in the table
+  (lyophilized variants belong to seed_lyo_catalog and are left alone).
 
 Public labels are strength-only ("1.5mg"): "Month N" reads as a human
 titration schedule, the consumer-use signal the compliance rules avoid.
@@ -295,8 +305,15 @@ def seed_pen_catalog(session=None) -> dict[str, int]:
                 counts["products_created"] += 1
             product.name = pen.name
             product.description = pen.description
-            product.content = dict(pen.content)
-            product.images = list(pen.images)
+            # Merge, don't replace: seed_lyo_catalog fills key_points /
+            # research_areas / pairs_with / faq on the same row. The pen
+            # overview wins where both have one.
+            product.content = {**(product.content or {}), **pen.content}
+            # Pen renders lead; any other seed's photos (the lyophilized
+            # vial shot) follow so the gallery shows both forms.
+            product.images = list(pen.images) + [
+                image for image in (product.images or []) if not image.startswith("/products/pens/")
+            ]
             product.category = PRODUCT_CATEGORY_BY_SLUG[pen.slug]
             product.is_active = True
             session.flush()
@@ -328,7 +345,11 @@ def seed_pen_catalog(session=None) -> dict[str, int]:
             session.flush()
 
         strays = session.execute(
-            select(ProductVariant).where(ProductVariant.is_sellable.is_(True), ProductVariant.sku.not_in(seeded_skus))
+            select(ProductVariant).where(
+                ProductVariant.is_sellable.is_(True),
+                ProductVariant.form == PEN_FORM,
+                ProductVariant.sku.not_in(seeded_skus),
+            )
         ).scalars()
         for variant in strays:
             variant.is_sellable = False

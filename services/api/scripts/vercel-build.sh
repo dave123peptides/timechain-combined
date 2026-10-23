@@ -55,10 +55,13 @@ echo "vercel-build: alembic upgrade head"
 # crashes the import — so run the DB steps with PYTHONPATH cleared; the
 # venv's own site-packages plus the project dir are all they need.
 env -u PYTHONPATH "$PY" -m alembic upgrade head
-# The pen catalog's source of truth is the seed script (idempotent), and
-# nobody can run scripts against the production DB by hand, so the build
-# seeds it — same reasoning as the certificate sync below.
+# The catalog's source of truth is the pair of seed scripts (idempotent,
+# pens then vials), and nobody can run scripts against the production DB
+# by hand, so the build seeds it — same reasoning as the certificate
+# sync below.
 echo "vercel-build: seeding the pen catalog"
 env -u PYTHONPATH "$PY" -m app.scripts.seed_pen_catalog
+echo "vercel-build: seeding the lyophilized vial catalog"
+env -u PYTHONPATH "$PY" -m app.scripts.seed_lyo_catalog
 echo "vercel-build: syncing certificate manifest"
 env -u PYTHONPATH "$PY" -m app.scripts.sync_coas
