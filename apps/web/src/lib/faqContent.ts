@@ -45,6 +45,6 @@ export const SITE_FAQ: ProductFaqEntry[] = [
   },
   {
     q: "Can we talk before ordering?",
-    a: "Yes. The Contact page has the email address and, once it is set up, a link to book a meeting. Many practices prefer to start that way and send a request afterwards.",
+    a: "Yes, and most practices do. Book a meeting from any page and we go through the catalog with you: formats, strengths, quantities, documentation and pricing. Send an order request before or after, whichever suits you.",
   },
 ];

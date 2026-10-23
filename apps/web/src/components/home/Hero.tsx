@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ProductSummary } from "@/lib/api";
 import { groupByCategory } from "@/lib/categories";
 import { promotableOnly } from "@/lib/compliance";
-import { AUDIENCE } from "@/lib/site";
+import { AUDIENCE, BOOK_PATH } from "@/lib/site";
 import styles from "./Hero.module.css";
 
 // Hero (2026-10-23): a plain statement on the left and, on the right, the
@@ -23,15 +23,16 @@ export default function Hero({ products, configurations }: { products: ProductSu
             Everything we supply, <em>in one place.</em>
           </h1>
           <p className={styles.lede}>
-            Research peptides in pre-filled auto-injector pens and lyophilized vials for {AUDIENCE}. Browse by
-            category, pick formats and strengths, and send one order request for the quantities you need.
+            Research peptides in pre-filled auto-injector pens and lyophilized vials for {AUDIENCE}. Review the
+            catalog below, then book a call and we go through formats, strengths, quantities, documentation and
+            pricing for your practice.
           </p>
           <div className={styles.actions}>
-            <Link href="/shop" className="button buttonAccent">
-              Open the catalog
+            <Link href={BOOK_PATH} className="button buttonAccent">
+              Book a meeting
             </Link>
-            <Link href="#how-it-works" className="button buttonAccentOutline">
-              How ordering works
+            <Link href="/shop" className="button buttonAccentOutline">
+              Open the catalog
             </Link>
           </div>
           {products.length > 0 && (

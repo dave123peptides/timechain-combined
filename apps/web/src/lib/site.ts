@@ -12,9 +12,17 @@ export const SUPPORT_EMAIL = "support@timechainpeptides.com";
 // cannot complete.
 export const ORDERING_ENABLED = process.env.NEXT_PUBLIC_ORDERING_ENABLED === "true";
 
-// The meeting-booking page David will supply (a hosted scheduling form).
-// Until it is set, /contact offers email instead.
+// Booking a meeting is the site's primary action (David, 2026-10-23: a
+// practice reviews the catalog, then books a call to go through it).
+// BOOKING_URL is the calendar link David supplies (Calendly, Cal.com, a
+// GoHighLevel calendar, any scheduling page); /book embeds it and every
+// Book a meeting button goes to /book. Until the link is set, /book
+// offers email instead. NEXT_PUBLIC_BOOKING_EMBED=false turns off the
+// embed for a provider that refuses to load in a frame; the page then
+// links out instead.
 export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL?.trim() || null;
+export const BOOKING_EMBED = process.env.NEXT_PUBLIC_BOOKING_EMBED !== "false";
+export const BOOK_PATH = "/book";
 
 export const CONTACT_PATH = "/contact";
 export const REQUEST_PATH = "/request";

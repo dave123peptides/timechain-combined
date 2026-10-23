@@ -87,3 +87,13 @@ select and quantity appear on the card only after that button is pressed
 (ProductCardActions). The hero's right side is the categories as tiles
 with counts and two example compounds, linking into the filtered
 catalog. The dense sheet remains as `?view=sheet`.
+
+## Booking as the primary action (2026-10-23)
+
+David: "I want a CTA of book a meeting ... I'll have a calendar link ...
+they're incentivized to book a meeting so they can review this site".
+Book a meeting is now the primary button in the header, hero, how it
+works, the request drawer and page, the confirmation page and contact;
+the order request is the secondary path. `/book` embeds the calendar
+(`NEXT_PUBLIC_BOOKING_URL`, `NEXT_PUBLIC_BOOKING_EMBED`) and states what
+the call covers; a homepage section (BookSection) makes the case for it.

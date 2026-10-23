@@ -38,7 +38,17 @@ Still David's:
 2. `ADMIN_BASIC_AUTH_PASSWORD` on BOTH projects (same value) if you want
    /admin; unset, admin is simply locked.
 3. `NEXT_PUBLIC_BOOKING_URL` on the web project when the scheduling link
-   exists, then redeploy the web project.
+   exists, then redeploy the web project. Booking is the site's primary
+   action (2026-10-23): every Book a meeting button goes to `/book`, which
+   embeds that link in a frame and also links out to it. If the provider
+   refuses to load in a frame, add `NEXT_PUBLIC_BOOKING_EMBED=false` and
+   the page links out only. Until the link is set, `/book` offers email.
+   To set it from the CLI:
+
+   ```sh
+   vercel env add NEXT_PUBLIC_BOOKING_URL production --project timechain-combined-web --value "<the link>" --yes
+   vercel deploy --prod --yes --project timechain-combined-web
+   ```
 4. Step 6: move the domain (below).
 5. Team plan: still Hobby.
 

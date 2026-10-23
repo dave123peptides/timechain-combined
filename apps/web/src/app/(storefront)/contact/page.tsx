@@ -2,7 +2,7 @@ import Link from "next/link";
 import SectionIcon from "@/components/SectionIcon";
 import { formatStrength, getProduct, type ProductDetail } from "@/lib/api";
 import { findForm } from "@/lib/forms";
-import { BOOKING_URL, SUPPORT_EMAIL } from "@/lib/site";
+import { BOOK_PATH, SUPPORT_EMAIL } from "@/lib/site";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -73,23 +73,15 @@ export default async function ContactPage({
               </p>
             )}
             <div className={styles.actions}>
-              <Link href="/shop" className="button buttonAccent">
+              <Link href={BOOK_PATH} className="button buttonAccent">
+                Book a meeting
+              </Link>
+              <Link href="/shop" className={`button ${styles.outline}`}>
                 Build an order request
               </Link>
-              {BOOKING_URL ? (
-                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className={`button ${styles.outline}`}>
-                  Book a meeting
-                </a>
-              ) : (
-                <a href={mailto} className={`button ${styles.outline}`}>
-                  Email us to book a meeting
-                </a>
-              )}
-              {BOOKING_URL && (
-                <a href={mailto} className={styles.secondary}>
-                  or email {SUPPORT_EMAIL}
-                </a>
-              )}
+              <a href={mailto} className={styles.secondary}>
+                or email {SUPPORT_EMAIL}
+              </a>
             </div>
           </div>
         </div>

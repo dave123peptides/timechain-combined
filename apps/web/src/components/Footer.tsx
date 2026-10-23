@@ -35,6 +35,7 @@ export default function Footer() {
           <div>
             <div className={styles.heading}>Ordering</div>
             <div className={styles.linkList}>
+              <Link href="/book">Book a meeting</Link>
               <Link href="/request">Your order request</Link>
               <Link href="/#how-it-works">How ordering works</Link>
               <Link href="/contact">Contact</Link>

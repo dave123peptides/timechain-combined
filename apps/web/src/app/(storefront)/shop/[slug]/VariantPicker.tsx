@@ -8,7 +8,7 @@ import { useCart } from "@/lib/cart-context";
 import { distinctLabs, formatCoaDate, latestCoaForStrength } from "@/lib/coa";
 import { findForm, formsIn } from "@/lib/forms";
 import { useOrderRequest } from "@/lib/request-context";
-import { BOOKING_URL, CONTACT_PATH, ORDERING_ENABLED, PRICING_VISIBLE } from "@/lib/site";
+import { BOOK_PATH, ORDERING_ENABLED, PRICING_VISIBLE } from "@/lib/site";
 import { isSupply } from "@/lib/supplies";
 import FormatNotice from "@/components/FormatNotice";
 import QuantityStepper from "@/components/QuantityStepper";
@@ -158,14 +158,7 @@ export default function VariantPicker({
         ) : (
           <>
             Build your list, then send it with your details. We reply by email with availability, documentation and
-            pricing for your quantities.{" "}
-            {BOOKING_URL ? (
-              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
-                Prefer to talk first? Book a meeting.
-              </a>
-            ) : (
-              <Link href={CONTACT_PATH}>Prefer to talk first? Contact us.</Link>
-            )}
+            pricing for your quantities. <Link href={BOOK_PATH}>Prefer to talk first? Book a meeting.</Link>
           </>
         )}
       </p>

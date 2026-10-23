@@ -1,12 +1,13 @@
 import Link from "next/link";
+import { BOOK_PATH } from "@/lib/site";
 import styles from "./HowItWorks.module.css";
 
 // Three steps from the catalog to an arranged order. No turnaround
 // promise: none has been confirmed.
 const STEPS = [
   {
-    title: "Build your request",
-    body: "Add compounds from the catalog. Pick pen or vial, the strength, and the quantity. Edit the list any time before you send it.",
+    title: "Review the catalog, or book a call",
+    body: "Browse by category and add compounds, formats, strengths and quantities to a request. Or book a meeting and we go through it with you.",
   },
   {
     title: "We review and reply",
@@ -28,11 +29,11 @@ export default function HowItWorks() {
             Three steps. <em>No checkout.</em>
           </h2>
           <div className={styles.actions}>
-            <Link href="/shop" className="button buttonAccent">
-              Start a request
+            <Link href={BOOK_PATH} className="button buttonAccent">
+              Book a meeting
             </Link>
-            <Link href="/contact" className="button buttonAccentOutline">
-              Talk with us first
+            <Link href="/shop" className="button buttonAccentOutline">
+              Start a request
             </Link>
           </div>
         </div>

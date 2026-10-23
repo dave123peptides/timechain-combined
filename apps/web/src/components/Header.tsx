@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
 import { useOrderRequest } from "@/lib/request-context";
-import { ORDERING_ENABLED } from "@/lib/site";
+import { BOOK_PATH, ORDERING_ENABLED } from "@/lib/site";
 import SectionIcon from "@/components/SectionIcon";
 import HeaderSearch from "./HeaderSearch";
 import styles from "./Header.module.css";
@@ -69,6 +69,9 @@ export default function Header() {
             <span className={styles.requestLabel}>Request</span>
             <span className={`${styles.count} ${hydrated && lineCount > 0 ? "" : styles.countEmpty}`}>{hydrated ? lineCount : 0}</span>
           </button>
+          <Link href={BOOK_PATH} className={styles.bookButton}>
+            Book a meeting
+          </Link>
           <button
             type="button"
             className={styles.menuToggle}

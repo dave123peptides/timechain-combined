@@ -101,6 +101,28 @@
   gap: 0.55rem;
   height: 2.5rem;
   padding: 0 0.5rem 0 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-label);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.requestButton:hover {
+  background: var(--surface);
+  border-color: #d3d7dd;
+}
+
+/* The primary action on every page (David, 2026-10-23). */
+.bookButton {
+  display: inline-flex;
+  align-items: center;
+  height: 2.5rem;
+  padding: 0 1rem;
   border: 1px solid var(--ink);
   border-radius: 8px;
   background: var(--ink);
@@ -108,11 +130,11 @@
   font-family: var(--font-label);
   font-size: 0.875rem;
   font-weight: 600;
-  cursor: pointer;
+  white-space: nowrap;
   transition: background-color 150ms ease;
 }
 
-.requestButton:hover {
+.bookButton:hover {
   background: #262d36;
 }
 
@@ -133,7 +155,8 @@
 }
 
 .countEmpty {
-  background: color-mix(in srgb, var(--paper) 18%, transparent);
+  background: var(--surface);
+  color: var(--ink-faint);
 }
 
 .iconButton .count {
@@ -204,6 +227,11 @@
 
   .requestButton {
     padding: 0 0.5rem;
+  }
+
+  .bookButton {
+    padding: 0 0.7rem;
+    font-size: 0.8rem;
   }
 
   .tools {

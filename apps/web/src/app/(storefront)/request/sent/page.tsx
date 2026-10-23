@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BOOKING_URL, SUPPORT_EMAIL } from "@/lib/site";
+import { BOOK_PATH } from "@/lib/site";
 import styles from "./page.module.css";
 
 export const metadata = { title: "Request received" };
@@ -35,18 +35,12 @@ export default async function RequestSentPage({ searchParams }: { searchParams: 
         </li>
       </ol>
       <div className={styles.actions}>
+        <Link href={BOOK_PATH} className="button buttonAccent">
+          Book a meeting to go through it
+        </Link>
         <Link href="/shop" className="button buttonAccentOutline">
           Back to the catalog
         </Link>
-        {BOOKING_URL ? (
-          <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="button buttonAccent">
-            Book a meeting
-          </a>
-        ) : (
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="button buttonAccent">
-            Email us
-          </a>
-        )}
       </div>
     </main>
   );

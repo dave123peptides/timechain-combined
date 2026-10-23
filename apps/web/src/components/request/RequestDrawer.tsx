@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { formatStrength } from "@/lib/api";
 import { formSingular } from "@/lib/forms";
 import { useOrderRequest } from "@/lib/request-context";
-import { REQUEST_PATH } from "@/lib/site";
+import { BOOK_PATH, REQUEST_PATH } from "@/lib/site";
 import { useResolvedRequest } from "@/lib/useResolvedRequest";
 import ProductImagePlaceholder from "@/components/ProductImagePlaceholder";
 import QuantityStepper from "@/components/QuantityStepper";
@@ -172,7 +172,7 @@ export default function RequestDrawer() {
             </button>
             <p className={styles.note}>
               No prices or payment here. We reply by email with availability, documentation and pricing for your
-              quantities.
+              quantities. Prefer to talk? <Link href={BOOK_PATH}>Book a meeting</Link>.
             </p>
           </div>
         )}

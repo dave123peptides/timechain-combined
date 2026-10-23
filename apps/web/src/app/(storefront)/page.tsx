@@ -3,6 +3,7 @@ import Faq from "@/components/Faq";
 import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
 import { DEFAULT_VIEW, isView } from "@/components/catalog/view";
+import BookSection from "@/components/home/BookSection";
 import Hero from "@/components/home/Hero";
 import HowItWorks from "@/components/home/HowItWorks";
 import QualitySection from "@/components/home/QualitySection";
@@ -53,6 +54,7 @@ export default async function Home({
         view={view}
       />
       <HowItWorks />
+      <BookSection />
       <QualitySection />
       <section className={styles.faq}>
         <div className={`container ${styles.faqInner}`}>

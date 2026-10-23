@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ApiError, createOrderRequest, formatStrength } from "@/lib/api";
 import { formSingular } from "@/lib/forms";
 import { useOrderRequest } from "@/lib/request-context";
-import { BOOKING_URL, CONTACT_PATH, SUPPORT_EMAIL } from "@/lib/site";
+import { BOOK_PATH, SUPPORT_EMAIL } from "@/lib/site";
 import { useResolvedRequest } from "@/lib/useResolvedRequest";
 import ProductImagePlaceholder from "@/components/ProductImagePlaceholder";
 import QuantityStepper from "@/components/QuantityStepper";
@@ -222,15 +222,8 @@ export default function RequestForm() {
             {submitting ? "Sending…" : "Send order request"}
           </button>
           <p className={styles.formNote}>
-            Prefer to talk first?{" "}
-            {BOOKING_URL ? (
-              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
-                Book a meeting
-              </a>
-            ) : (
-              <Link href={CONTACT_PATH}>Contact us</Link>
-            )}
-            . Everything we supply is for laboratory research use only.
+            Prefer to talk first? <Link href={BOOK_PATH}>Book a meeting</Link>. Everything we supply is for laboratory
+            research use only.
           </p>
         </form>
       </div>
