@@ -19,13 +19,17 @@ const COVERS = [
   { icon: "chat", title: "Pricing and terms", body: "Pricing for your quantities, how ordering is arranged, and how to reach us afterwards." },
 ] as const;
 
-// Cal.com honours ?theme= on a booking link; the embed asks for light so
-// it sits on the white page, while the new-tab link stays as given.
+// Cal.com's plain booking page follows the visitor's system theme and
+// ignores ?theme=; its /embed route honours it (checked 2026-10-23) and
+// lays the month and the time slots side by side, which is what the
+// frame wants. The new-tab link stays as given.
 function embedSrc(url: string): string {
   try {
     const parsed = new URL(url);
     if (parsed.hostname === "cal.com" || parsed.hostname.endsWith(".cal.com")) {
+      if (!parsed.pathname.endsWith("/embed")) parsed.pathname = `${parsed.pathname.replace(/\/$/, "")}/embed`;
       if (!parsed.searchParams.has("theme")) parsed.searchParams.set("theme", "light");
+      if (!parsed.searchParams.has("layout")) parsed.searchParams.set("layout", "month_view");
     }
     return parsed.toString();
   } catch {
