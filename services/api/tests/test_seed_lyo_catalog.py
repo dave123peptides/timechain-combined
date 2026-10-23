@@ -16,9 +16,10 @@ _PUBLIC = Path(__file__).resolve().parents[3] / "apps" / "web" / "public"
 
 
 def test_table_matches_the_ladder_counts():
-    # 35 ladder products, 48 vials (the vial site's _LADDER, 9.1.26 sheet).
-    assert len(_VIALS) == 35
-    assert sum(len(v.sizes) for v in _VIALS) == 48
+    # The vial site's _LADDER (9.1.26 sheet) less BAC water, dropped
+    # 2026-10-23: 34 products, 47 vials.
+    assert len(_VIALS) == 34
+    assert sum(len(v.sizes) for v in _VIALS) == 47
 
 
 def test_slugs_and_skus_are_unique_and_never_collide_with_pen_skus():
@@ -30,13 +31,14 @@ def test_slugs_and_skus_are_unique_and_never_collide_with_pen_skus():
     assert all("-LYOPHILIZED-" in sku for sku in skus)
 
 
-def test_size_keys_are_bare_mg_numbers_except_bac_water():
+def test_size_keys_are_bare_mg_numbers():
     for vial in _VIALS:
         for size in vial.sizes:
-            if vial.slug == "bac-water":
-                assert size.size_key == "10mL"
-            else:
-                assert SIZE_KEY_RE.match(size.size_key), (vial.slug, size.size_key)
+            assert SIZE_KEY_RE.match(size.size_key), (vial.slug, size.size_key)
+
+
+def test_bac_water_is_not_sold():
+    assert all(v.slug != "bac-water" for v in _VIALS)
 
 
 def test_prices_are_positive_and_strictly_ascending_within_a_product():
@@ -62,11 +64,10 @@ def test_shared_compounds_use_the_pen_seed_name():
         assert vial.name == pen_names[vial.slug], vial.slug
 
 
-def test_vial_only_compounds_are_the_expected_six():
+def test_vial_only_compounds_are_the_expected_five():
     pen_slugs = {p.slug for p in _PENS}
     assert sorted(v.slug for v in _VIALS if v.slug not in pen_slugs) == [
         "aod-9604",
-        "bac-water",
         "ghk-cu-kpv",
         "ghrp-2",
         "ghrp-6",

@@ -3,7 +3,7 @@
 The lyophilized vial catalog's source of truth on the combined site
 (2026-10-22). `_VIALS` below is the vial site's "TimeChain RUO LYO -
 Final Pricing 9.1.26" ladder (David's 2026-08-22 lyophilized-only line,
-35 products, 48 vials), carried over verbatim from that site's
+34 products, 47 vials once BAC water was dropped on 2026-10-23), carried over verbatim from that site's
 app.scripts.sync_lyo_catalog._LADDER. Prices are the 9.1.26 sheet; edit
 here and rerun.
 
@@ -158,9 +158,10 @@ _VIALS: tuple[VialProduct, ...] = (
     _vial("semax", "Semax", "semax-2.png", ("10", 6900)),
     _vial("ss-31", "SS-31", "ss-31-lyo.png", ("50", 16500)),
     _vial("dsip", "DSIP", "dsip-1.jpg", ("5", 5500)),
-    # $10 per David 9/2. A reconstitution supply, not a research compound:
-    # no benefit group (lib/categories.ts) and never promoted.
-    _vial("bac-water", "Bacteriostatic Reconstitution Water (BAC)", "bac-water-1.jpg", ("10mL", 1000)),
+    # Bacteriostatic water (the vial site's $10 "bac-water" supply) is
+    # deliberately NOT here (David, 2026-10-23: "remove the BAC water"):
+    # its row stays in the database but the stray-hiding below keeps it
+    # off the storefront.
 )
 
 

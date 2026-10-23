@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { BulkDiscountTier, ProductCoa, Variant } from "@/lib/api";
 import { formatMoney, formatStrength } from "@/lib/api";
 import { distinctLabs, formatCoaDate, latestCoaForStrength } from "@/lib/coa";
@@ -32,6 +32,7 @@ export default function VariantPicker({
   productSlug,
   sdsUrl,
   initialForm,
+  onFormChange,
 }: {
   variants: Variant[];
   bulkTiers: BulkDiscountTier[];
@@ -40,10 +41,17 @@ export default function VariantPicker({
   productSlug: string;
   sdsUrl: string | null;
   initialForm?: string;
+  // Lets the page swap the gallery to the selected format's photo.
+  onFormChange?: (form: string | null) => void;
 }) {
   const [selectedId, setSelectedId] = useState(() => pickInitial(variants, initialForm));
-
   const selected = variants.find((v) => v.id === selectedId) ?? variants[0];
+  const selectedFormKey = selected?.form ?? null;
+
+  useEffect(() => {
+    onFormChange?.(selectedFormKey);
+  }, [selectedFormKey, onFormChange]);
+
   if (!selected) return null;
 
   const forms = formsIn(variants);

@@ -9,9 +9,8 @@ import {
   type ProductSummary,
 } from "@/lib/api";
 import Breadcrumb from "@/components/Breadcrumb";
-import ProductGallery from "@/components/ProductGallery";
 import { isPromotable, promotableOnly } from "@/lib/compliance";
-import VariantPicker from "./VariantPicker";
+import ProductShowcase from "./ProductShowcase";
 import ProductOverview from "./ProductOverview";
 import ResearchAreas from "./ResearchAreas";
 import RelatedProducts from "./RelatedProducts";
@@ -114,25 +113,7 @@ export default async function ProductDetailPage({
   return (
     <main className={`container ${styles.page}`}>
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Catalog", href: "/shop" }, { label: product.name }]} />
-      <div className={styles.layout}>
-        <div className={styles.imageWrap}>
-          <ProductGallery images={product.images} name={product.name} />
-        </div>
-        <div>
-          <h1 className={styles.name}>{product.name}</h1>
-          {product.description && <p className={styles.description}>{product.description}</p>}
-          <VariantPicker
-            variants={product.variants}
-            bulkTiers={bulkTiers}
-            coas={product.coas}
-            productName={product.name}
-            productSlug={product.slug}
-            sdsUrl={product.sds_url}
-            initialForm={form}
-          />
-          <p className={styles.disclaimerNote}>For laboratory research use only. Not for human consumption.</p>
-        </div>
-      </div>
+      <ProductShowcase product={product} bulkTiers={bulkTiers} initialForm={form} />
 
       <ProductTabs tabs={tabs} />
       <RelatedProducts products={relatedProducts} />

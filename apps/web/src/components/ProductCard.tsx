@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ProductSummary } from "@/lib/api";
 import { formatMoney, formatStrength } from "@/lib/api";
-import { formSingular, formsIn, strengthList, type FormKey } from "@/lib/forms";
+import { formSingular, formsIn, imagesForForm, strengthList, type FormKey } from "@/lib/forms";
 import { PRICING_VISIBLE } from "@/lib/site";
 import ProductImagePlaceholder from "./ProductImagePlaceholder";
 import styles from "./ProductCard.module.css";
@@ -13,7 +13,7 @@ import styles from "./ProductCard.module.css";
 // Book a meeting link in the header (David, 2026-10-23). No price unless
 // pricing is on (lib/site.ts) and the API sent one.
 export default function ProductCard({ product, form }: { product: ProductSummary; form?: FormKey }) {
-  const image = product.images[0];
+  const image = imagesForForm(product.images, form)[0];
   const href = `/shop/${product.slug}${form ? `?form=${form}` : ""}`;
   const forms = formsIn(product.variants);
   const strengths = strengthList(product.variants);

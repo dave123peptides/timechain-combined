@@ -1,12 +1,10 @@
-import Link from "next/link";
-import { BAC_WATER_SLUG, isSupply } from "@/lib/supplies";
+import { isSupply } from "@/lib/supplies";
 import styles from "./FormatNotice.module.css";
 
 // Generic, legally-safe copy: not dosing or reconstitution instructions,
 // which would need real content from David. Keyed off the variant's raw
 // `form` (not the display label), since that's the stable value this
-// should branch on. BAC water is a diluent, not a lyophilized compound,
-// so it gets its own line.
+// should branch on. A supply (lib/supplies.ts) gets its own line.
 const NOTICES: Record<string, string> = {
   pen: "Ships as a pre-filled 3 mL auto-injector pen. No reconstitution required.",
   lyophilized:
@@ -26,16 +24,5 @@ export default function FormatNotice({ form, productSlug }: { form: string | nul
   if (!form) return null;
   const notice = NOTICES[form];
   if (!notice) return null;
-
-  return (
-    <p className={styles.notice}>
-      {notice}
-      {form === "lyophilized" && (
-        <>
-          {" "}
-          Bacteriostatic water is <Link href={`/shop/${BAC_WATER_SLUG}`}>listed in the catalog</Link>.
-        </>
-      )}
-    </p>
-  );
+  return <p className={styles.notice}>{notice}</p>;
 }

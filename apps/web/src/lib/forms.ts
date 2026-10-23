@@ -84,3 +84,14 @@ export function strengthList(variants: Pick<Variant, "strength">[]): string[] {
   const leading = (strength: string) => Number.parseFloat(strength) || 0;
   return [...seen].sort((a, b) => leading(a) - leading(b) || a.localeCompare(b));
 }
+
+// Pen renders live under /products/pens/; every other product photo is
+// the vial (the vial site's photography). Given a form, put the matching
+// photos first so a grid narrowed to Vials shows vials (David,
+// 2026-10-23) and the product page opens on the right shot.
+export function imagesForForm(images: string[], form?: string | null): string[] {
+  if (!form) return images;
+  const isPen = (src: string) => src.includes("/products/pens/");
+  const wanted = form === "pen" ? isPen : (src: string) => !isPen(src);
+  return [...images.filter(wanted), ...images.filter((src) => !wanted(src))];
+}
