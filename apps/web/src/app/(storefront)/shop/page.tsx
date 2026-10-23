@@ -3,50 +3,51 @@ import { isSort } from "@/components/catalog/sort";
 import PageBanner from "@/components/PageBanner";
 import { listProductsOrEmpty } from "@/lib/api";
 import { findCategory } from "@/lib/categories";
+import { findForm } from "@/lib/forms";
 
 export const dynamic = "force-dynamic";
 
 // Cut-out pen renders (see public/products/hero/README.md) of promotable,
-// non-GLP products only (lib/compliance.ts) — this is a promotional
-// surface.
+// non-GLP products only (lib/compliance.ts): this is a promotional
+// surface. Shown on the all-products and Pens views; the Vials view has
+// no vial render to match, so it goes without.
 const BANNER_PENS = ["/products/hero/tb-500.png", "/products/hero/bpc-157.png", "/products/hero/ghk-cu.png"];
 
-// One flat, alphabetical catalog with a benefit-category pill row on top
-// (lib/categories.ts — David's 2026-09-05 decision for the pens site;
-// the vial site kept categories internal, see the TODO(attorney-review)
-// there). ?category= narrows the grid; an unknown value means "all".
+// One flat, alphabetical catalog with the Pens | Vials toggle
+// (lib/forms.ts, David 2026-10-22) and a benefit-category pill row
+// (lib/categories.ts) on top. ?form= narrows to one line, ?category=
+// narrows within it; an unknown value for either means "all".
 // Product.category (the internal taxonomy) still never renders.
-//
-// No format filter either: every sellable variant is form="pen"
-// (ProductVariant._validate_is_sellable rejects every other form), so a
-// format control would be a one-option filter that does nothing. The
-// grid's standing line says the same thing more usefully. The Core
-// reference's price/category/stock chips are likewise absent: categories
-// are banned, and there is no stock state in the catalog.
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; sort?: string; category?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; category?: string; form?: string }>;
 }) {
   const params = await searchParams;
   const query = params.q?.trim() || undefined;
   const sort = isSort(params.sort) ? params.sort : "name";
   const category = findCategory(params.category);
+  const form = findForm(params.form);
 
   // Degrades to empty rather than crashing the page if the API is
   // unreachable.
   const products = await listProductsOrEmpty({ q: query, sort });
+
+  const title = query ? `Results for “${query}”` : form ? `Research Peptide ${form.label}` : "Research Peptides For Sale";
 
   return (
     <main>
       <PageBanner
         variant="dark"
         eyebrow="Research use only"
-        title={query ? `Results for “${query}”` : "Research Peptides For Sale"}
-        images={BANNER_PENS}
+        title={title}
+        images={form?.key === "lyophilized" ? undefined : BANNER_PENS}
       >
-        {/* TODO(David): confirm the compounding/testing claim for the pen line before launch. */}
-        <p>Pre-filled 3 mL auto-injector pens. Ready to use — no reconstitution.</p>
+        <p>
+          {form
+            ? form.description
+            : "Pre-filled auto-injector pens and lyophilized vials. Pick a format, or browse the whole catalog."}
+        </p>
       </PageBanner>
       <CatalogGrid
         products={products}
@@ -55,6 +56,7 @@ export default async function ShopPage({
         sort={sort}
         query={query}
         category={category}
+        form={form}
       />
     </main>
   );

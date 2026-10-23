@@ -255,3 +255,22 @@
     transform: translateY(0);
   }
 }
+
+/* --- Inquiry mode (lib/site.ts ORDERING_ENABLED off): the one action on
+   the page is to start a conversation about this variant. Unlike .buyRow
+   it stays visible on phones, where there is no fixed bar to replace it. */
+.inquiry {
+  margin-bottom: 1.75rem;
+}
+
+.inquiryButton {
+  display: inline-flex;
+  padding: 0.95rem 1.75rem;
+}
+
+.inquiryNote {
+  margin: 0.75rem 0 0;
+  max-width: 32rem;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}

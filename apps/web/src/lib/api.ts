@@ -16,10 +16,11 @@ export type Variant = {
   id: string;
   name: string;
   format: string;
-  // Raw form key ("pen" for everything sellable on this site; the API
-  // still knows "lyophilized"/"preconstituted"/etc) — `format` above is
-  // the display label. Components that branch on physical form key off
-  // this (FormatNotice).
+  // Raw form key: "pen" or "lyophilized" for everything sellable on this
+  // site (the API still knows "preconstituted" etc). `format` above is
+  // the API's display label; lib/forms.ts has the storefront's words.
+  // Components that branch on physical form key off this (FormatNotice,
+  // VariantPicker, the Pens | Vials toggle).
   form: string | null;
   strength: string | null;
   price_cents: number;

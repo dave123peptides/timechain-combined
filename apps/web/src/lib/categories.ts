@@ -1,21 +1,26 @@
 import type { ProductSummary } from "@/lib/api";
 
-// Customer-facing benefit categories for the pens site (David, 2026-09-05),
-// taken from his TCP Guide (https://tcpguidehelp.vercel.app/): the seven
-// groups, their one-line descriptions, and which pens sit in each. A pen
-// can belong to more than one group, which is why this is a presentation-
+// Customer-facing benefit categories (David, 2026-09-05), taken from his
+// TCP Guide (https://tcpguidehelp.vercel.app/): the seven groups, their
+// one-line descriptions, and which compounds sit in each. A compound can
+// belong to more than one group, which is why this is a presentation-
 // layer list of slugs rather than the single internal Product.category.
+// Groups are by compound, so they apply to a product's pen and vial
+// variants alike; the Pens | Vials toggle narrows first, then these.
 //
 // TODO(attorney-review): the vial site deliberately never rendered
 // categories because benefit-named groups ("Weight Loss", "Anti-Aging",
-// "Sexual Health") read as intended-use claims — see
+// "Sexual Health") read as intended-use claims, see
 // docs/plans/claude-answers-glp-decision.md ("NEVER reference weight
-// loss, appetite …"). David chose to show them on the pens site; the
-// labels and descriptions below are his guide's wording, verbatim.
+// loss, appetite ..."). David chose to show them on the pens site and,
+// on 2026-10-22, on both lines of the combined site; the labels and
+// descriptions below are his guide's wording, verbatim.
 //
-// Not in the guide, placed by compound class: cjc-1295-no-dac and
-// hexarelin (GH secretagogues → growth), hcg-6000-units (reproductive
-// hormone → sexual).
+// Not in the guide, placed by compound class: cjc-1295-no-dac, hexarelin,
+// ghrp-2 and ghrp-6 (GH secretagogues, growth), hcg-6000-units and mt-1
+// (reproductive hormone / melanocortin, sexual), aod-9604 (hGH fragment
+// studied in lipid metabolism, weight), ghk-cu-kpv (healing). BAC water
+// is a supply (lib/supplies.ts) and belongs to no group.
 export type StorefrontCategory = {
   slug: string;
   label: string;
@@ -29,7 +34,7 @@ export const STOREFRONT_CATEGORIES: StorefrontCategory[] = [
     label: "Weight Loss, Appetite & Metabolic Health",
     description:
       "Compounds working through GLP-1/GIP/glucagon pathways, amylin, or mitochondrial signaling for fat loss, blood sugar control, and energy.",
-    products: ["glp-1s", "glp-2t", "glp-3r", "cagrilinitide", "mots-c", "5-amino-1mq"],
+    products: ["glp-1s", "glp-2t", "glp-3r", "cagrilinitide", "mots-c", "5-amino-1mq", "aod-9604"],
   },
   {
     slug: "healing",
@@ -44,6 +49,7 @@ export const STOREFRONT_CATEGORIES: StorefrontCategory[] = [
       "glow-bpc-157-tb-500-ghk",
       "klow-kpv-bpc-157-tb-500-ghk",
       "kpv",
+      "ghk-cu-kpv",
     ],
   },
   {
@@ -59,6 +65,8 @@ export const STOREFRONT_CATEGORIES: StorefrontCategory[] = [
       "sermorelin",
       "hexarelin",
       "igf1-lr3",
+      "ghrp-2",
+      "ghrp-6",
     ],
   },
   {
@@ -71,7 +79,7 @@ export const STOREFRONT_CATEGORIES: StorefrontCategory[] = [
     slug: "sexual",
     label: "Sexual Health & Libido",
     description: "Desire, arousal, and reproductive hormone support for both men and women.",
-    products: ["pt-141", "mt-2", "kisspeptin", "hcg-6000-units"],
+    products: ["pt-141", "mt-2", "mt-1", "kisspeptin", "hcg-6000-units"],
   },
   {
     slug: "longevity",

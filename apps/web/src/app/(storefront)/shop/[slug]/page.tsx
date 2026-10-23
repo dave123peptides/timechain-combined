@@ -22,8 +22,16 @@ import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProductDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ form?: string }>;
+}) {
   const { slug } = await params;
+  // From a grid narrowed to one format (?form=): the picker opens on it.
+  const { form } = await searchParams;
 
   let product;
   try {
@@ -118,7 +126,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             bulkTiers={bulkTiers}
             coas={product.coas}
             productName={product.name}
+            productSlug={product.slug}
             sdsUrl={product.sds_url}
+            initialForm={form}
           />
           <p className={styles.disclaimerNote}>For laboratory research use only. Not for human consumption.</p>
         </div>

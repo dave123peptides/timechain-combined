@@ -7,6 +7,7 @@ import TrustStrip from "@/components/home/TrustStrip";
 import { listProductsOrEmpty } from "@/lib/api";
 import { findCategory } from "@/lib/categories";
 import { SITE_FAQ } from "@/lib/faqContent";
+import { findForm } from "@/lib/forms";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -14,23 +15,34 @@ export const dynamic = "force-dynamic";
 const HOMEPAGE_FAQ_COUNT = 6;
 
 // Core-reference homepage (David, 9/4): hero, the black trust strip, then
-// the WHOLE catalog as a grid — no featured/"popular" selection, which is
-// also what lib/compliance.ts wants: with every product listed
+// the WHOLE catalog as a grid. No featured or "popular" selection, which
+// is also what lib/compliance.ts wants: with every product listed
 // alphabetically there is no curated surface that could promote a
-// GLP-class product. Category pills (lib/categories.ts) filter that
-// grid in place. The standards/pipeline/purity content that used to
-// fill this page lives on /about now.
-export default async function Home({ searchParams }: { searchParams: Promise<{ sort?: string; category?: string }> }) {
+// GLP-class product. The Pens | Vials toggle and the category pills
+// filter that grid in place (?form=, ?category=).
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string; category?: string; form?: string }>;
+}) {
   const params = await searchParams;
   const sort = isSort(params.sort) ? params.sort : "name";
   const category = findCategory(params.category);
+  const form = findForm(params.form);
   const products = await listProductsOrEmpty({ sort });
 
   return (
     <main>
       <HomeHero />
       <TrustStrip />
-      <CatalogGrid products={products} title="Research Peptides For Sale" basePath="/" sort={sort} category={category} />
+      <CatalogGrid
+        products={products}
+        title="Research Peptides For Sale"
+        basePath="/"
+        sort={sort}
+        category={category}
+        form={form}
+      />
       <section className={styles.faq}>
         <div className={`container ${styles.faqInner}`}>
           <div className={styles.sectionHead}>
