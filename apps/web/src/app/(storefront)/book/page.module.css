@@ -101,7 +101,7 @@
 .frame {
   display: block;
   width: 100%;
-  min-height: 46rem;
+  min-height: 54rem;
   border: 0;
   background: var(--paper);
 }

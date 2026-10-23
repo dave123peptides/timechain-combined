@@ -19,6 +19,20 @@ const COVERS = [
   { icon: "chat", title: "Pricing and terms", body: "Pricing for your quantities, how ordering is arranged, and how to reach us afterwards." },
 ] as const;
 
+// Cal.com honours ?theme= on a booking link; the embed asks for light so
+// it sits on the white page, while the new-tab link stays as given.
+function embedSrc(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === "cal.com" || parsed.hostname.endsWith(".cal.com")) {
+      if (!parsed.searchParams.has("theme")) parsed.searchParams.set("theme", "light");
+    }
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
 export default function BookPage() {
   return (
     <main className={`container ${styles.page}`}>
@@ -59,7 +73,7 @@ export default function BookPage() {
           {BOOKING_URL ? (
             <>
               {BOOKING_EMBED ? (
-                <iframe src={BOOKING_URL} title="Book a meeting" className={styles.frame} loading="lazy" allow="payment *" />
+                <iframe src={embedSrc(BOOKING_URL)} title="Book a meeting" className={styles.frame} loading="lazy" allow="payment *" />
               ) : (
                 <div className={styles.fallback}>
                   <p>Pick a time on our calendar.</p>
