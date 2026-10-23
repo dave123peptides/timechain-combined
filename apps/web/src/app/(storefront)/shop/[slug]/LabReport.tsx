@@ -61,7 +61,7 @@ export default function LabReport({
         <h2>Certificates of Analysis</h2>
         <p className={styles.sectionLede}>
           {coas.length} third-party {coas.length === 1 ? "certificate" : "certificates"} from {labs.join(" and ")}{" "}
-          for {productName}, grouped by pen strength with the most recent lot in front. Each one opens the
+          for {productName}, grouped by strength with the most recent lot in front. Each one opens the
           laboratory&apos;s own copy in a new tab and carries a verification code you can check with the lab
           directly. Most recent certificate: {formatCoaDate(latest.issued_on)}.
         </p>
@@ -69,7 +69,7 @@ export default function LabReport({
       <CoaGrid groups={groups} />
       <p className={styles.sectionNote}>
         Certificates are issued by the laboratory to our supplier for each lot it tests. If the lot printed on
-        your pen isn&apos;t listed here, email{" "}
+        your pen or vial isn&apos;t listed here, email{" "}
         <a href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`COA request: ${productName}`)}`}>
           {SUPPORT_EMAIL}
         </a>{" "}

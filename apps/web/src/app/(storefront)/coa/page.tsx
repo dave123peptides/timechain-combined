@@ -6,7 +6,7 @@ import CoaIndex from "./CoaIndex";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Certificates of Analysis | TCP" };
+export const metadata = { title: "Certificates of Analysis" };
 
 const SUPPORT_EMAIL = "support@timechainpeptides.com";
 

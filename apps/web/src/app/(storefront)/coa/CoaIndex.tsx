@@ -7,7 +7,7 @@ import styles from "./page.module.css";
 
 // Search-as-you-type over the certificate cards. Purely a filter on the
 // server-rendered list — matches product name, strength, lot and
-// verification code, so a customer can paste the code off a pen's
+// verification code, so a customer can paste the code off a pen's or vial's
 // certificate and land on it.
 export default function CoaIndex({ groups }: { groups: CoaCardGroup[] }) {
   const inputId = useId();
@@ -48,7 +48,7 @@ export default function CoaIndex({ groups }: { groups: CoaCardGroup[] }) {
         <p className={styles.empty}>No certificates are published yet — every product is available on request.</p>
       ) : shown.length === 0 ? (
         <p className={styles.empty}>
-          Nothing matches “{term.trim()}”. Try the product name, or the lot number printed on the pen.
+          Nothing matches “{term.trim()}”. Try the product name, or the lot number printed on the pen or vial.
         </p>
       ) : (
         <CoaGrid groups={shown} />

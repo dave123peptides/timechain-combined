@@ -21,8 +21,12 @@ const bodyFont = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TCP",
-  description: "Research compounds sourced and handled to exacting standards, for laboratory and research use.",
+  title: {
+    default: "TimeChain Peptides",
+    template: "%s | TimeChain Peptides",
+  },
+  description:
+    "Research peptides in pre-filled auto-injector pens and lyophilized vials, for laboratory and research use.",
 };
 
 export default function RootLayout({

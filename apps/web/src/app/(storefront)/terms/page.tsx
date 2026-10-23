@@ -1,18 +1,18 @@
 import Link from "next/link";
 import styles from "../legal.module.css";
 
-export const metadata = { title: "Terms of Service | TCP" };
+export const metadata = { title: "Terms of Service" };
 
 export default function TermsPage() {
   return (
     <main className={styles.wrap}>
       <span className={`eyebrow ${styles.eyebrow}`}>Policy</span>
       <h1>Terms of Service</h1>
-      <p className={styles.updated}>Last updated August 13, 2026</p>
+      <p className={styles.updated}>Last updated October 22, 2026</p>
 
       <p>
-        These terms govern your use of this site and any order you place through it. By using this site or
-        placing an order, you agree to these terms.
+        These terms govern your use of this site and any order you arrange with us after contacting us through
+        it. By using this site or placing an order, you agree to these terms.
       </p>
 
       <h2>Eligibility</h2>
@@ -29,7 +29,8 @@ export default function TermsPage() {
 
       <h2>Orders</h2>
       <p>
-        Placing an order is an offer to purchase, subject to our acceptance. We may decline or cancel any order
+        This site does not take payments. Orders are arranged directly with us after you contact us. Placing an
+        order is an offer to purchase, subject to our acceptance. We may decline or cancel any order
         at our discretion, including where a product is no longer available or where required acknowledgments
         have not been given.
       </p>
@@ -48,7 +49,7 @@ export default function TermsPage() {
       </p>
 
       <h2>Contact</h2>
-      <p>Questions about these terms can be sent to the contact address provided at checkout confirmation.</p>
+      <p>Questions about these terms can be sent to support@timechainpeptides.com.</p>
     </main>
   );
 }
