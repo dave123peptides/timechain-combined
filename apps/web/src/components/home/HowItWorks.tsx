@@ -1,8 +1,7 @@
 import Link from "next/link";
 import styles from "./HowItWorks.module.css";
 
-// Three steps (Ascend's "how a vial reaches you", redirected at ordering):
-// what happens from the catalog to an arranged order. No turnaround
+// Three steps from the catalog to an arranged order. No turnaround
 // promise: none has been confirmed.
 const STEPS = [
   {
@@ -22,30 +21,32 @@ const STEPS = [
 export default function HowItWorks() {
   return (
     <section className={styles.section} id="how-it-works">
-      <div className="container">
+      <div className={`container ${styles.inner}`}>
         <div className={styles.head}>
           <span className="eyebrow">How ordering works</span>
           <h2>
-            Three steps, <em>no checkout.</em>
+            Three steps. <em>No checkout.</em>
           </h2>
+          <div className={styles.actions}>
+            <Link href="/shop" className="button buttonAccent">
+              Start a request
+            </Link>
+            <Link href="/contact" className="button buttonAccentOutline">
+              Talk with us first
+            </Link>
+          </div>
         </div>
         <ol className={styles.steps}>
           {STEPS.map((step, index) => (
             <li key={step.title} className={styles.step}>
-              <span className={styles.number}>0{index + 1}</span>
-              <h3 className={styles.title}>{step.title}</h3>
-              <p className={styles.body}>{step.body}</p>
+              <span className={styles.number}>{index + 1}</span>
+              <div>
+                <h3 className={styles.title}>{step.title}</h3>
+                <p className={styles.body}>{step.body}</p>
+              </div>
             </li>
           ))}
         </ol>
-        <div className={styles.actions}>
-          <Link href="/shop" className="button buttonAccent">
-            Start a request
-          </Link>
-          <Link href="/contact" className="button buttonAccentOutline">
-            Talk with us first
-          </Link>
-        </div>
       </div>
     </section>
   );

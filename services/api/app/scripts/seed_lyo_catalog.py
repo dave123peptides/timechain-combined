@@ -53,7 +53,7 @@ from app.constants.lyo_content import LYO_CONTENT
 from app.constants.product_categories import PRODUCT_CATEGORY_BY_SLUG
 from app.db.session import SessionLocal
 from app.models.catalog import Product, ProductVariant, SupplierProduct, SupplierProductMapping
-from app.scripts.seed_pen_catalog import SIZE_KEY_RE, _next_placeholder_id
+from app.scripts.seed_pen_catalog import GENERIC_PEN_DESCRIPTION, SIZE_KEY_RE, _next_placeholder_id
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -219,7 +219,8 @@ def seed_lyo_catalog(session=None) -> dict[str, int]:
                 product = Product(slug=vial.slug, name=vial.name, description=description, images=[], is_active=True)
                 session.add(product)
                 counts["products_created"] += 1
-            if not product.description:
+            # A real tagline beats the pen seed's generic one.
+            if not product.description or product.description == GENERIC_PEN_DESCRIPTION:
                 product.description = description
             product.content = _merge_content(product.content, content)
             # Vial photo after whatever is already there (the pen renders);

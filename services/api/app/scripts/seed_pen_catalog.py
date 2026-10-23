@@ -60,6 +60,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 PEN_FORM = "pen"
+# The tagline a pen gets when the TCP Guide has no copy for it.
+GENERIC_PEN_DESCRIPTION = "Pre-filled 3 mL auto-injector pen."
 # Bare mg number(s): "1.5", "10", "10/10/50". The web/API strength
 # formatters append "mg" only to values of this shape.
 SIZE_KEY_RE = re.compile(r"^[\d.]+(/[\d.]+)*$")
@@ -84,7 +86,7 @@ class PenProduct:
     # "/products/pens/<slug>-<size>.<ext>" in ascending size order; empty
     # means the storefront renders its letter-tile placeholder.
     images: tuple[str, ...] = ()
-    description: str = "Pre-filled 3 mL auto-injector pen."
+    description: str = GENERIC_PEN_DESCRIPTION
     content: dict = field(default_factory=dict)
 
 
@@ -304,7 +306,11 @@ def seed_pen_catalog(session=None) -> dict[str, int]:
                 session.add(product)
                 counts["products_created"] += 1
             product.name = pen.name
-            product.description = pen.description
+            # The guide's chemistry subtitle always wins; the generic pen
+            # tagline only fills an empty row, so a compound that also
+            # ships as a vial keeps the vial site's tagline (seed_lyo_catalog).
+            if pen.description != GENERIC_PEN_DESCRIPTION or not product.description:
+                product.description = pen.description
             # Merge, don't replace: seed_lyo_catalog fills key_points /
             # research_areas / pairs_with / faq on the same row. The pen
             # overview wins where both have one.

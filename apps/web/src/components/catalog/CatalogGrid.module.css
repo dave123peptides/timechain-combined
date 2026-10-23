@@ -1,16 +1,19 @@
 .section {
-  padding: 3.5rem 0 5rem;
+  padding: 4rem 0 5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .title {
-  text-align: center;
   font-size: var(--text-3xl);
-  margin-bottom: 2rem;
-}
-
-.title em {
-  font-style: italic;
-  color: var(--gold-deep);
 }
 
 .toolbar {
@@ -18,7 +21,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin: 1.25rem 0 1rem;
 }
 
 .count {
@@ -32,10 +35,69 @@
   color: var(--ink-faint);
 }
 
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.viewSwitch {
+  display: inline-flex;
+  padding: 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.viewOption {
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+  font-family: var(--font-label);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.viewOptionActive {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- the sheet ----------------------------------------------------------- */
+
+.sheet {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.sheetHead {
+  display: grid;
+  grid-template-columns: 3.25rem 1.5fr 0.7fr auto;
+  gap: 1.25rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-label);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.sheetHeadControls {
+  text-align: right;
+  min-width: 20rem;
+}
+
+/* --- the grid ------------------------------------------------------------ */
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 2.5rem 1.5rem;
+  gap: 1.25rem;
 }
 
 .empty {
@@ -53,6 +115,10 @@
 @media (max-width: 1024px) {
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sheetHead {
+    display: none;
   }
 }
 
@@ -72,6 +138,6 @@
 
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem 1rem;
+    gap: 1rem;
   }
 }

@@ -53,3 +53,24 @@ ascendbioslabs.com, americanpeptides.us.
 
 Pricing and volume tiers (sheet to come), accounts or wholesale logins,
 a CMS, blog or learn section, any payment.
+
+## Second pass, same evening: modern, clean, minimal
+
+David rejected the cream-and-serif pass ("make it more modern ... doctor
+focused ... simple doctor can go in there and see all the stuff ... modern
+clean minimalistic look"). The direction now:
+
+- **Palette**: white, `#f6f7f9` surface, near-black `#0f1419` type, thin
+  `#e6e8ec` lines, one teal accent `#0f766e`. No ticker, no pedestal art,
+  no serif.
+- **Type**: Inter Tight for headings (600, -0.03em), labels, nav and
+  buttons; Inter for body. A headline's `<em>` is its quiet gray clause.
+- **The catalog is an order sheet**: one row per compound with
+  thumbnail, name, chemistry line, format badges, a configuration select
+  ("10mg · Pen", pens first), a quantity field (default 10) and Add, so a
+  practice orders without leaving the list. A grid of cards remains as
+  `?view=grid` for when images matter (David: "about the images later").
+- **Homepage**: hero with a live slice of the sheet (first promotable
+  rows), a four-fact row, the full sheet, three steps, quality, FAQ.
+- Images are de-emphasized until David sorts them: 52px thumbnails in
+  the sheet, no hero photography.

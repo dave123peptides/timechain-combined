@@ -1,24 +1,15 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Inter, Inter_Tight } from "next/font/google";
+import { Inter, Inter_Tight } from "next/font/google";
 import { CartProvider } from "@/lib/cart-context";
 import { RequestProvider } from "@/lib/request-context";
 import "./globals.css";
 
-// B2B redesign (David, 2026-10-22): a serif display face with an italic
-// for the accent word, Inter for body copy, Inter Tight for the uppercase
-// labels, nav and buttons. See globals.css for the tokens.
-const displayFont = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-display-serif",
-  display: "swap",
-});
-
-const labelFont = Inter_Tight({
+// Modern, clean, minimal (David, 2026-10-22): one family. Inter Tight at
+// tight tracking for headings, labels, nav and buttons; Inter for body.
+const displayFont = Inter_Tight({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  variable: "--font-label-sans",
+  variable: "--font-display-sans",
   display: "swap",
 });
 
@@ -44,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${displayFont.variable} ${labelFont.variable} ${bodyFont.variable}`}>
+    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body>
         <CartProvider>
           <RequestProvider>{children}</RequestProvider>

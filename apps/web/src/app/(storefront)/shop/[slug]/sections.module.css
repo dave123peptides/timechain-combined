@@ -60,7 +60,7 @@
 }
 
 .relatedTitle {
-  text-align: center;
+  text-align: left;
   font-size: var(--text-2xl);
   margin-bottom: 2rem;
 }

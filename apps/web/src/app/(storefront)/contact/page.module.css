@@ -11,35 +11,36 @@
 .dark {
   display: flex;
   justify-content: flex-end;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--paper);
+  color: var(--ink);
+  border-right: 1px solid var(--line);
 }
 
 .title {
   font-size: var(--text-3xl);
-  color: var(--gold);
+  color: var(--ink);
 }
 
 .lede {
   margin-top: 1rem;
-  color: color-mix(in srgb, var(--paper) 78%, transparent);
+  color: var(--ink-soft);
 }
 
 .asking {
   margin-top: 1.5rem;
   padding: 0.9rem 1.1rem;
   border-left: 3px solid var(--gold);
-  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  background: var(--surface);
   font-size: var(--text-sm);
-  color: color-mix(in srgb, var(--paper) 85%, transparent);
+  color: var(--ink-soft);
 }
 
 .asking strong {
-  color: var(--paper);
+  color: var(--ink);
 }
 
 .asking a {
-  color: var(--gold);
+  color: var(--gold-deep);
   text-decoration: underline;
 }
 
@@ -53,7 +54,7 @@
 
 .secondary {
   font-size: var(--text-sm);
-  color: var(--gold);
+  color: var(--gold-deep);
   font-weight: 600;
   text-decoration: underline;
 }
@@ -61,21 +62,21 @@
 /* --- accent panel ------------------------------------------------------ */
 
 .accent {
-  background: linear-gradient(160deg, var(--gold) 0%, var(--gold-deep) 100%);
-  color: var(--paper);
+  background: var(--surface);
+  color: var(--ink);
 }
 
 .accentTitle {
   font-size: var(--text-2xl);
-  color: var(--paper);
+  color: var(--ink);
   padding-bottom: 1rem;
-  border-bottom: 2px solid color-mix(in srgb, var(--paper) 60%, transparent);
+  border-bottom: 1px solid var(--line);
   max-width: 24rem;
 }
 
 .accentLede {
   margin-top: 1.25rem;
-  color: color-mix(in srgb, var(--paper) 85%, transparent);
+  color: var(--ink-soft);
 }
 
 .rows {
@@ -107,17 +108,19 @@
   justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--paper) 15%, transparent);
+  border-radius: 8px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--gold);
 }
 
 .accentNote {
   margin-top: 2.25rem;
   padding-top: 1.25rem;
-  border-top: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
+  border-top: 1px solid var(--line);
   font-size: var(--text-xs);
   line-height: 1.6;
-  color: color-mix(in srgb, var(--paper) 78%, transparent);
+  color: var(--ink-faint);
 }
 
 @media (max-width: 900px) {
@@ -136,13 +139,11 @@
 }
 
 .outline {
-  background: transparent;
-  border-color: color-mix(in srgb, var(--paper) 55%, transparent);
-  color: var(--paper);
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
 }
 
 .outline:hover:not(:disabled) {
-  background: var(--paper);
-  color: var(--ink);
-  border-color: var(--paper);
+  background: var(--surface);
 }

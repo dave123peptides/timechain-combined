@@ -1,29 +1,27 @@
 .wrap {
   display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
 }
 
 .segments {
   display: inline-flex;
   margin: 0;
-  padding: 0.25rem;
+  padding: 0.2rem;
   list-style: none;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--surface);
 }
 
 .segment {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 1.25rem;
-  border-radius: 999px;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
   color: var(--ink-soft);
+  font-family: var(--font-label);
   font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 500;
   text-decoration: none;
   transition: background 150ms ease, color 150ms ease;
 }
@@ -34,22 +32,14 @@
 
 .segmentActive,
 .segmentActive:hover {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
 }
 
 .count {
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--ink-faint);
-}
-
-.segmentActive .count {
-  color: color-mix(in srgb, var(--paper) 75%, transparent);
-}
-
-@media (max-width: 720px) {
-  .segment {
-    padding: 0.5rem 0.9rem;
-  }
+  font-variant-numeric: tabular-nums;
 }

@@ -1,162 +1,140 @@
 .hero {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, var(--surface) 0%, var(--paper) 100%);
   border-bottom: 1px solid var(--line);
 }
 
 .inner {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: 1.05fr 0.95fr;
   align-items: center;
-  gap: 3rem;
-  min-height: 34rem;
-  padding-top: 3.5rem;
-  padding-bottom: 3.5rem;
+  gap: 4rem;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
 }
 
 .copy {
-  max-width: 36rem;
+  max-width: 34rem;
 }
 
 .headline {
   margin-top: 1rem;
-  font-size: clamp(2.8rem, 5vw, 4.4rem);
-  line-height: 1.02;
+  font-size: clamp(2.4rem, 4.6vw, 3.9rem);
 }
 
 .lede {
-  margin-top: 1.5rem;
-  max-width: 32rem;
+  margin-top: 1.25rem;
+  max-width: 30rem;
   font-size: var(--text-lg);
-  color: var(--ink-soft);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 2rem;
+  gap: 0.6rem;
+  margin-top: 1.75rem;
 }
 
-/* --- the pedestal ------------------------------------------------------- */
-
-.visual {
-  position: relative;
-  justify-self: end;
-  width: 100%;
-  max-width: 30rem;
+.meta {
+  margin-top: 1.5rem;
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
 }
 
-.pedestal {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--radius-lg);
-  background:
-    radial-gradient(60% 50% at 50% 95%, rgba(21, 33, 58, 0.14), transparent 70%),
-    linear-gradient(160deg, #f1ece2 0%, #e6dfd0 100%);
+/* --- the catalog slice --------------------------------------------------- */
+
+.sheet {
   border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
-.code {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  padding: 0.3rem 0.65rem;
-  border-radius: 999px;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  font-family: var(--font-label);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: var(--ink-soft);
-}
-
-.vial {
-  position: absolute;
-  left: 8%;
-  bottom: 6%;
-  width: 48%;
-  height: auto;
-}
-
-.pen {
-  position: absolute;
-  right: -14%;
-  top: 30%;
-  width: 92%;
-  height: auto;
-  transform: rotate(-32deg);
-  filter: drop-shadow(0 22px 20px rgba(21, 33, 58, 0.25));
-}
-
-.callouts {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  pointer-events: none;
-}
-
-.callout {
-  position: absolute;
-  display: inline-flex;
+.sheetHead,
+.row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 1fr;
+  gap: 1rem;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.75rem;
-  border-radius: 999px;
-  background: var(--ink);
-  color: var(--paper);
+  padding: 0.85rem 1.25rem;
+}
+
+.sheetHead {
   font-family: var(--font-label);
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  box-shadow: 0 6px 14px rgba(21, 33, 58, 0.18);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
 
-.callout:nth-child(1) {
-  top: 9%;
-  right: 6%;
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.callout:nth-child(2) {
-  top: 52%;
-  left: -5%;
+.row {
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--text-sm);
+  transition: background-color 120ms ease;
 }
 
-.callout:nth-child(3) {
-  bottom: 7%;
-  right: 8%;
+.row:hover {
+  background: var(--surface);
+}
+
+.rowName {
+  font-family: var(--font-label);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rowFormats {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.badge {
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.rowStrengths {
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.sheetMore {
+  display: block;
+  padding: 0.85rem 1.25rem;
+  font-family: var(--font-label);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--gold-deep);
+}
+
+.sheetMore:hover {
+  background: var(--surface);
 }
 
 @media (max-width: 900px) {
   .inner {
     grid-template-columns: 1fr;
-    min-height: 0;
-    gap: 2rem;
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem;
+    gap: 2.5rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
   }
 
-  .visual {
-    max-width: 22rem;
-    justify-self: center;
-  }
-
-  .callouts {
-    position: static;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .callout {
-    position: static;
+  .sheetHead,
+  .row {
+    grid-template-columns: 1.3fr 0.7fr 1fr;
+    padding: 0.75rem 1rem;
   }
 }

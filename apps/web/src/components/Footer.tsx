@@ -2,11 +2,8 @@ import Link from "next/link";
 import { ORDERING_ENABLED, SUPPORT_EMAIL } from "@/lib/site";
 import styles from "./Footer.module.css";
 
-// Four columns on navy (B2B redesign, 2026-10-22): the brand with the
-// one-line proposition and the support address, the catalog, the company
-// pages, and legal. The research-use-only disclaimer closes every page.
-// No entity line: the LLC name stays off the storefront (David,
-// 2026-09-06). No Shipping or Returns link: the facts are unconfirmed.
+// Minimal footer: a thin rule, three link columns, the support address,
+// and the research-use-only line. No entity line (David, 2026-09-06).
 export default function Footer() {
   return (
     <footer className={styles.footer}>
@@ -14,10 +11,11 @@ export default function Footer() {
         <div className={styles.grid}>
           <div className={styles.brand}>
             <div className={styles.wordmark}>
-              TimeChain<span>Peptides</span>
+              <span className={styles.mark} aria-hidden="true" />
+              TimeChain <span>Peptides</span>
             </div>
             <p className={styles.tagline}>
-              Research peptides in pre-filled auto-injector pens and lyophilized vials, supplied to research
+              Research peptides in pre-filled pens and lyophilized vials, supplied in quantity to research
               organizations and medical practices.
             </p>
             <a href={`mailto:${SUPPORT_EMAIL}`} className={styles.email}>
@@ -39,7 +37,7 @@ export default function Footer() {
             <div className={styles.linkList}>
               <Link href="/request">Your order request</Link>
               <Link href="/#how-it-works">How ordering works</Link>
-              <Link href="/contact">Contact and meetings</Link>
+              <Link href="/contact">Contact</Link>
               <Link href="/faq">FAQ</Link>
             </div>
           </div>

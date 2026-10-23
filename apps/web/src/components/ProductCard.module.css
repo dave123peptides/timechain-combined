@@ -5,21 +5,19 @@
   border-radius: var(--radius-lg);
   background: var(--paper);
   overflow: hidden;
-  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .card:hover {
-  transform: translateY(-3px);
+  border-color: #d3d7dd;
   box-shadow: var(--shadow-md);
-  border-color: color-mix(in srgb, var(--gold) 45%, var(--line));
 }
 
-/* The product on a soft ground. 1 / 1 keeps the grid even. */
 .media {
   position: relative;
   display: flex;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
@@ -27,23 +25,16 @@
   overflow: hidden;
 }
 
-/* Pen renders are landscape (about 4.3:1); laid flat they would be a thin
-   strip, so they sit diagonally. Vial photos are square-ish and multiply
-   onto the ground (globals.css .productPhoto). */
 .image,
 .imageHover {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transform: rotate(-30deg) scale(1.18);
 }
 
-.image[src*="/products/pens/"] {
-  transform: rotate(-30deg) scale(1.18);
-}
-
-.image:not([src*="/products/pens/"]) {
-  transform: none;
+.image[src*="/products/pens/"],
+.imageHover[src*="/products/pens/"] {
+  transform: rotate(-30deg) scale(1.15);
 }
 
 .imageHover {
@@ -55,10 +46,6 @@
   transition: opacity 200ms ease;
 }
 
-.imageHover:not([src*="/products/pens/"]) {
-  transform: none;
-}
-
 @media (hover: hover) {
   .card:hover .imageHover {
     opacity: 1;
@@ -67,36 +54,36 @@
 
 .formats {
   position: absolute;
-  top: 0.9rem;
-  left: 0.9rem;
+  top: 0.75rem;
+  left: 0.75rem;
   display: flex;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
 .format {
-  padding: 0.3rem 0.6rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ink) 90%, transparent);
-  color: var(--paper);
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink-soft);
   font-family: var(--font-label);
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 0.5rem;
-  padding: 1.1rem 1.25rem 1.25rem;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem 1.1rem;
 }
 
 .name {
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  line-height: 1.1;
+  font-family: var(--font-label);
+  font-size: var(--text-base);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--ink);
   text-wrap: balance;
 }
@@ -117,9 +104,9 @@
 .facts {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  margin: 0.4rem 0 0.9rem;
-  padding-top: 0.75rem;
+  gap: 0.25rem;
+  margin: 0.5rem 0 0.9rem;
+  padding-top: 0.6rem;
   border-top: 1px solid var(--line-soft);
 }
 
@@ -131,11 +118,8 @@
 }
 
 .facts dt {
-  font-family: var(--font-label);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--ink-faint);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .facts dd {
@@ -145,11 +129,9 @@
   text-align: right;
 }
 
-/* margin-top:auto pins the button to the bottom so tiles in a row line
-   up even when their titles wrap to different heights. */
 .action {
   width: 100%;
   margin-top: auto;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
 }

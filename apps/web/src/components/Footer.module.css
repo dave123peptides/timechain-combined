@@ -1,8 +1,9 @@
 .footer {
   margin-top: 5rem;
-  padding: 4rem 0 2.5rem;
-  background: var(--navy-deep);
-  color: var(--paper);
+  padding: 3.5rem 0 2.5rem;
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
 }
 
 .grid {
@@ -17,25 +18,28 @@
 
 .wordmark {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.45rem;
+  align-items: center;
+  gap: 0.55rem;
   font-family: var(--font-display);
-  font-size: 1.7rem;
-  color: var(--paper);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin-bottom: 0.9rem;
 }
 
-.wordmark span {
-  font-family: var(--font-label);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gold);
+.wordmark span:not(.mark) {
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+
+.mark {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 3px;
+  background: var(--gold);
 }
 
 .tagline {
-  color: color-mix(in srgb, var(--paper) 68%, transparent);
   font-size: var(--text-sm);
 }
 
@@ -43,43 +47,43 @@
   display: inline-block;
   margin-top: 1rem;
   font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--gold);
+  font-weight: 500;
+  color: var(--gold-deep);
+}
+
+.email:hover {
   text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .heading {
   font-family: var(--font-label);
-  font-size: 0.72rem;
+  font-size: var(--text-sm);
   font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.9rem;
 }
 
 .linkList {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.6rem;
 }
 
 .linkList a {
   font-size: var(--text-sm);
-  color: color-mix(in srgb, var(--paper) 82%, transparent);
+  color: var(--ink-soft);
 }
 
 .linkList a:hover {
-  color: var(--gold);
+  color: var(--ink);
 }
 
 .disclaimer {
   margin-top: 3rem;
-  padding-top: 1.75rem;
-  border-top: 1px solid color-mix(in srgb, var(--paper) 14%, transparent);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
   font-size: var(--text-xs);
-  color: color-mix(in srgb, var(--paper) 50%, transparent);
+  color: var(--ink-faint);
   line-height: 1.6;
 }
 
@@ -96,8 +100,6 @@
   }
 }
 
-/* The contact page's full-bleed panels run straight into the footer: it
-   marks its <main data-flush-footer> and the top gap is dropped. */
 :global(#content:has(> main[data-flush-footer])) + .footer {
   margin-top: 0;
 }

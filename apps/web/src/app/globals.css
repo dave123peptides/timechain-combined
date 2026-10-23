@@ -1,53 +1,50 @@
-/* TimeChain Peptides, combined site: the B2B redesign (David, 2026-10-22,
-   brief in docs/plans/redesign-b2b.md). Warm paper, navy ink, a brass
-   accent, serif display type with one italic accent word. The token NAMES
-   are unchanged from the earlier themes on purpose: every CSS Module
-   references them by name, so this file plus the font swap in layout.tsx
-   is the re-skin. `--gold*` is literal brass at last. A single committed
-   presentation (no dark-mode variant). */
+/* TimeChain Peptides, combined site: modern, clean, minimal (David,
+   2026-10-22, second pass after the cream-and-serif direction was
+   rejected). White ground, near-black type in one tight sans, a single
+   teal accent, thin lines. Built for a practice to open the site and see
+   everything on offer at a glance. The token NAMES are unchanged from the
+   earlier themes on purpose: every CSS Module references them by name,
+   so this file plus the font swap in layout.tsx is the re-skin.
+   `--gold*` holds the accent (teal, not gold). */
 
 :root {
-  --ink: #15213a;
-  --ink-soft: #4b5468;
-  --ink-faint: #8a8f9c;
-  --paper: #f7f4ee;
-  --surface: #efeae0;
-  --line: #e2dccf;
-  --line-soft: #ece7dc;
-  --navy-deep: #0f172b;
+  --ink: #0f1419;
+  --ink-soft: #5b6472;
+  --ink-faint: #8b95a3;
+  --paper: #ffffff;
+  --surface: #f6f7f9;
+  --line: #e6e8ec;
+  --line-soft: #f0f2f4;
+  --navy-deep: #0f1419;
 
-  --gold: #b4893a;
-  --gold-deep: #8f6b26;
-  --gold-pale: #f2e8d3;
+  --gold: #0f766e;
+  --gold-deep: #115e59;
+  --gold-pale: #e6f4f1;
 
   --danger: #b3261e;
 
-  --font-display: var(--font-display-serif), "Iowan Old Style", "Times New Roman", serif;
-  --font-label: var(--font-label-sans), -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display-sans), -apple-system, "Segoe UI", sans-serif;
+  --font-label: var(--font-display-sans), -apple-system, "Segoe UI", sans-serif;
   --font-body: var(--font-body-sans), -apple-system, "Segoe UI", sans-serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
-  --text-lg: 1.15rem;
-  --text-xl: 1.5rem;
-  --text-2xl: 2.1rem;
-  --text-3xl: 2.9rem;
-  --text-4xl: 4rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.3rem;
+  --text-2xl: 1.7rem;
+  --text-3xl: 2.3rem;
+  --text-4xl: 3.3rem;
 
   --max-width: 1240px;
-  --radius: 14px;
-  --radius-lg: 26px;
+  --radius: 10px;
+  --radius-lg: 16px;
 
-  /* Header.module.css: a 4rem floating bar inside 0.75rem of vertical
-     padding. Everything that offsets against the sticky header (the PDP
-     gallery, the drawer) reads this. */
-  --header-h: 5.5rem;
+  /* Header.module.css: a 4rem bar plus its 1px border. */
+  --header-h: calc(4rem + 1px);
   --sticky-gap: 0.65rem;
   --sticky-top: calc(var(--header-h) + var(--sticky-gap));
 
-  /* Header is position:sticky with a non-auto z-index, so it CREATES A
-     STACKING CONTEXT. Drawers render from (storefront)/layout.tsx. */
   --z-sticky-nav: 20;
   --z-header: 30;
   --z-buy-bar: 40;
@@ -65,9 +62,9 @@
   --space-8: 3.5rem;
   --space-9: 5rem;
 
-  --shadow-sm: 0 1px 2px rgba(21, 33, 58, 0.06);
-  --shadow-md: 0 8px 24px rgba(21, 33, 58, 0.08);
-  --shadow-lg: 0 -8px 28px rgba(21, 33, 58, 0.1);
+  --shadow-sm: 0 1px 2px rgba(15, 20, 25, 0.05);
+  --shadow-md: 0 6px 20px rgba(15, 20, 25, 0.08);
+  --shadow-lg: 0 -8px 28px rgba(15, 20, 25, 0.1);
 }
 
 * {
@@ -89,15 +86,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Serif display at regular weight; the accent word is an <em>. */
+/* Tight, confident display type. The <em> in a headline is the quiet
+   second clause, set in gray at the same size. */
 h1,
 h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   margin: 0;
   text-wrap: balance;
   color: var(--ink);
@@ -113,14 +111,16 @@ h2 {
 
 h3 {
   font-size: var(--text-xl);
+  letter-spacing: -0.02em;
 }
 
 h1 em,
 h2 em,
 h3 em,
 .accent {
-  font-style: italic;
-  color: var(--gold-deep);
+  font-style: normal;
+  font-weight: 500;
+  color: var(--ink-faint);
 }
 
 p {
@@ -145,9 +145,9 @@ img {
 .eyebrow {
   font-family: var(--font-label);
   font-size: 0.72rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--gold-deep);
+  color: var(--gold);
   font-weight: 600;
 }
 
@@ -157,23 +157,21 @@ img {
   padding: 0 1.75rem;
 }
 
-/* Pill buttons by default now; .buttonPill is kept as a no-op modifier so
-   the older markup composes unchanged. */
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.85rem 1.6rem;
+  padding: 0.7rem 1.2rem;
   font-family: var(--font-label);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 999px;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  border-radius: 8px;
   border: 1px solid var(--ink);
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, transform 150ms ease;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .buttonPrimary {
@@ -182,19 +180,18 @@ img {
 }
 
 .buttonPrimary:hover:not(:disabled) {
-  background: var(--navy-deep);
-  border-color: var(--navy-deep);
+  background: #262d36;
+  border-color: #262d36;
 }
 
 .buttonSecondary {
   background: transparent;
   color: var(--ink);
-  border-color: var(--ink);
+  border-color: var(--line);
 }
 
 .buttonSecondary:hover:not(:disabled) {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--surface);
 }
 
 .button:disabled {
@@ -202,32 +199,32 @@ img {
   cursor: not-allowed;
 }
 
+/* Kept for older markup; the modern buttons are 8px, pills are opt-in. */
 .buttonPill {
   border-radius: 999px;
 }
 
-/* The brass call to action. */
 .buttonAccent {
-  background: var(--gold-deep);
-  border-color: var(--gold-deep);
+  background: var(--ink);
+  border-color: var(--ink);
   color: var(--paper);
 }
 
 .buttonAccent:hover:not(:disabled) {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: #262d36;
+  border-color: #262d36;
 }
 
 .buttonAccentOutline {
-  background: transparent;
-  border-color: var(--ink);
+  background: var(--paper);
+  border-color: var(--line);
   color: var(--ink);
 }
 
 .buttonAccentOutline:hover:not(:disabled) {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--paper);
+  background: var(--surface);
+  border-color: #d3d7dd;
+  color: var(--ink);
 }
 
 .buttonOnDark {
@@ -237,8 +234,8 @@ img {
 }
 
 .buttonOnDark:hover:not(:disabled) {
-  background: var(--gold-pale);
-  border-color: var(--gold-pale);
+  background: var(--surface);
+  border-color: var(--surface);
 }
 
 .priceTag {
@@ -247,9 +244,8 @@ img {
   font-variant-numeric: tabular-nums;
 }
 
-/* Product photography is shot on white; multiply blends that white into
-   the paper so a vial sits on the page instead of in a white box. Pen
-   renders are transparent cut-outs and are unaffected. */
+/* Product photography is shot on white; on the white ground nothing is
+   needed, and on the gray surface multiply hides the photo's box. */
 .productPhoto {
   mix-blend-mode: multiply;
 }
@@ -285,9 +281,9 @@ img {
 
 @media (max-width: 720px) {
   :root {
-    --text-4xl: 2.7rem;
-    --text-3xl: 2.2rem;
-    --text-2xl: 1.7rem;
+    --text-4xl: 2.4rem;
+    --text-3xl: 1.9rem;
+    --text-2xl: 1.45rem;
   }
 
   .container {

@@ -1,5 +1,6 @@
 import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
+import { isView } from "@/components/catalog/view";
 import PageBanner from "@/components/PageBanner";
 import { listProductsOrEmpty } from "@/lib/api";
 import { findCategory } from "@/lib/categories";
@@ -7,47 +8,27 @@ import { findForm } from "@/lib/forms";
 
 export const dynamic = "force-dynamic";
 
-// Cut-out pen renders (see public/products/hero/README.md) of promotable,
-// non-GLP products only (lib/compliance.ts): this is a promotional
-// surface. Shown on the all-products and Pens views; the Vials view has
-// no vial render to match, so it goes without.
-const BANNER_PENS = ["/products/hero/tb-500.png", "/products/hero/bpc-157.png", "/products/hero/ghk-cu.png"];
-
-// One flat, alphabetical catalog with the Pens | Vials toggle
-// (lib/forms.ts) and the benefit-category pill row (lib/categories.ts)
-// on top. ?form= narrows to one line, ?category= narrows within it; an
-// unknown value for either means "all". Product.category (the internal
-// taxonomy) still never renders.
+// The catalog page: the same order sheet as the homepage, under its own
+// heading. ?form= narrows to one line, ?category= within it, ?view=
+// switches sheet and grid; an unknown value means "all" / the default.
+// Product.category (the internal taxonomy) still never renders.
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; sort?: string; category?: string; form?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; category?: string; form?: string; view?: string }>;
 }) {
   const params = await searchParams;
   const query = params.q?.trim() || undefined;
   const sort = isSort(params.sort) ? params.sort : "name";
   const category = findCategory(params.category);
   const form = findForm(params.form);
+  const view = isView(params.view) ? params.view : "list";
 
   const products = await listProductsOrEmpty({ q: query, sort });
 
-  const title = query ? (
-    <>
-      Results for <em>“{query}”</em>
-    </>
-  ) : form ? (
-    <>
-      Research peptide <em>{form.label.toLowerCase()}</em>
-    </>
-  ) : (
-    <>
-      The <em>catalog</em>
-    </>
-  );
-
   return (
     <main>
-      <PageBanner eyebrow="Research use only" title={title} images={form?.key === "lyophilized" ? undefined : BANNER_PENS}>
+      <PageBanner eyebrow="Research use only" title={query ? `Results for “${query}”` : form ? `Research peptide ${form.label.toLowerCase()}` : "Catalog"}>
         <p>
           {form
             ? form.description
@@ -56,12 +37,13 @@ export default async function ShopPage({
       </PageBanner>
       <CatalogGrid
         products={products}
-        title={query ? "Search results" : "Every compound we supply"}
+        title={query ? "Search results" : "Every compound"}
         basePath="/shop"
         sort={sort}
         query={query}
         category={category}
         form={form}
+        view={view}
       />
     </main>
   );

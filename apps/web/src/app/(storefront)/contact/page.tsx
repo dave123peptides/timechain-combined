@@ -73,7 +73,7 @@ export default async function ContactPage({
               </p>
             )}
             <div className={styles.actions}>
-              <Link href="/shop" className="button buttonOnDark">
+              <Link href="/shop" className="button buttonAccent">
                 Build an order request
               </Link>
               {BOOKING_URL ? (
