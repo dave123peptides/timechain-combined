@@ -2,7 +2,7 @@ import Link from "next/link";
 import Faq from "@/components/Faq";
 import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
-import { isView } from "@/components/catalog/view";
+import { DEFAULT_VIEW, isView } from "@/components/catalog/view";
 import Hero from "@/components/home/Hero";
 import HowItWorks from "@/components/home/HowItWorks";
 import QualitySection from "@/components/home/QualitySection";
@@ -31,7 +31,7 @@ export default async function Home({
   const sort = isSort(params.sort) ? params.sort : "name";
   const category = findCategory(params.category);
   const form = findForm(params.form);
-  const view = isView(params.view) ? params.view : "list";
+  const view = isView(params.view) ? params.view : DEFAULT_VIEW;
   const products = await listProductsOrEmpty({ sort });
   const configurations = products.reduce((sum, product) => sum + product.variants.length, 0);
 
@@ -43,7 +43,7 @@ export default async function Home({
         products={products}
         title={
           <>
-            The catalog. <em>Every compound, every format.</em>
+            The catalog, <em>by category.</em>
           </>
         }
         basePath="/"

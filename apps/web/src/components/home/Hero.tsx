@@ -1,20 +1,18 @@
 import Link from "next/link";
 import type { ProductSummary } from "@/lib/api";
-import { formatStrength } from "@/lib/api";
+import { groupByCategory } from "@/lib/categories";
 import { promotableOnly } from "@/lib/compliance";
-import { formSingular, formsIn, strengthList } from "@/lib/forms";
 import { AUDIENCE } from "@/lib/site";
 import styles from "./Hero.module.css";
 
-// Hero (modern, minimal, 2026-10-22): a plain statement on the left and,
-// instead of product photography, a live slice of the catalog sheet on
-// the right: the first rows of the same list the page scrolls into. The
-// slice is the alphabetical head of the promotable catalog, never a
-// curated pick and never a GLP-class code name (lib/compliance.ts).
-const PREVIEW_ROWS = 5;
-
+// Hero (2026-10-23): a plain statement on the left and, on the right, the
+// catalog's categories as tiles with counts and two example compounds
+// each, so "what's here" is answered before anyone scrolls. Examples are
+// the first promotable members alphabetically, never a curated pick and
+// never a GLP-class code name (lib/compliance.ts). Each tile opens the
+// catalog narrowed to that category.
 export default function Hero({ products, configurations }: { products: ProductSummary[]; configurations: number }) {
-  const preview = promotableOnly(products).slice(0, PREVIEW_ROWS);
+  const groups = groupByCategory(products).filter((group) => group.category.slug !== "supplies");
 
   return (
     <section className={styles.hero}>
@@ -25,8 +23,8 @@ export default function Hero({ products, configurations }: { products: ProductSu
             Everything we supply, <em>in one place.</em>
           </h1>
           <p className={styles.lede}>
-            Research peptides in pre-filled auto-injector pens and lyophilized vials for {AUDIENCE}. See the whole
-            catalog, pick formats, strengths and quantities, and send one order request.
+            Research peptides in pre-filled auto-injector pens and lyophilized vials for {AUDIENCE}. Browse by
+            category, pick formats and strengths, and send one order request for the quantities you need.
           </p>
           <div className={styles.actions}>
             <Link href="/shop" className="button buttonAccent">
@@ -43,34 +41,23 @@ export default function Hero({ products, configurations }: { products: ProductSu
           )}
         </div>
 
-        {preview.length > 0 && (
-          <div className={styles.sheet} aria-label="Catalog preview">
-            <div className={styles.sheetHead}>
-              <span>Compound</span>
-              <span>Formats</span>
-              <span>Strengths</span>
-            </div>
-            <ul className={styles.rows}>
-              {preview.map((product) => (
-                <li key={product.slug}>
-                  <Link href={`/shop/${product.slug}`} className={styles.row}>
-                    <span className={styles.rowName}>{product.name}</span>
-                    <span className={styles.rowFormats}>
-                      {formsIn(product.variants).map((form) => (
-                        <span key={form.key} className={styles.badge}>
-                          {formSingular(form.key)}
-                        </span>
-                      ))}
-                    </span>
-                    <span className={styles.rowStrengths}>{strengthList(product.variants).map(formatStrength).join(", ")}</span>
+        {groups.length > 0 && (
+          <ul className={styles.tiles} aria-label="Catalog categories">
+            {groups.map((group) => {
+              const examples = promotableOnly(group.products)
+                .slice(0, 2)
+                .map((product) => product.name);
+              return (
+                <li key={group.category.slug}>
+                  <Link href={`/shop?category=${group.category.slug}`} className={styles.tile}>
+                    <span className={styles.tileCount}>{group.products.length}</span>
+                    <span className={styles.tileLabel}>{group.category.label}</span>
+                    {examples.length > 0 && <span className={styles.tileExamples}>{examples.join(", ")}</span>}
                   </Link>
                 </li>
-              ))}
-            </ul>
-            <Link href="/shop" className={styles.sheetMore}>
-              See all {products.length} compounds
-            </Link>
-          </div>
+              );
+            })}
+          </ul>
         )}
       </div>
     </section>

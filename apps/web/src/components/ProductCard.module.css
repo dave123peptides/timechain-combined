@@ -17,39 +17,23 @@
   position: relative;
   display: flex;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 5 / 4;
   align-items: center;
   justify-content: center;
-  padding: 1.25rem;
+  padding: 1.5rem;
   background: var(--surface);
   overflow: hidden;
 }
 
-.image,
-.imageHover {
+.image {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.image[src*="/products/pens/"],
-.imageHover[src*="/products/pens/"] {
-  transform: rotate(-30deg) scale(1.15);
-}
-
-.imageHover {
-  position: absolute;
-  inset: 1.25rem;
-  width: auto;
-  height: auto;
-  opacity: 0;
-  transition: opacity 200ms ease;
-}
-
-@media (hover: hover) {
-  .card:hover .imageHover {
-    opacity: 1;
-  }
+/* Pen renders are landscape; diagonal, they fill the frame. */
+.image[src*="/products/pens/"] {
+  transform: rotate(-30deg) scale(1.2);
 }
 
 .formats {
@@ -75,15 +59,16 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 0.35rem;
+  gap: 0.3rem;
   padding: 1rem 1.1rem 1.1rem;
 }
 
 .name {
   font-family: var(--font-label);
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
   color: var(--ink);
   text-wrap: balance;
 }
@@ -101,32 +86,20 @@
   overflow: hidden;
 }
 
-.facts {
+/* Formats on one line, strengths on the next: a long strength list wraps
+   on its own line instead of carrying a separator over. */
+.meta {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  margin: 0.5rem 0 0.9rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--line-soft);
-}
-
-.facts div {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.15rem;
+  margin: 0.35rem 0 0.9rem;
   font-size: var(--text-xs);
-}
-
-.facts dt {
   color: var(--ink-faint);
-  font-weight: 500;
 }
 
-.facts dd {
-  margin: 0;
-  color: var(--ink);
+.meta span:first-child {
+  color: var(--ink-soft);
   font-weight: 500;
-  text-align: right;
 }
 
 .action {
@@ -134,4 +107,81 @@
   margin-top: auto;
   padding-top: 0.6rem;
   padding-bottom: 0.6rem;
+}
+
+/* --- the on-demand chooser ---------------------------------------------- */
+
+.chooser {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.chooserSelect,
+.chooserQuantity {
+  height: 2.5rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  padding: 0 0.7rem;
+}
+
+.chooserSelect {
+  width: 100%;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-faint) 50%), linear-gradient(135deg, var(--ink-faint) 50%, transparent 50%);
+  background-position: calc(100% - 1rem) 50%, calc(100% - 0.7rem) 50%;
+  background-size: 0.3rem 0.3rem, 0.3rem 0.3rem;
+  background-repeat: no-repeat;
+  padding-right: 1.8rem;
+}
+
+.chooserRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chooserQuantity {
+  width: 4.25rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.chooserQuantity::-webkit-outer-spin-button,
+.chooserQuantity::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.chooserSelect:focus-visible,
+.chooserQuantity:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -1px;
+}
+
+.chooserAdd {
+  flex: 1;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+.chooserCancel {
+  border: none;
+  background: transparent;
+  color: var(--ink-faint);
+  font-family: var(--font-label);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+
+.chooserCancel:hover {
+  color: var(--ink);
 }

@@ -1,6 +1,6 @@
 import CatalogGrid from "@/components/catalog/CatalogGrid";
 import { isSort } from "@/components/catalog/sort";
-import { isView } from "@/components/catalog/view";
+import { DEFAULT_VIEW, isView } from "@/components/catalog/view";
 import PageBanner from "@/components/PageBanner";
 import { listProductsOrEmpty } from "@/lib/api";
 import { findCategory } from "@/lib/categories";
@@ -22,7 +22,7 @@ export default async function ShopPage({
   const sort = isSort(params.sort) ? params.sort : "name";
   const category = findCategory(params.category);
   const form = findForm(params.form);
-  const view = isView(params.view) ? params.view : "list";
+  const view = isView(params.view) ? params.view : DEFAULT_VIEW;
 
   const products = await listProductsOrEmpty({ q: query, sort });
 

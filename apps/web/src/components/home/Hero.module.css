@@ -4,7 +4,7 @@
 
 .inner {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
   gap: 4rem;
   padding-top: 5rem;
@@ -40,88 +40,57 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* --- the catalog slice --------------------------------------------------- */
+/* --- category tiles ------------------------------------------------------ */
 
-.sheet {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--paper);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.sheetHead,
-.row {
+.tiles {
   display: grid;
-  grid-template-columns: 1.4fr 0.8fr 1fr;
-  gap: 1rem;
-  align-items: center;
-  padding: 0.85rem 1.25rem;
-}
-
-.sheetHead {
-  font-family: var(--font-label);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-
-.rows {
-  list-style: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
-.row {
-  border-bottom: 1px solid var(--line-soft);
-  font-size: var(--text-sm);
-  transition: background-color 120ms ease;
-}
-
-.row:hover {
-  background: var(--surface);
-}
-
-.rowName {
-  font-family: var(--font-label);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.rowFormats {
+.tile {
   display: flex;
-  gap: 0.3rem;
-}
-
-.badge {
-  padding: 0.15rem 0.5rem;
+  flex-direction: column;
+  gap: 0.2rem;
+  height: 100%;
+  padding: 1rem 1.1rem 1.1rem;
   border: 1px solid var(--line);
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--ink-soft);
+  border-radius: var(--radius);
+  background: var(--paper);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.rowStrengths {
-  color: var(--ink-soft);
+.tile:hover {
+  border-color: #d3d7dd;
+  box-shadow: var(--shadow-md);
+}
+
+.tileCount {
+  font-family: var(--font-label);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--gold);
   font-variant-numeric: tabular-nums;
 }
 
-.sheetMore {
-  display: block;
-  padding: 0.85rem 1.25rem;
+.tileLabel {
   font-family: var(--font-label);
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--gold-deep);
+  line-height: 1.25;
+  color: var(--ink);
 }
 
-.sheetMore:hover {
-  background: var(--surface);
+.tileExamples {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 900px) {
@@ -131,10 +100,10 @@
     padding-top: 3rem;
     padding-bottom: 3rem;
   }
+}
 
-  .sheetHead,
-  .row {
-    grid-template-columns: 1.3fr 0.7fr 1fr;
-    padding: 0.75rem 1rem;
+@media (max-width: 480px) {
+  .tiles {
+    grid-template-columns: 1fr;
   }
 }

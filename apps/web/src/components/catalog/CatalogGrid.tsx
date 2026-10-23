@@ -2,26 +2,27 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { ProductSort, ProductSummary } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
-import { inCategory, type StorefrontCategory } from "@/lib/categories";
+import { groupByCategory, inCategory, type StorefrontCategory } from "@/lib/categories";
 import { narrowToForm, type StorefrontForm } from "@/lib/forms";
 import CatalogRow from "./CatalogRow";
 import CategoryPills from "./CategoryPills";
 import FormPills from "./FormPills";
 import ShopSort from "./ShopSort";
-import { VIEW_OPTIONS, type CatalogView } from "./view";
+import { DEFAULT_VIEW, VIEW_OPTIONS, type CatalogView } from "./view";
 import styles from "./CatalogGrid.module.css";
 
 function plural(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`;
 }
 
-// The whole catalog with the Pens | Vials toggle and the category pills
-// on top, a result count, a sort control and the view switch. The default
-// view is the order sheet: one CatalogRow per compound with the
-// configuration, quantity and Add in the row. The grid of cards is the
-// alternative. Rendered by the homepage AND /shop. `products` is the
-// whole (search-filtered) catalog; `form` narrows to one line (variants
-// of that form only), `category` narrows within it.
+// The whole catalog (2026-10-23, David: "more easy to see the different
+// peptides"). The default view is cards grouped under their category
+// headings, so the page reads as "here is what we have", with one button
+// per card. A category filter, a search or a format shows a flat grid of
+// what matched. The dense order sheet (one row per compound with the
+// controls in the row) is the other view. Rendered by the homepage AND
+// /shop. `products` is the whole (search-filtered) catalog; `form`
+// narrows to one line, `category` narrows within it.
 export default function CatalogGrid({
   products,
   title,
@@ -30,7 +31,7 @@ export default function CatalogGrid({
   query,
   category,
   form,
-  view = "list",
+  view = DEFAULT_VIEW,
 }: {
   products: ProductSummary[];
   title: ReactNode;
@@ -45,10 +46,11 @@ export default function CatalogGrid({
   const visible = category ? inCategory(inForm, category) : inForm;
   const unit = form ? [form.singular.toLowerCase(), form.label.toLowerCase()] : ["compound", "compounds"];
   const count = plural(visible.length, unit[0], unit[1]);
+  const grouped = view === "cards" && !category && !query && sort === "name";
 
   const viewHref = (next: CatalogView) => {
     const params = new URLSearchParams();
-    if (next !== "list") params.set("view", next);
+    if (next !== DEFAULT_VIEW) params.set("view", next);
     if (form) params.set("form", form.key);
     if (category) params.set("category", category.slug);
     if (sort !== "name") params.set("sort", sort);
@@ -56,6 +58,14 @@ export default function CatalogGrid({
     const qs = params.toString();
     return qs ? `${basePath}?${qs}` : basePath;
   };
+
+  const cards = (items: ProductSummary[]) => (
+    <div className={styles.grid}>
+      {items.map((product) => (
+        <ProductCard key={product.slug} product={product} form={form?.key} />
+      ))}
+    </div>
+  );
 
   return (
     <section className={styles.section} id="catalog">
@@ -105,13 +115,7 @@ export default function CatalogGrid({
               "Nothing is available right now. Check back soon."
             )}
           </p>
-        ) : view === "grid" ? (
-          <div className={styles.grid}>
-            {visible.map((product) => (
-              <ProductCard key={product.slug} product={product} form={form?.key} />
-            ))}
-          </div>
-        ) : (
+        ) : view === "sheet" ? (
           <ul className={styles.sheet}>
             <li className={styles.sheetHead} aria-hidden="true">
               <span />
@@ -123,6 +127,23 @@ export default function CatalogGrid({
               <CatalogRow key={product.slug} product={product} form={form?.key} />
             ))}
           </ul>
+        ) : grouped ? (
+          <div className={styles.groups}>
+            {groupByCategory(visible).map((group) => (
+              <section key={group.category.slug} id={`cat-${group.category.slug}`} className={styles.group}>
+                <div className={styles.groupHead}>
+                  <h3 className={styles.groupTitle}>
+                    {group.category.label}
+                    <span className={styles.groupCount}>{group.products.length}</span>
+                  </h3>
+                  {group.category.description && <p className={styles.groupDescription}>{group.category.description}</p>}
+                </div>
+                {cards(group.products)}
+              </section>
+            ))}
+          </div>
+        ) : (
+          cards(visible)
         )}
       </div>
     </section>

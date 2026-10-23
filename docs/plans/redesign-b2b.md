@@ -74,3 +74,16 @@ clean minimalistic look"). The direction now:
   rows), a four-fact row, the full sheet, three steps, quality, FAQ.
 - Images are de-emphasized until David sorts them: 52px thumbnails in
   the sheet, no hero photography.
+
+## Third pass (2026-10-23): see the different peptides
+
+David liked the minimal pass but the sheet was "a little too much of what
+do I do, what's here". Now the default catalog view is cards grouped
+under their category headings (lib/categories.ts `groupByCategory`: each
+compound under the first group that lists it, BAC water under Supplies),
+each card with a generous image, the name, its chemistry line, formats
+and strengths on two quiet lines, and ONE button. The configuration
+select and quantity appear on the card only after that button is pressed
+(ProductCardActions). The hero's right side is the categories as tiles
+with counts and two example compounds, linking into the filtered
+catalog. The dense sheet remains as `?view=sheet`.

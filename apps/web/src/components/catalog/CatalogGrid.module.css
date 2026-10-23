@@ -141,3 +141,46 @@
     gap: 1rem;
   }
 }
+
+/* --- grouped cards (the default view) ------------------------------------- */
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+  margin-top: 1rem;
+}
+
+.group {
+  scroll-margin-top: calc(var(--sticky-top) + 1rem);
+}
+
+.groupHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.groupTitle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: var(--text-xl);
+}
+
+.groupCount {
+  font-family: var(--font-label);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.groupDescription {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}

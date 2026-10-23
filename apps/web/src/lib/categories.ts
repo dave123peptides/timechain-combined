@@ -107,3 +107,30 @@ export function isCategorySlug(value: string | undefined): value is string {
 export function inCategory<T extends Pick<ProductSummary, "slug">>(products: T[], category: StorefrontCategory): T[] {
   return products.filter((product) => category.products.includes(product.slug));
 }
+
+// The catalog grouped for display (2026-10-23, David: "make it a little
+// more easy to see the different peptides"): each product under the FIRST
+// group that lists it, in STOREFRONT_CATEGORIES order, and anything no
+// group lists (BAC water) under a closing "Supplies" group. Presentation
+// only; the pills still filter on the full membership (a compound can be
+// in two groups).
+export const OTHER_CATEGORY: StorefrontCategory = {
+  slug: "supplies",
+  label: "Supplies",
+  description: "Reconstitution supplies for the lyophilized vials.",
+  products: [],
+};
+
+export type CategoryGroup = { category: StorefrontCategory; products: ProductSummary[] };
+
+export function groupByCategory<T extends ProductSummary>(products: T[]): { category: StorefrontCategory; products: T[] }[] {
+  const placed = new Set<string>();
+  const groups = STOREFRONT_CATEGORIES.map((category) => {
+    const members = products.filter((product) => !placed.has(product.slug) && category.products.includes(product.slug));
+    for (const product of members) placed.add(product.slug);
+    return { category, products: members };
+  }).filter((group) => group.products.length > 0);
+  const rest = products.filter((product) => !placed.has(product.slug));
+  if (rest.length > 0) groups.push({ category: OTHER_CATEGORY, products: rest });
+  return groups;
+}
